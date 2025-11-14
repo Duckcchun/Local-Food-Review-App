@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { ArrowLeft, User, Store, Mail, Lock, Phone, Building } from "lucide-react";
 import { Logo } from "./Logo";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 import type { UserInfo } from "../App";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { publicAnonKey } from "../utils/supabase/info";
+import { requestJson } from "../utils/request";
 
 interface SignupPageProps {
   onBack: () => void;
-  onSignupComplete: (userData: UserInfo) => void;
-  onSwitchToLogin?: () => void;
+  onSignupComplete: (userData: UserInfo, accessToken?: string) => void;
+  onSwitchToLogin: () => void;
 }
 
 type UserType = "reviewer" | "business" | null;
@@ -45,16 +46,15 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
       return;
     }
 
+    if (isLoading) return;
     setIsLoading(true);
 
     try {
-      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-98b21042/signup`, {
+      // Signup with timeout
+      const { response, data } = await requestJson<any, any>({
+        path: "/signup",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${publicAnonKey}`
-        },
-        body: JSON.stringify({
+        body: {
           email: formData.email,
           password: formData.password,
           name: formData.name,
@@ -62,37 +62,72 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
           userType: userType,
           businessName: formData.businessName || null,
           businessNumber: formData.businessNumber || null,
-          businessAddress: formData.businessAddress || null
-        })
+          businessAddress: formData.businessAddress || null,
+        },
+        timeoutMs: 15000,
       });
-
-      const data = await response.json();
 
       if (!response.ok) {
         toast.error(data.error || "회원가입에 실패했습니다");
-        setIsLoading(false);
         return;
       }
 
       toast.success(data.message || "회원가입이 완료되었습니다!");
       
-      // Convert backend user data to UserInfo format
-      const userData: UserInfo = {
-        name: data.user.name,
-        email: data.user.email,
-        phone: data.user.phone,
-        userType: data.user.userType,
-        businessName: data.user.businessName || undefined,
-        businessNumber: data.user.businessNumber || undefined,
-        businessAddress: data.user.businessAddress || undefined,
-      };
+      // Auto login after signup
+      try {
+        // Auto login with timeout
+        const { response: loginResponse, data: loginData } = await requestJson<{ email: string; password: string }, any>({
+          path: "/signin",
+          method: "POST",
+          body: { email: formData.email, password: formData.password },
+          timeoutMs: 12000,
+        });
 
-      setTimeout(() => {
+        if (loginResponse.ok && loginData.accessToken) {
+          // Convert backend user data to UserInfo format
+          const userData: UserInfo = {
+            name: data.user.name,
+            email: data.user.email,
+            phone: data.user.phone,
+            userType: data.user.userType,
+            businessName: data.user.businessName || undefined,
+            businessNumber: data.user.businessNumber || undefined,
+            businessAddress: data.user.businessAddress || undefined,
+          };
+
+          onSignupComplete(userData, loginData.accessToken);
+        } else {
+          // Fallback without token
+          const userData: UserInfo = {
+            name: data.user.name,
+            email: data.user.email,
+            phone: data.user.phone,
+            userType: data.user.userType,
+            businessName: data.user.businessName || undefined,
+            businessNumber: data.user.businessNumber || undefined,
+            businessAddress: data.user.businessAddress || undefined,
+          };
+          onSignupComplete(userData);
+        }
+      } catch (loginError) {
+        console.error("Auto login failed:", loginError);
+        // Fallback without token
+        const userData: UserInfo = {
+          name: data.user.name,
+          email: data.user.email,
+          phone: data.user.phone,
+          userType: data.user.userType,
+          businessName: data.user.businessName || undefined,
+          businessNumber: data.user.businessNumber || undefined,
+          businessAddress: data.user.businessAddress || undefined,
+        };
         onSignupComplete(userData);
-      }, 1500);
+      }
     } catch (error) {
       console.error("Signup error:", error);
       toast.error("서버 연결에 실패했습니다");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -366,6 +401,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
         <div className="max-w-md mx-auto px-6 py-4">
           <button
             onClick={handleSubmit}
+            disabled={isLoading}
             className={`w-full text-white py-4 rounded-[1rem] transition-colors text-center ${
               userType === "reviewer" 
                 ? "bg-[#f5a145] hover:bg-[#e89535]" 

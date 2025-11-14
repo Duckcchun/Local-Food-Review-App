@@ -22,7 +22,7 @@ export function ProductCard({ product, onClick, isFavorite = false, onToggleFavo
   };
 
   const { daysUntilDeadline, fillingRate } = getProductStats(product);
-  const isUrgent = daysUntilDeadline <= 2;
+  const isUrgent = daysUntilDeadline <= 3 && daysUntilDeadline > 0; // 3일 이하 남았을 때만 표시
   const isAlmostFull = fillingRate >= 80;
 
   return (
@@ -44,21 +44,21 @@ export function ProductCard({ product, onClick, isFavorite = false, onToggleFavo
         {/* Top Left Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {product.badge && (
-            <div className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 shadow-lg">
+            <div className="bg-linear-to-r from-[#6b8e6f] to-[#8fa893] text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 shadow-lg">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="animate-spin-slow">
                 <path d="M8 2L10 6L14 7L11 10L12 14L8 12L4 14L5 10L2 7L6 6L8 2Z" fill="white"/>
               </svg>
               <span>{product.badge}</span>
             </div>
           )}
-          {isUrgent && daysUntilDeadline >= 0 && (
-            <div className="bg-gradient-to-r from-[#e63946] to-[#f25c54] text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 shadow-lg animate-pulse">
+          {isUrgent && (
+            <div className="bg-linear-to-r from-[#e63946] to-[#f25c54] text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 shadow-lg animate-pulse">
               <Clock size={14} />
               <span>마감 {daysUntilDeadline}일 전</span>
             </div>
           )}
           {isAlmostFull && (
-            <div className="bg-gradient-to-r from-[#f77f00] to-[#fcbf49] text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 shadow-lg">
+            <div className="bg-linear-to-r from-[#f77f00] to-[#fcbf49] text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 shadow-lg">
               <span className="inline-block animate-wiggle">🔥</span>
               <span>{Math.round(fillingRate)}% 달성</span>
             </div>
@@ -105,10 +105,10 @@ export function ProductCard({ product, onClick, isFavorite = false, onToggleFavo
           </div>
           <div className="h-2 bg-[#f5f0dc] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-[#f5a145] to-[#e89535] rounded-full transition-all duration-500 ease-out relative overflow-hidden"
+              className="h-full bg-linear-to-r from-[#f5a145] to-[#e89535] rounded-full transition-all duration-500 ease-out relative overflow-hidden"
               style={{ width: `${Math.min(fillingRate, 100)}%` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
             </div>
           </div>
         </div>

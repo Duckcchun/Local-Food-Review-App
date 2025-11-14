@@ -1,8 +1,17 @@
-import { useState } from "react";
-import { ArrowLeft, Upload, X } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { ArrowLeft, Upload, X, Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner@2.0.3";
 import type { Product } from "../data/mockData";
 import type { UserInfo } from "../App";
+// Replacing Popover + custom Calendar with Dialog + react-datepicker for stability
+import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "./ui/dialog";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+// date-fns v2 locale는 기본 export 형태이므로 named import 대신 default import 사용
+import koLocale from "date-fns/locale/ko";
+
+// Register Korean locale for react-datepicker
+registerLocale("ko", koLocale as any);
 
 interface CreateProductPageProps {
   onBack: () => void;
@@ -16,26 +25,51 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
     description: "",
     price: "",
     requiredReviewers: "10",
-    deadline: "",
+    deadline: "", // formatted string: MM.DD(요일) - MM.DD(요일)
     category: "한식",
     detailDescription: "",
     benefits: "",
   });
 
+  // Date range state using react-datepicker (startDate, endDate)
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   const [imagePreview, setImagePreview] = useState<string>("");
 
-  // Get minimum date (today)
-  const getMinDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
+  // Date limits
+  const minDate = useMemo(() => new Date(), []);
+  const maxDate = useMemo(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 3);
+    return d;
+  }, []);
+
+  const weekdayMap = ["일", "월", "화", "수", "목", "금", "토"];
+
+  const formatDate = (d: Date) => {
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    const weekday = weekdayMap[d.getDay()];
+    // Use no leading zero for month, pad day for consistency
+    return `${m}.${day.toString().padStart(2,'0')}(${weekday})`;
   };
 
-  // Get maximum date (3 months from now)
-  const getMaxDate = () => {
-    const maxDate = new Date();
-    maxDate.setMonth(maxDate.getMonth() + 3);
-    return maxDate.toISOString().split('T')[0];
-  };
+  const formatRangeString = useCallback((from?: Date, to?: Date) => {
+    if (!from || !to) return "";
+    return `${formatDate(from)} - ${formatDate(to)}`;
+  }, []);
+
+  // Update formatted deadline when range selected
+  useEffect(() => {
+    if (startDate && endDate) {
+      const formatted = formatRangeString(startDate, endDate);
+      setFormData(prev => ({ ...prev, deadline: formatted }));
+    } else if (!startDate && !endDate) {
+      setFormData(prev => ({ ...prev, deadline: "" }));
+    }
+  }, [startDate, endDate, formatRangeString]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -236,20 +270,84 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
             </div>
           </div>
 
-          {/* Deadline */}
+          {/* Deadline Range Picker (react-datepicker) */}
           <div>
             <label className="block text-[#2d3e2d] mb-2">
-              모집 마감일 <span className="text-[#f5a145]">*</span>
+              모집 기간 <span className="text-[#f5a145]">*</span>
             </label>
-            <input
-              type="date"
-              name="deadline"
-              value={formData.deadline}
-              onChange={handleInputChange}
-              min={getMinDate()}
-              max={getMaxDate()}
-              className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
-            />
+            <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <DialogTrigger asChild>
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white text-left hover:border-[#f5a145] focus:outline-none"
+                >
+                  <span className={formData.deadline ? "text-[#2d3e2d]" : "text-[#9ca89d]"}>
+                    {formData.deadline || "기간 선택 (시작일-종료일)"}
+                  </span>
+                  <CalendarIcon size={20} className="text-[#9ca89d]" />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md w-full bg-white rounded-[1.5rem] border-2 border-[#d4c5a0] p-6">
+                <DialogTitle className="sr-only">모집 기간 선택</DialogTitle>
+                <DialogDescription className="text-xs text-[#6b8e6f]">
+                  시작일과 종료일을 선택해 모집 기간을 설정하세요. 최대 3개월 이내만 선택할 수 있습니다.
+                </DialogDescription>
+                <div className="space-y-4">
+                  <DatePicker
+                    inline
+                    selectsRange
+                    startDate={startDate}
+                    endDate={endDate}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                    monthsShown={1}
+                    onChange={(dates) => {
+                      const [start, end] = dates as [Date | null, Date | null];
+                      setStartDate(start);
+                      setEndDate(end);
+                    }}
+                    locale="ko"
+                    dayClassName={(d) => {
+                      // Add brand highlight for days in range
+                      if (startDate && endDate && d >= startDate && d <= endDate) {
+                        return "react-datepicker__day--in-range";
+                      }
+                      return undefined as any;
+                    }}
+                  />
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStartDate(null); setEndDate(null);
+                      }}
+                      className="text-xs text-[#6b8e6f] underline"
+                    >
+                      초기화
+                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        disabled={!startDate || !endDate}
+                        onClick={() => setCalendarOpen(false)}
+                        className="text-xs bg-[#6b8e6f] text-white px-4 py-1.5 rounded disabled:opacity-40"
+                      >
+                        완료
+                      </button>
+                      <DialogClose asChild>
+                        <button
+                          type="button"
+                          className="text-xs px-3 py-1.5 rounded border border-[#d4c5a0] text-[#2d3e2d] hover:bg-[#f5f0dc]"
+                        >
+                          닫기
+                        </button>
+                      </DialogClose>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-[#9ca89d]">* 최대 3개월 이내 기간만 선택 가능합니다</p>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Benefits */}
@@ -283,7 +381,7 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
           <div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity text-center"
+              className="w-full bg-[#6b8e6f] text-white py-4 rounded-[1.5rem] hover:bg-[#5a7a5e] transition-all text-center font-medium shadow-md"
             >
               체험단 모집 등록하기
             </button>

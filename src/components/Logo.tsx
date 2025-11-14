@@ -1,13 +1,30 @@
-import React from 'react'; // React import 추가
+import React, { useMemo } from 'react'; // React import 추가
 
 export function Logo({ className = "", variant = "orange" }: { className?: string; variant?: "orange" | "green" | "white" }) {
   const color = variant === "white" ? "#ffffff" : variant === "green" ? "#6b8e6f" : "#f5a145";
   const textColor = variant === "white" ? "#ffffff" : variant === "green" ? "#6b8e6f" : "#f5a145";
+  // Some browsers/environments fail to honor background-clip:text and render a solid background box.
+  // Detect support and gracefully fall back to solid text color when not supported to avoid the "highlight box" look.
+  const supportsTextClip = useMemo(() => {
+    try {
+      // Prefer vendor-prefixed check for broadest support
+      // @ts-ignore - CSS may not exist during SSR
+      if (typeof CSS !== 'undefined' && CSS.supports) {
+        // Two forms to maximize compatibility
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return CSS.supports('-webkit-background-clip', 'text') || CSS.supports('background-clip', 'text');
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, []);
   
   const logoText = "밥터뷰"; // 텍스트 변수 추가
 
   return (
-    <div className={`flex flex-row items-center gap-2 group ${className}`} style={{ display: 'flex', flexDirection: 'row' }}>
+    <div className={`flex flex-row items-center gap-2 group select-none ${className}`} style={{ display: 'flex', flexDirection: 'row' }}>
       <svg 
         width="48" 
         height="48" 
@@ -54,26 +71,20 @@ export function Logo({ className = "", variant = "orange" }: { className?: strin
         </g>
       </svg>
       <span 
-        className="transition-all duration-300 group-hover:scale-105" // gradient-text 클래스 제거
+        className="transition-all duration-300 group-hover:scale-105 select-none inline-block"
         style={{
-
-          color: variant === 'white' ? textColor : 'transparent',
-          background: variant === 'white' ? 'none' : `linear-gradient(135deg, ${color} 0%, ${textColor} 100%)`,
-
-          
+          // If text-clipping isn't supported, render as solid color to avoid background box highlight
+          color: variant === 'white' || !supportsTextClip ? textColor : 'transparent',
+          background: variant === 'white' || !supportsTextClip ? 'none' : `linear-gradient(135deg, ${color} 0%, ${textColor} 100%)`,
           backgroundColor: 'transparent',
-
-          
-          WebkitBackgroundClip: variant === 'white' ? 'unset' : 'text',
-          WebkitTextFillColor: variant === 'white' ? 'unset' : 'transparent',
-          backgroundClip: variant === 'white' ? 'unset' : 'text',
-          
-          
-          fontSize: '2.10rem', 
-          fontWeight: 900, 
-          
-          letterSpacing: '-0.025em', 
-          whiteSpace: 'nowrap' 
+          WebkitBackgroundClip: variant === 'white' || !supportsTextClip ? 'unset' : 'text',
+          WebkitTextFillColor: variant === 'white' || !supportsTextClip ? 'unset' : 'transparent',
+          backgroundClip: variant === 'white' || !supportsTextClip ? 'unset' : 'text',
+          fontSize: '2.10rem',
+          fontWeight: 900,
+          letterSpacing: '-0.025em',
+          whiteSpace: 'nowrap',
+          userSelect: 'none'
         }}
       >
         {logoText}

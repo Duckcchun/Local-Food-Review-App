@@ -17,7 +17,7 @@ export function LevelSystemModal({ isOpen, onClose, currentLevel }: LevelSystemM
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] rounded-t-[1.5rem] px-6 py-5 flex items-center justify-between">
+  <div className="sticky top-0 bg-linear-to-r from-[#6b8e6f] to-[#8fa893] rounded-t-[1.5rem] px-6 py-5 flex items-center justify-between">
           <div>
             <h2 className="text-white mb-1">평가단 등급 시스템</h2>
             <p className="text-sm text-white/90">리뷰 활동으로 등급을 올리세요!</p>

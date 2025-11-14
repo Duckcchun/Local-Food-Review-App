@@ -24,10 +24,15 @@ export function BusinessDashboard({
 }: BusinessDashboardProps) {
   const [period, setPeriod] = useState<PeriodFilter>("week");
 
+  // Filter reviews for only this business's products
+  const businessReviews = reviews.filter(review => 
+    products.some(product => product.id === review.productId)
+  );
+
   // Safely calculate stats
-  const stats = calculateBusinessStats(products || [], applications || [], reviews || [], period);
-  const performances = getProductPerformances(products || [], applications || [], reviews || []);
-  const chartData = getChartData(applications || [], reviews || [], period);
+  const stats = calculateBusinessStats(products || [], applications || [], businessReviews || [], period);
+  const performances = getProductPerformances(products || [], applications || [], businessReviews || []);
+  const chartData = getChartData(applications || [], businessReviews || [], period);
 
   const periods: Array<{ id: PeriodFilter; label: string }> = [
     { id: "week", label: "이번 주" },
@@ -49,7 +54,7 @@ export function BusinessDashboard({
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-6xl mx-auto px-6">
           <button onClick={onBack} className="mb-6 text-white hover:opacity-80">
             <ChevronLeft size={24} />
@@ -152,7 +157,7 @@ export function BusinessDashboard({
               </div>
               <div className="w-full bg-[#f5f0dc] rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-[#9d4edd] to-[#c77dff] h-full rounded-full transition-all"
+                  className="bg-linear-to-r from-[#9d4edd] to-[#c77dff] h-full rounded-full transition-all"
                   style={{ width: `${Math.min(stats.averageFillRate, 100)}%` }}
                 />
               </div>
@@ -181,7 +186,7 @@ export function BusinessDashboard({
               </div>
               <div className="w-full bg-[#f5f0dc] rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-[#06a77d] to-[#38b2ac] h-full rounded-full transition-all"
+                  className="bg-linear-to-r from-[#06a77d] to-[#38b2ac] h-full rounded-full transition-all"
                   style={{ width: `${Math.min(stats.reviewCompletionRate, 100)}%` }}
                 />
               </div>
@@ -311,7 +316,7 @@ export function BusinessDashboard({
                             </div>
                             <div className="w-full bg-[#f5f0dc] rounded-full h-2 overflow-hidden">
                               <div
-                                className="bg-gradient-to-r from-[#f5a145] to-[#e89535] h-full rounded-full transition-all"
+                                className="bg-linear-to-r from-[#f5a145] to-[#e89535] h-full rounded-full transition-all"
                                 style={{ width: `${Math.min(perf.fillRate, 100)}%` }}
                               />
                             </div>
@@ -325,13 +330,97 @@ export function BusinessDashboard({
                               </div>
                               <div className="w-full bg-[#f5f0dc] rounded-full h-2 overflow-hidden">
                                 <div
-                                  className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] h-full rounded-full transition-all"
+                                  className="bg-linear-to-r from-[#6b8e6f] to-[#8fa893] h-full rounded-full transition-all"
                                   style={{ width: `${Math.min(perf.reviewRate, 100)}%` }}
                                 />
                               </div>
                             </div>
                           )}
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Reviews Section */}
+        <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0] mb-6">
+          <h2 className="text-[#2d3e2d] mb-4">받은 리뷰 ({businessReviews.length})</h2>
+          {businessReviews.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText size={48} className="mx-auto mb-4 text-[#d4c5a0]" />
+              <p className="text-[#9ca89d]">받은 리뷰가 없습니다</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {businessReviews.map((review) => {
+                const product = products.find(p => p.id === review.productId);
+                return (
+                  <div
+                    key={review.id}
+                    className="border-2 border-[#d4c5a0] rounded-[1rem] p-4 hover:border-[#6b8e6f] transition-all"
+                  >
+                    <div className="flex gap-4">
+                      {/* Product Info */}
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="text-[#2d3e2d] mb-1">{review.productName}</h4>
+                            <div className="flex items-center gap-2 text-sm text-[#9ca89d]">
+                              <span>{review.userName || '익명'}</span>
+                              <span>•</span>
+                              <span>{new Date(review.createdAt).toLocaleDateString('ko-KR')}</span>
+                            </div>
+                          </div>
+                          {review.status === "published" ? (
+                            <span className="text-xs px-3 py-1 rounded-full bg-[#d4edda] text-[#155724]">
+                              공개
+                            </span>
+                          ) : (
+                            <span className="text-xs px-3 py-1 rounded-full bg-[#f8d7da] text-[#721c24]">
+                              비공개
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Review Content */}
+                        <div className="space-y-2 text-sm">
+                          {review.pros && (
+                            <div className="bg-[#d4edda] rounded-lg p-3">
+                              <span className="text-[#155724] font-medium">👍 장점: </span>
+                              <span className="text-[#2d3e2d]">{review.pros}</span>
+                            </div>
+                          )}
+                          {review.cons && (
+                            <div className="bg-[#f8d7da] rounded-lg p-3">
+                              <span className="text-[#721c24] font-medium">👎 단점: </span>
+                              <span className="text-[#2d3e2d]">{review.cons}</span>
+                            </div>
+                          )}
+                          {review.improvements && (
+                            <div className="bg-[#fff3cd] rounded-lg p-3">
+                              <span className="text-[#856404] font-medium">💡 개선점: </span>
+                              <span className="text-[#2d3e2d]">{review.improvements}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Review Photos */}
+                        {review.photos && review.photos.length > 0 && (
+                          <div className="mt-3 flex gap-2 overflow-x-auto">
+                            {review.photos.map((photo, idx) => (
+                              <img 
+                                key={idx} 
+                                src={photo} 
+                                alt={`리뷰 사진 ${idx + 1}`}
+                                className="w-20 h-20 object-cover rounded-lg shrink-0"
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

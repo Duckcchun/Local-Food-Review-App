@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Toaster } from "./components/ui/sonner";
 import { HomePage } from "./components/HomePage";
@@ -21,12 +21,18 @@ import { ManageApplicantsPage } from "./components/ManageApplicantsPage";
 import { NotificationsPage } from "./components/NotificationsPage";
 import { ReviewManagementPage } from "./components/ReviewManagementPage";
 import { BottomNav } from "./components/BottomNav";
+import { TermsPage } from "./components/TermsPage";
+import { PrivacyPage } from "./components/PrivacyPage";
 import type { Product } from "./data/mockData";
 import type { PointProduct, PointTransaction } from "./data/pointShop";
 import { mockProducts } from "./data/mockData";
 import { toast } from "sonner";
+// 서버 연동 활성화
+import { productsApi, applicationsApi, favoritesApi, reviewsApi, notificationsApi, businessApplicationsApi } from "./utils/api";
+import { getLevelInfo } from "./data/levelSystem";
+import { projectId } from "./utils/supabase/info";
 
-type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard";
+type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy";
 
 export interface UserInfo {
   name: string;
@@ -102,26 +108,264 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("signup");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [accessToken, setAccessToken] = useState<string>("");
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [businessProducts, setBusinessProducts] = useState<Product[]>([]);
-  const [allProducts, setAllProducts] = useState<Product[]>(mockProducts);
-  const [completedReviews, setCompletedReviews] = useState<Review[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [accessToken, setAccessToken] = useState<string>(() => {
+    // Restore access token from localStorage on first load
+    try {
+      return localStorage.getItem('accessToken') || "";
+    } catch {
+      return "";
+    }
+  });
+  const [applications, setApplications] = useState<Application[]>(() => {
+    const saved = localStorage.getItem('applications');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    const saved = localStorage.getItem('favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  // Track product likes by user
+  const [productLikes, setProductLikes] = useState<string[]>(() => {
+    const saved = localStorage.getItem('productLikes');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  // Load business products from localStorage on mount
+  const [businessProducts, setBusinessProducts] = useState<Product[]>(() => {
+    const saved = localStorage.getItem('businessProducts');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const [allProducts, setAllProducts] = useState<Product[]>(() => {
+    const saved = localStorage.getItem('businessProducts');
+    const savedProducts = saved ? JSON.parse(saved) : [];
+    return [...savedProducts, ...mockProducts];
+  });
+  
+  const [completedReviews, setCompletedReviews] = useState<Review[]>(() => {
+    const saved = localStorage.getItem('completedReviews');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [notifications, setNotifications] = useState<Notification[]>(() => {
+    const saved = localStorage.getItem('notifications');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [pointProducts, setPointProducts] = useState<PointProduct[]>([]);
-  const [pointTransactions, setPointTransactions] = useState<PointTransaction[]>([]);
+  const [pointTransactions, setPointTransactions] = useState<PointTransaction[]>(() => {
+    const saved = localStorage.getItem('pointTransactions');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [userPoints, setUserPoints] = useState<number>(() => {
+    const saved = localStorage.getItem('userPoints');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [userLevel, setUserLevel] = useState<number>(() => {
+    const saved = localStorage.getItem('userLevel');
+    return saved ? parseInt(saved) : 1;
+  });
+
+  // Persist access token to localStorage
+  useEffect(() => {
+    try {
+      if (accessToken) {
+        localStorage.setItem('accessToken', accessToken);
+      } else {
+        localStorage.removeItem('accessToken');
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [accessToken]);
+
+  // Restore user session using access token if present
+  useEffect(() => {
+    const restoreSession = async () => {
+      if (!accessToken || userInfo) return;
+      try {
+        const resp = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-98b21042/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        const data = await resp.json();
+        if (resp.ok && data?.success && data.user) {
+          const restored = {
+            name: data.user.name,
+            email: data.user.email,
+            phone: data.user.phone,
+            userType: data.user.userType,
+            businessName: data.user.businessName || undefined,
+            businessNumber: data.user.businessNumber || undefined,
+            businessAddress: data.user.businessAddress || undefined,
+          } as UserInfo;
+          setUserInfo(restored);
+          toast.success('세션이 복원되었습니다');
+        } else {
+          // invalid token – clear
+          setAccessToken("");
+        }
+      } catch (e) {
+        // Network failure – keep offline mode
+      }
+    };
+    restoreSession();
+  }, [accessToken, userInfo]);
+
+  // Load user data from backend when user logs in
+  const loadUserData = useCallback(async () => {
+    if (!accessToken) return;
+
+    // Helper: merge arrays by id with server taking precedence, preserve locals if server is empty
+    const mergeById = <T extends { id: string }>(serverList: T[] | undefined, localList: T[]): T[] => {
+      const server = serverList ?? [];
+      if (server.length === 0) return localList; // don't wipe local data with empty server
+      const map = new Map<string, T>();
+      // local first
+      for (const item of localList) map.set(item.id, item);
+      // server overrides
+      for (const item of server) map.set(item.id, item);
+      return Array.from(map.values());
+    };
+
+    // Helper: merge string arrays (union)
+    const mergeStrings = (serverList: string[] | undefined, localList: string[]): string[] => {
+      const set = new Set<string>(localList);
+      for (const id of serverList ?? []) set.add(id);
+      return Array.from(set);
+    };
+
+    let anySuccess = false;
+
+    // Applications
+    try {
+      const appsData = userInfo?.userType === "business"
+        ? await businessApplicationsApi.getAll(accessToken)
+        : await applicationsApi.getAll(accessToken);
+      if (appsData?.success) {
+        anySuccess = true;
+        const localApps: Application[] = (() => {
+          try { return JSON.parse(localStorage.getItem('applications') || '[]'); } catch { return []; }
+        })();
+        const mergedApps = mergeById<Application>(appsData.applications, localApps);
+        setApplications(mergedApps);
+        localStorage.setItem('applications', JSON.stringify(mergedApps));
+      }
+    } catch (e) { console.warn('Failed to load applications:', e); }
+
+    // Favorites
+    try {
+      const favsData = await favoritesApi.getAll(accessToken);
+      if (favsData.success) {
+        anySuccess = true;
+        const localFavs: string[] = (() => {
+          try { return JSON.parse(localStorage.getItem('favorites') || '[]'); } catch { return []; }
+        })();
+        const mergedFavs = mergeStrings(favsData.favorites, localFavs);
+        setFavorites(mergedFavs);
+        localStorage.setItem('favorites', JSON.stringify(mergedFavs));
+      }
+    } catch (e) { console.warn('Failed to load favorites:', e); }
+
+    // Reviews
+    try {
+      const reviewsData = await reviewsApi.getAll(accessToken);
+      if (reviewsData.success) {
+        anySuccess = true;
+        const localReviews: Review[] = (() => {
+          try { return JSON.parse(localStorage.getItem('completedReviews') || '[]'); } catch { return []; }
+        })();
+        const mergedReviews = mergeById<Review>(reviewsData.reviews, localReviews);
+        setCompletedReviews(mergedReviews);
+        localStorage.setItem('completedReviews', JSON.stringify(mergedReviews));
+      }
+    } catch (e) { console.warn('Failed to load reviews:', e); }
+
+    // Notifications
+    try {
+      const notifsData = await notificationsApi.getAll(accessToken);
+      if (notifsData.success) {
+        anySuccess = true;
+        const localNotifs: Notification[] = (() => {
+          try { return JSON.parse(localStorage.getItem('notifications') || '[]'); } catch { return []; }
+        })();
+        const mergedNotifs = mergeById<Notification>(notifsData.notifications, localNotifs);
+        setNotifications(mergedNotifs);
+        localStorage.setItem('notifications', JSON.stringify(mergedNotifs));
+      }
+    } catch (e) { console.warn('Failed to load notifications:', e); }
+
+    // Business products
+    if (userInfo?.userType === "business") {
+      try {
+        const productsData = await productsApi.getAll(accessToken);
+        if (productsData.success) {
+          anySuccess = true;
+          const localBiz: Product[] = (() => {
+            try { return JSON.parse(localStorage.getItem('businessProducts') || '[]'); } catch { return []; }
+          })();
+          const mergedBiz = mergeById<Product>(productsData.products, localBiz);
+          setBusinessProducts(mergedBiz);
+          const mergedAllMap = new Map<string, Product>();
+          for (const p of [...mergedBiz, ...mockProducts]) mergedAllMap.set(p.id, p);
+          const mergedAll = Array.from(mergedAllMap.values());
+          setAllProducts(mergedAll);
+          localStorage.setItem('businessProducts', JSON.stringify(mergedBiz));
+        }
+      } catch (e) { console.warn('Failed to load business products:', e); }
+    }
+
+    if (anySuccess) {
+      toast.success("서버 데이터 로드 완료");
+    }
+  }, [accessToken, userInfo?.userType]);
+
+  // Avoid duplicate loads/toasts when dependencies change rapidly
+  const lastLoadKeyRef = (typeof window !== 'undefined' ? (window as any).__lastLoadKeyRef : undefined) || { current: "" };
+  if (typeof window !== 'undefined') (window as any).__lastLoadKeyRef = lastLoadKeyRef;
+
+  useEffect(() => {
+    if (!userInfo || !accessToken) return;
+    const key = `${accessToken}:${userInfo.userType}`;
+    if (lastLoadKeyRef.current === key) return; // already loaded for this session
+    lastLoadKeyRef.current = key;
+    loadUserData();
+  }, [userInfo, accessToken, loadUserData]);
+
+  // Update level when points change
+  useEffect(() => {
+    const levelInfo = getLevelInfo(userPoints);
+    if (levelInfo.level !== userLevel) {
+      setUserLevel(levelInfo.level);
+      localStorage.setItem('userLevel', levelInfo.level.toString());
+      if (levelInfo.level > userLevel) {
+        toast.success(`🎉 레벨 ${levelInfo.level}로 승급했습니다!`);
+      }
+    }
+  }, [userPoints]);
+
+  // Save products to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('businessProducts', JSON.stringify(businessProducts));
+  }, [businessProducts]);
+
+  useEffect(() => {
+    // Save only businessProducts to avoid duplicating mockProducts
+    const businessOnly = allProducts.filter(p => p.id.startsWith('business-'));
+    localStorage.setItem('businessProducts', JSON.stringify(businessOnly));
+  }, [allProducts]);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setCurrentPage("product-detail");
   };
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (selectedProduct) {
       // Add to applications if not already applied
-      if (!applications.find(app => app.id === selectedProduct.id)) {
-        setApplications(prev => [...prev, {
+      if (!applications.find(app => app.productId === selectedProduct.id && app.userEmail === userInfo?.email)) {
+        const newApplication: Application = {
           id: `application-${Date.now()}`,
           productId: selectedProduct.id,
           productName: selectedProduct.name,
@@ -133,8 +377,37 @@ export default function App() {
           userLevel: 1, // Default user level
           status: "pending",
           appliedAt: new Date().toISOString(),
-        }]);
+        };
+
+        setApplications(prev => [...prev, newApplication]);
+        
+        // Update product's currentApplicants count
+        setAllProducts(prev => prev.map(p => 
+          p.id === selectedProduct.id 
+            ? { ...p, currentApplicants: p.currentApplicants + 1 }
+            : p
+        ));
+        
+        setBusinessProducts(prev => prev.map(p => 
+          p.id === selectedProduct.id 
+            ? { ...p, currentApplicants: p.currentApplicants + 1 }
+            : p
+        ));
+        
         toast.success("체험단 신청이 완료되었습니다!");
+
+        // Save to localStorage
+        const updatedApplications = [...applications, newApplication];
+        localStorage.setItem('applications', JSON.stringify(updatedApplications));
+
+        // Save to backend
+        if (accessToken) {
+          try {
+            await applicationsApi.create(newApplication, accessToken);
+          } catch (error) {
+            console.log("Backend save failed (using localStorage):", error);
+          }
+        }
         
         // Go back to home after short delay
         setTimeout(() => {
@@ -147,34 +420,160 @@ export default function App() {
     }
   };
 
-  const handleToggleFavorite = (productId: string) => {
-    setFavorites(prev => {
-      if (prev.includes(productId)) {
-        toast.success("찜 목록에서 제거되었습니다");
-        return prev.filter(id => id !== productId);
-      } else {
-        toast.success("찜 목록에 추가되었습니다");
-        return [...prev, productId];
-      }
-    });
+  const handleCancelApplication = async (productId: string) => {
+    const app = applications.find(a => a.productId === productId && a.userEmail === userInfo?.email);
+    if (!app) {
+      toast.error("신청 내역을 찾을 수 없습니다");
+      return;
+    }
+    if (app.status !== "pending") {
+      toast.error("대기 중 상태에서만 취소할 수 있습니다");
+      return;
+    }
+
+    // Remove locally
+    const updated = applications.filter(a => a.id !== app.id);
+    setApplications(updated);
+    localStorage.setItem('applications', JSON.stringify(updated));
+
+    // Decrement product applicants count
+    setAllProducts(prev => prev.map(p => 
+      p.id === productId ? { ...p, currentApplicants: Math.max(0, (p.currentApplicants || 0) - 1) } : p
+    ));
+    setBusinessProducts(prev => prev.map(p => 
+      p.id === productId ? { ...p, currentApplicants: Math.max(0, (p.currentApplicants || 0) - 1) } : p
+    ));
+
+    toast.success("신청이 취소되었습니다");
+
+    // Backend delete (optional)
+    if (accessToken) {
+      applicationsApi.delete(app.id, accessToken).catch(error => {
+        console.log("Backend delete failed (using localStorage):", (error as any)?.message || error);
+      });
+    }
   };
 
-  const handleCreateProduct = (productData: Omit<Product, "id">) => {
+  const handleToggleFavorite = async (productId: string) => {
+    const isCurrentlyFavorite = favorites.includes(productId);
+    
+    const newFavorites = isCurrentlyFavorite
+      ? favorites.filter(id => id !== productId)
+      : [...favorites, productId];
+    
+    setFavorites(newFavorites);
+    
+    // Save to localStorage
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+    
+    if (isCurrentlyFavorite) {
+      toast.success("찜 목록에서 제거되었습니다");
+    } else {
+      toast.success("찜 목록에 추가되었습니다");
+    }
+
+    // Save to backend (optional - fails silently)
+    if (accessToken) {
+      if (isCurrentlyFavorite) {
+        favoritesApi.remove(productId, accessToken).catch(error => {
+          console.log("Backend save failed (using localStorage):", error.message);
+        });
+      } else {
+        favoritesApi.add(productId, accessToken).catch(error => {
+          console.log("Backend save failed (using localStorage):", error.message);
+        });
+      }
+    }
+  };
+
+  const handleToggleProductLike = async (productId: string) => {
+    const isCurrentlyLiked = productLikes.includes(productId);
+    
+    const newLikes = isCurrentlyLiked
+      ? productLikes.filter(id => id !== productId)
+      : [...productLikes, productId];
+    
+    setProductLikes(newLikes);
+    
+    // Update product's likeCount
+    setAllProducts(prev => prev.map(p => 
+      p.id === productId 
+        ? { ...p, likeCount: p.likeCount + (isCurrentlyLiked ? -1 : 1) }
+        : p
+    ));
+    
+    setBusinessProducts(prev => prev.map(p => 
+      p.id === productId 
+        ? { ...p, likeCount: p.likeCount + (isCurrentlyLiked ? -1 : 1) }
+        : p
+    ));
+    
+    // Save to localStorage
+    localStorage.setItem('productLikes', JSON.stringify(newLikes));
+    
+    if (isCurrentlyLiked) {
+      toast.success("좋아요를 취소했습니다");
+    } else {
+      toast.success("좋아요를 눌렀습니다 👍");
+    }
+  };
+
+  const handleCreateProduct = async (productData: Omit<Product, "id">) => {
     const newProduct: Product = {
       ...productData,
       id: `business-${Date.now()}`
     };
     
-    setBusinessProducts(prev => [...prev, newProduct]);
+    const updatedBusinessProducts = [...businessProducts, newProduct];
+    setBusinessProducts(updatedBusinessProducts);
     setAllProducts(prev => [newProduct, ...prev]);
+    
+    // Save to localStorage (backup)
+    localStorage.setItem('businessProducts', JSON.stringify(updatedBusinessProducts));
+
+    // Save to backend (optional - fails silently)
+    if (accessToken) {
+      productsApi.create(newProduct, accessToken).catch(error => {
+        console.log("Backend save failed (using localStorage):", error.message);
+      });
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    // Remove from businessProducts
+    const updatedBusinessProducts = businessProducts.filter(p => p.id !== productId);
+    setBusinessProducts(updatedBusinessProducts);
+    
+    // Remove from allProducts
+    setAllProducts(prev => prev.filter(p => p.id !== productId));
+    
+    // Remove related applications
+    const updatedApplications = applications.filter(app => app.productId !== productId);
+    setApplications(updatedApplications);
+    
+    // Save to localStorage
+    localStorage.setItem('businessProducts', JSON.stringify(updatedBusinessProducts));
+    localStorage.setItem('applications', JSON.stringify(updatedApplications));
+    
+    toast.success("체험단이 삭제되었습니다");
+    
+    // Delete from backend (optional - fails silently)
+    if (accessToken) {
+      // Backend delete API would go here
+      console.log("Backend delete not implemented yet");
+    }
   };
 
   const handleLogout = () => {
     setUserInfo(null);
+    setAccessToken("");
     setCurrentPage("signup");
-    setApplications([]);
-    setFavorites([]);
-    setBusinessProducts([]);
+    try { localStorage.removeItem('accessToken'); } catch {}
+    // Don't clear data - keep in localStorage for persistence
+    // setApplications([]);
+    // setFavorites([]);
+    // setCompletedReviews([]);
+    // setNotifications([]);
     setSelectedProduct(null);
     toast.success("로그아웃 되었습니다");
   };
@@ -194,7 +593,7 @@ export default function App() {
     } else if (currentPage === "edit-review") {
       setCurrentPage("profile");
       setSelectedProduct(null);
-    } else if (currentPage === "my-applications" || currentPage === "my-favorites") {
+    } else if (currentPage === "my-applications" || currentPage === "my-favorites" || currentPage === "terms" || currentPage === "privacy") {
       setCurrentPage("profile");
     } else if (currentPage === "create-product" || currentPage === "manage-applicants" || currentPage === "review-management") {
       setCurrentPage("home");
@@ -204,8 +603,17 @@ export default function App() {
     }
   };
 
-  const handleSignupComplete = (userData: UserInfo) => {
+  const handleSignupComplete = (userData: UserInfo, token?: string) => {
     setUserInfo(userData);
+    if (token) {
+      setAccessToken(token);
+    }
+    setCurrentPage("home");
+  };
+
+  const handleLoginComplete = (userData: UserInfo, token: string) => {
+    setUserInfo(userData);
+    setAccessToken(token);
     setCurrentPage("home");
   };
 
@@ -219,15 +627,62 @@ export default function App() {
     setCurrentPage("edit-review");
   };
 
-  const handleSubmitReview = (reviewData: Omit<Review, "id" | "createdAt">) => {
+  const handleSubmitReview = async (reviewData: Omit<Review, "id" | "createdAt">) => {
     const newReview: Review = {
       ...reviewData,
       id: `review-${Date.now()}`,
       createdAt: new Date().toISOString(),
     };
     
-    setCompletedReviews(prev => [...prev, newReview]);
-    toast.success("리뷰가 등록되었습니다! +500P 적립");
+    const updatedReviews = [...completedReviews, newReview];
+    setCompletedReviews(updatedReviews);
+    
+    // Save to localStorage
+    localStorage.setItem('completedReviews', JSON.stringify(updatedReviews));
+    
+    // Update product's reviewCount
+    setAllProducts(prev => prev.map(p => 
+      p.id === reviewData.productId 
+        ? { ...p, reviewCount: p.reviewCount + 1 }
+        : p
+    ));
+    
+    setBusinessProducts(prev => prev.map(p => 
+      p.id === reviewData.productId 
+        ? { ...p, reviewCount: p.reviewCount + 1 }
+        : p
+    ));
+    
+    // Calculate points based on level
+    const basePoints = 500;
+    const earnedPoints = basePoints; // Can add level bonus later
+    
+    // Update points
+    const newPoints = userPoints + earnedPoints;
+    setUserPoints(newPoints);
+    localStorage.setItem('userPoints', newPoints.toString());
+    
+    // Add transaction
+    const transaction: PointTransaction = {
+      id: `trans-${Date.now()}`,
+      type: "earn",
+      amount: earnedPoints,
+      description: "리뷰 작성",
+      date: new Date().toLocaleString('ko-KR'),
+      category: "리뷰"
+    };
+    const updatedTransactions = [transaction, ...pointTransactions];
+    setPointTransactions(updatedTransactions);
+    localStorage.setItem('pointTransactions', JSON.stringify(updatedTransactions));
+    
+    toast.success(`리뷰가 등록되었습니다! +${earnedPoints}P 적립`);
+
+    // Save to backend (optional - fails silently)
+    if (accessToken) {
+      reviewsApi.create(newReview, accessToken).catch(error => {
+        console.log("Backend save failed (using localStorage):", error.message);
+      });
+    }
     
     // Go back to review page
     setTimeout(() => {
@@ -236,21 +691,48 @@ export default function App() {
     }, 1500);
   };
 
-  const handleUpdateApplicationStatus = (applicationId: string, status: ApplicationStatus) => {
+  const handleUpdateApplicationStatus = async (applicationId: string, status: ApplicationStatus) => {
     const application = applications.find(app => app.id === applicationId);
     
-    setApplications(prev => 
-      prev.map(app => 
-        app.id === applicationId 
-          ? { ...app, status, reviewedAt: new Date().toISOString() }
-          : app
-      )
+    const updatedApplications = applications.map(app => 
+      app.id === applicationId 
+        ? { ...app, status, reviewedAt: new Date().toISOString() }
+        : app
     );
+    
+    setApplications(updatedApplications);
+    
+    // Update product's currentApplicants count if rejected
+    if (status === "rejected" && application) {
+      setAllProducts(prev => prev.map(p => 
+        p.id === application.productId && p.currentApplicants > 0
+          ? { ...p, currentApplicants: p.currentApplicants - 1 }
+          : p
+      ));
+      
+      setBusinessProducts(prev => prev.map(p => 
+        p.id === application.productId && p.currentApplicants > 0
+          ? { ...p, currentApplicants: p.currentApplicants - 1 }
+          : p
+      ));
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('applications', JSON.stringify(updatedApplications));
+
+    // Update in backend (optional - fails silently)
+    if (accessToken) {
+      applicationsApi.updateStatus(applicationId, status, accessToken).catch(error => {
+        console.log("Backend save failed (using localStorage):", error.message);
+      });
+    }
 
     // Create notification for the user
     if (application) {
+      let notification: Notification;
+      
       if (status === "accepted") {
-        const notification: Notification = {
+        notification = {
           id: `notif-${Date.now()}`,
           type: "selection",
           title: "🎉 체험단에 선정되었습니다!",
@@ -261,10 +743,9 @@ export default function App() {
           createdAt: new Date().toISOString(),
           read: false,
         };
-        setNotifications(prev => [notification, ...prev]);
         toast.success("체험단으로 선정했습니다");
       } else if (status === "rejected") {
-        const notification: Notification = {
+        notification = {
           id: `notif-${Date.now()}`,
           type: "rejection",
           title: "체험단 선정 결과 안내",
@@ -275,8 +756,22 @@ export default function App() {
           createdAt: new Date().toISOString(),
           read: false,
         };
-        setNotifications(prev => [notification, ...prev]);
         toast.success("미선정 처리했습니다");
+      } else {
+        return;
+      }
+
+      const updatedNotifications = [notification, ...notifications];
+      setNotifications(updatedNotifications);
+      
+      // Save to localStorage
+      localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+
+      // Save notification to backend (optional - fails silently)
+      if (accessToken) {
+        notificationsApi.create({ ...notification, targetUserId: application.userId }, accessToken).catch(error => {
+          console.log("Backend save failed (using localStorage):", error.message);
+        });
       }
     }
   };
@@ -348,7 +843,7 @@ export default function App() {
           >
             <LoginPage 
               onBack={() => setCurrentPage("home")} 
-              onLoginComplete={handleSignupComplete}
+              onLoginComplete={handleLoginComplete}
               onSwitchToSignup={() => setCurrentPage("signup")}
             />
           </motion.div>
@@ -390,6 +885,7 @@ export default function App() {
                 onManageApplicants={handleManageApplicants}
                 onManageReviews={() => setCurrentPage("review-management")}
                 onViewDashboard={() => setCurrentPage("business-dashboard")}
+                onDeleteProduct={handleDeleteProduct}
               />
             </motion.div>
           ) : (
@@ -446,6 +942,12 @@ export default function App() {
               onApply={handleApply}
               isFavorite={favorites.includes(selectedProduct.id)}
               onToggleFavorite={() => handleToggleFavorite(selectedProduct.id)}
+              isLiked={productLikes.includes(selectedProduct.id)}
+              onToggleLike={() => handleToggleProductLike(selectedProduct.id)}
+              reviews={completedReviews}
+              hasApplied={applications.some(a => a.productId === selectedProduct.id && a.userEmail === userInfo?.email)}
+              canCancel={applications.some(a => a.productId === selectedProduct.id && a.userEmail === userInfo?.email && a.status === "pending")}
+              onCancel={() => handleCancelApplication(selectedProduct.id)}
             />
           </motion.div>
         )}
@@ -555,13 +1057,44 @@ export default function App() {
             <ProfilePage 
               userInfo={userInfo}
               completedReviews={completedReviews}
+              userPoints={userPoints}
+              userLevel={userLevel}
               onNavigateToApplications={() => setCurrentPage("my-applications")}
               onNavigateToFavorites={() => setCurrentPage("my-favorites")}
               onNavigateToPointShop={() => setCurrentPage("point-shop")}
               onNavigateToPointHistory={() => setCurrentPage("point-history")}
               onEditReview={handleEditReview}
+              onNavigateToDashboard={() => setCurrentPage("business-dashboard")}
+              onNavigateToTerms={() => setCurrentPage("terms")}
+              onNavigateToPrivacy={() => setCurrentPage("privacy")}
               onLogout={handleLogout}
             />
+          </motion.div>
+        )}
+
+        {currentPage === "terms" && userInfo && (
+          <motion.div
+            key="terms"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <TermsPage onBack={handleBack} />
+          </motion.div>
+        )}
+
+        {currentPage === "privacy" && userInfo && (
+          <motion.div
+            key="privacy"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <PrivacyPage onBack={handleBack} />
           </motion.div>
         )}
 
@@ -597,7 +1130,14 @@ export default function App() {
             <NotificationsPage
               onBack={handleBack}
               notifications={notifications}
-              onMarkAsRead={id => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))}
+              onMarkAsRead={async (id) => {
+                setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+                if (accessToken) {
+                  notificationsApi.markAsRead(id, accessToken).catch(error => {
+                    console.log("Backend save failed (using localStorage):", error.message);
+                  });
+                }
+              }}
             />
           </motion.div>
         )}
@@ -615,6 +1155,7 @@ export default function App() {
               onBack={handleBack}
               reviews={completedReviews}
               onToggleVisibility={handleToggleReviewVisibility}
+              onReportReview={handleReportReview}
             />
           </motion.div>
         )}
@@ -632,9 +1173,15 @@ export default function App() {
               onBack={() => {
                 setCurrentPage("profile");
               }}
-              userPoints={1250}
-              userLevel={3}
+              userPoints={userPoints}
+              userLevel={userLevel}
               onPurchase={(product) => {
+                // Deduct points
+                const newPoints = userPoints - product.price;
+                setUserPoints(newPoints);
+                localStorage.setItem('userPoints', newPoints.toString());
+                
+                // Add transaction
                 const transaction: PointTransaction = {
                   id: `trans-${Date.now()}`,
                   type: "spend",
@@ -643,7 +1190,10 @@ export default function App() {
                   date: new Date().toLocaleString('ko-KR'),
                   category: product.category,
                 };
-                setPointTransactions(prev => [transaction, ...prev]);
+                const updatedTransactions = [transaction, ...pointTransactions];
+                setPointTransactions(updatedTransactions);
+                localStorage.setItem('pointTransactions', JSON.stringify(updatedTransactions));
+                
                 toast.success(`${product.name} 구매가 완료되었습니다!`);
               }}
             />
@@ -664,7 +1214,7 @@ export default function App() {
                 setCurrentPage("profile");
               }}
               transactions={pointTransactions}
-              currentPoints={1250}
+              currentPoints={userPoints}
             />
           </motion.div>
         )}
@@ -689,7 +1239,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Bottom Navigation */}
-      {userInfo && currentPage !== "signup" && currentPage !== "login" && currentPage !== "product-detail" && currentPage !== "review-write" && currentPage !== "edit-review" && currentPage !== "my-applications" && currentPage !== "my-favorites" && currentPage !== "create-product" && currentPage !== "manage-applicants" && currentPage !== "notifications" && currentPage !== "review-management" && currentPage !== "point-shop" && currentPage !== "point-history" && currentPage !== "business-dashboard" && (
+      {userInfo && currentPage !== "signup" && currentPage !== "login" && currentPage !== "product-detail" && currentPage !== "review-write" && currentPage !== "edit-review" && currentPage !== "my-applications" && currentPage !== "my-favorites" && currentPage !== "create-product" && currentPage !== "manage-applicants" && currentPage !== "notifications" && currentPage !== "review-management" && currentPage !== "point-shop" && currentPage !== "point-history" && currentPage !== "business-dashboard" && currentPage !== "terms" && currentPage !== "privacy" && (
         <BottomNav 
           activeTab={currentPage as "home" | "review" | "profile"} 
           onTabChange={handleTabChange}

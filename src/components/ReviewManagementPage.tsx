@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ChevronLeft, Eye, EyeOff, AlertTriangle, CheckCircle } from "lucide-react";
+import { ChevronLeft, Eye, EyeOff, AlertTriangle, CheckCircle, Flag } from "lucide-react";
 import { Logo } from "./Logo";
+import { ReportModal } from "./ReportModal";
 // Simple local ImageWithFallback to avoid missing module; falls back to a 1x1 transparent GIF if load fails
 function ImageWithFallback({
   src,
@@ -30,10 +31,13 @@ interface ReviewManagementPageProps {
   reviews: Review[];
   onBack: () => void;
   onToggleVisibility: (reviewId: string) => void;
+  onReportReview?: (reviewId: string, reason: string) => void;
 }
 
-export function ReviewManagementPage({ reviews, onBack, onToggleVisibility }: ReviewManagementPageProps) {
+export function ReviewManagementPage({ reviews, onBack, onToggleVisibility, onReportReview }: ReviewManagementPageProps) {
   const [activeTab, setActiveTab] = useState<"all" | "published" | "hidden" | "reported">("all");
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState<string>("");
 
   const publishedReviews = reviews.filter(r => r.status === "published" && !r.reported);
   const hiddenReviews = reviews.filter(r => r.status === "hidden");
@@ -62,7 +66,7 @@ export function ReviewManagementPage({ reviews, onBack, onToggleVisibility }: Re
   return (
     <div className="min-h-screen bg-[#fffef5] pb-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">
           <button onClick={onBack} className="mb-6 text-white hover:opacity-80">
             <ChevronLeft size={24} />
@@ -244,32 +248,61 @@ export function ReviewManagementPage({ reviews, onBack, onToggleVisibility }: Re
                   </div>
                 )}
 
-                {/* Action Button */}
-                <button
-                  onClick={() => onToggleVisibility(review.id)}
-                  className={`w-full py-3 px-4 rounded-[1rem] transition-colors flex items-center justify-center gap-2 ${
-                    review.status === "published"
-                      ? "bg-[#f5f0dc] text-[#6b8e6f] hover:bg-[#ebe5cc] border-2 border-[#d4c5a0]"
-                      : "bg-[#6b8e6f] text-white hover:bg-[#5a7a5e]"
-                  }`}
-                >
-                  {review.status === "published" ? (
-                    <>
-                      <EyeOff size={18} />
-                      비공개 처리
-                    </>
-                  ) : (
-                    <>
-                      <Eye size={18} />
-                      공개 처리
-                    </>
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onToggleVisibility(review.id)}
+                    className={`flex-1 py-3 px-4 rounded-[1rem] transition-colors flex items-center justify-center gap-2 ${
+                      review.status === "published"
+                        ? "bg-[#f5f0dc] text-[#6b8e6f] hover:bg-[#ebe5cc] border-2 border-[#d4c5a0]"
+                        : "bg-[#6b8e6f] text-white hover:bg-[#5a7a5e]"
+                    }`}
+                  >
+                    {review.status === "published" ? (
+                      <>
+                        <EyeOff size={18} />
+                        비공개 처리
+                      </>
+                    ) : (
+                      <>
+                        <Eye size={18} />
+                        공개 처리
+                      </>
+                    )}
+                  </button>
+                  {!review.reported && onReportReview && (
+                    <button
+                      onClick={() => {
+                        setSelectedReviewId(review.id);
+                        setReportModalOpen(true);
+                      }}
+                      className="py-3 px-4 rounded-[1rem] bg-[#fff8ed] text-[#f5a145] hover:bg-[#ffe5c7] transition-colors flex items-center justify-center gap-2 border-2 border-[#f5a145]"
+                    >
+                      <Flag size={18} />
+                      신고
+                    </button>
                   )}
-                </button>
+                </div>
               </div>
             ))
           )}
         </div>
       </div>
+
+      {/* Report Modal */}
+      {onReportReview && (
+        <ReportModal
+          isOpen={reportModalOpen}
+          onClose={() => {
+            setReportModalOpen(false);
+            setSelectedReviewId("");
+          }}
+          onSubmit={(reason) => {
+            onReportReview(selectedReviewId, reason);
+          }}
+          reviewId={selectedReviewId}
+        />
+      )}
     </div>
   );
 }

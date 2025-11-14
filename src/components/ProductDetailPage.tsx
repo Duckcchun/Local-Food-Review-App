@@ -1,4 +1,7 @@
-import { ArrowLeft, MapPin, Heart, ThumbsUp, Share2, Calendar, Users } from "lucide-react";
+import { ArrowLeft, MapPin, Heart, ThumbsUp, Share2, Calendar, Users, Star } from "lucide-react";
+import type { Product } from "../data/mockData";
+import type { Review } from "../App";
+
 // Simple ImageWithFallback component to avoid missing module error
 function ImageWithFallback({
   src,
@@ -22,22 +25,48 @@ function ImageWithFallback({
 
   return <img src={src} alt={alt} className={className} onError={handleError} {...props} />;
 }
-import type { Product } from "../data/mockData";
 
 interface ProductDetailPageProps {
   product: Product;
   onBack: () => void;
   onApply: () => void;
+  onCancel?: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  isLiked?: boolean;
+  onToggleLike?: () => void;
+  reviews?: Review[];
+  hasApplied?: boolean;
+  canCancel?: boolean;
 }
 
-export function ProductDetailPage({ product, onBack, onApply, isFavorite = false, onToggleFavorite }: ProductDetailPageProps) {
+export function ProductDetailPage({ 
+  product, 
+  onBack, 
+  onApply,
+  onCancel,
+  isFavorite = false, 
+  onToggleFavorite,
+  isLiked = false,
+  onToggleLike,
+  reviews = [],
+  hasApplied = false,
+  canCancel = false,
+}: ProductDetailPageProps) {
   const handleFavoriteClick = () => {
     if (onToggleFavorite) {
       onToggleFavorite();
     }
   };
+
+  const handleLikeClick = () => {
+    if (onToggleLike) {
+      onToggleLike();
+    }
+  };
+
+  // Filter reviews for this product
+  const productReviews = reviews.filter(r => r.productId === product.id);
 
   return (
     <div className="min-h-screen bg-[#fffef5] pb-32">
@@ -148,31 +177,124 @@ export function ProductDetailPage({ product, onBack, onApply, isFavorite = false
 
           {/* Stats */}
           <div className="flex items-center justify-around py-4 border-t-2 border-[#d4c5a0]">
-            <div className="text-center">
+            <button 
+              onClick={handleLikeClick}
+              className="text-center hover:scale-105 transition-transform"
+            >
               <div className="flex items-center justify-center gap-1 mb-1">
-                <ThumbsUp size={20} fill="#6b8e6f" stroke="#6b8e6f" />
+                <ThumbsUp 
+                  size={20} 
+                  fill={isLiked ? "#6b8e6f" : "none"} 
+                  stroke="#6b8e6f"
+                  className={isLiked ? "animate-pulse" : ""}
+                />
                 <span className="text-[#2d3e2d]">{product.likeCount}</span>
               </div>
               <div className="text-sm text-[#9ca89d]">좋아요</div>
-            </div>
+            </button>
             <div className="w-px h-12 bg-[#d4c5a0]"></div>
             <div className="text-center">
               <div className="text-[#2d3e2d] mb-1">{product.reviewCount}</div>
               <div className="text-sm text-[#9ca89d]">리뷰 수</div>
             </div>
           </div>
+
+          {/* Reviews Section */}
+          {productReviews.length > 0 && (
+            <div className="mt-6 mb-6">
+              <h4 className="text-[#2d3e2d] mb-4">작성된 리뷰 ({productReviews.length})</h4>
+              <div className="space-y-4">
+                {productReviews.map((review) => (
+                  <div key={review.id} className="bg-[#f5f0dc] rounded-[1rem] p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-[#6b8e6f] flex items-center justify-center text-white text-sm">
+                          {review.userName ? review.userName[0] : 'U'}
+                        </div>
+                        <div>
+                          <div className="text-sm text-[#2d3e2d] font-medium">{review.userName || '익명'}</div>
+                          <div className="text-xs text-[#9ca89d]">
+                            {new Date(review.createdAt).toLocaleDateString('ko-KR')}
+                          </div>
+                        </div>
+                      </div>
+                      {review.status === "published" && (
+                        <div className="flex items-center gap-1 text-[#f5a145]">
+                          <Star size={16} fill="#f5a145" />
+                          <span className="text-xs">공개</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      {review.pros && (
+                        <div>
+                          <span className="text-[#6b8e6f] font-medium">👍 장점: </span>
+                          <span className="text-[#2d3e2d]">{review.pros}</span>
+                        </div>
+                      )}
+                      {review.cons && (
+                        <div>
+                          <span className="text-[#e63946] font-medium">👎 단점: </span>
+                          <span className="text-[#2d3e2d]">{review.cons}</span>
+                        </div>
+                      )}
+                      {review.improvements && (
+                        <div>
+                          <span className="text-[#f5a145] font-medium">💡 개선점: </span>
+                          <span className="text-[#2d3e2d]">{review.improvements}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {review.photos && review.photos.length > 0 && (
+                      <div className="mt-3 flex gap-2 overflow-x-auto">
+                        {review.photos.map((photo, idx) => (
+                          <img 
+                            key={idx} 
+                            src={photo} 
+                            alt={`리뷰 사진 ${idx + 1}`}
+                            className="w-20 h-20 object-cover rounded-lg shrink-0"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#6b8e6f] z-20">
         <div className="max-w-md mx-auto px-6 py-4">
-          <button
-            onClick={onApply}
-            className="w-full bg-[#f5a145] text-white py-4 rounded-[1rem] hover:bg-[#e89535] transition-colors text-center"
-          >
-            체험단 신청하기
-          </button>
+          {hasApplied ? (
+            canCancel ? (
+              <button
+                onClick={onCancel}
+                className="w-full bg-[#f5f0dc] text-[#6b8e6f] py-4 rounded-[1rem] hover:bg-[#ebe5cc] transition-colors text-center border-2 border-[#d4c5a0]"
+              >
+                신청 취소하기
+              </button>
+            ) : (
+              <button
+                disabled
+                className="w-full bg-[#9ca89d] text-white py-4 rounded-[1rem] opacity-80 cursor-not-allowed"
+                title="이미 신청되었습니다"
+              >
+                신청 완료됨
+              </button>
+            )
+          ) : (
+            <button
+              onClick={onApply}
+              className="w-full bg-[#f5a145] text-white py-4 rounded-[1rem] hover:bg-[#e89535] transition-colors text-center"
+            >
+              체험단 신청하기
+            </button>
+          )}
         </div>
       </div>
     </div>

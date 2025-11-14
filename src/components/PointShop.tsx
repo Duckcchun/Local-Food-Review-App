@@ -41,7 +41,7 @@ export function PointShop({ onBack, userPoints, userLevel, onPurchase }: PointSh
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#f5a145] to-[#e89535] pt-8 pb-12">
+  <div className="bg-linear-to-br from-[#f5a145] to-[#e89535] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">
           <button onClick={onBack} className="mb-6 text-white hover:opacity-80">
             <ChevronLeft size={24} />
@@ -63,7 +63,7 @@ export function PointShop({ onBack, userPoints, userLevel, onPurchase }: PointSh
                 <span className="text-[#9ca89d]">P</span>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-[#f5a145] to-[#e89535] rounded-full p-4">
+            <div className="bg-linear-to-br from-[#f5a145] to-[#e89535] rounded-full p-4">
               <Sparkles size={32} className="text-white" />
             </div>
           </div>

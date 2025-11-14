@@ -74,7 +74,7 @@ export function EditReviewPage({ review, onBack }: EditReviewPageProps) {
         {/* Product Info */}
         <div className="bg-white rounded-[1.5rem] p-5 mb-6 border-2 border-[#d4c5a0]">
           <div className="flex gap-4">
-            <div className="w-20 h-20 rounded-[1rem] overflow-hidden bg-[#f5f0dc] flex-shrink-0">
+            <div className="w-20 h-20 rounded-[1rem] overflow-hidden bg-[#f5f0dc] shrink-0">
               <ImageWithFallback
                 src={review.productImage}
                 alt={review.productName}
@@ -183,7 +183,7 @@ export function EditReviewPage({ review, onBack }: EditReviewPageProps) {
           </button>
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity"
+            className="flex-1 bg-linear-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity"
           >
             수정 완료
           </button>

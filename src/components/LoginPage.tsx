@@ -3,7 +3,8 @@ import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { Logo } from "./Logo";
 import { toast } from "sonner";
 import type { UserInfo } from "../App";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { publicAnonKey } from "../utils/supabase/info";
+import { requestJson } from "../utils/request";
 
 interface LoginPageProps {
   onBack: () => void;
@@ -31,26 +32,19 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
       return;
     }
 
+    if (isLoading) return;
     setIsLoading(true);
 
     try {
-      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-98b21042/signin`, {
+      const { response, data } = await requestJson<{ email: string; password: string }, any>({
+        path: "/signin",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${publicAnonKey}`
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
+        body: { email: formData.email, password: formData.password },
+        timeoutMs: 12000,
       });
-
-      const data = await response.json();
 
       if (!response.ok) {
         toast.error(data.error || "로그인에 실패했습니다");
-        setIsLoading(false);
         return;
       }
 
@@ -68,9 +62,15 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
       };
 
       onLoginComplete(userData, data.accessToken);
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error("서버 연결에 실패했습니다");
+    } catch (error: any) {
+      // If request was intentionally aborted (timeout or navigation), avoid noisy error
+      if (error?.name === "AbortError") {
+        toast.warning("요청이 시간 초과되었습니다. 네트워크 상태를 확인해주세요.");
+      } else {
+        console.error("Login error:", error);
+        toast.error("서버 연결에 실패했습니다");
+      }
+    } finally {
       setIsLoading(false);
     }
   };
@@ -78,7 +78,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
   return (
     <div className="min-h-screen bg-[#fffef5]">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-16">
+  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-16">
         <div className="max-w-md mx-auto px-6">
           <button onClick={onBack} className="text-white mb-6 hover:opacity-80">
             <ArrowLeft size={24} />
@@ -141,7 +141,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity disabled:opacity-50 text-center"
+              className="w-full bg-linear-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity disabled:opacity-50 text-center"
             >
               {isLoading ? "로그인 중..." : "로그인"}
             </button>

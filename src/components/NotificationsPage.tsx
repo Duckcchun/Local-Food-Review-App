@@ -47,7 +47,7 @@ export function NotificationsPage({ notifications, onBack, onMarkAsRead }: Notif
   return (
     <div className="min-h-screen bg-[#fffef5] pb-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">
           <button onClick={onBack} className="mb-6 text-white hover:opacity-80">
             <ChevronLeft size={24} />

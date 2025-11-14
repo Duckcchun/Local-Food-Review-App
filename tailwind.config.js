@@ -7,8 +7,10 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
+        'linear-to-b': 'linear-gradient(to bottom, var(--tw-gradient-stops))',
         'linear-to-br': 'linear-gradient(to bottom right, var(--tw-gradient-stops))',
         'linear-to-r': 'linear-gradient(to right, var(--tw-gradient-stops))',
+        'linear-to-l': 'linear-gradient(to left, var(--tw-gradient-stops))',
       },
     
       animation: {

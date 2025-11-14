@@ -29,15 +29,34 @@ import { useState } from "react";
 interface ProfilePageProps {
   userInfo: UserInfo;
   completedReviews?: Review[];
+  userPoints?: number;
+  userLevel?: number;
   onNavigateToApplications: () => void;
   onNavigateToFavorites: () => void;
   onNavigateToPointShop?: () => void;
   onNavigateToPointHistory?: () => void;
   onEditReview?: (product: Product) => void;
+  onNavigateToDashboard?: () => void;
+  onNavigateToTerms?: () => void;
+  onNavigateToPrivacy?: () => void;
   onLogout: () => void;
 }
 
-export function ProfilePage({ userInfo, completedReviews = [], onNavigateToApplications, onNavigateToFavorites, onNavigateToPointShop, onNavigateToPointHistory, onEditReview, onLogout }: ProfilePageProps) {
+export function ProfilePage({ 
+  userInfo, 
+  completedReviews = [], 
+  userPoints = 0, 
+  userLevel = 1, 
+  onNavigateToApplications, 
+  onNavigateToFavorites, 
+  onNavigateToPointShop, 
+  onNavigateToPointHistory, 
+  onEditReview, 
+  onNavigateToDashboard,
+  onNavigateToTerms,
+  onNavigateToPrivacy,
+  onLogout 
+}: ProfilePageProps) {
   const isBusinessUser = userInfo.userType === "business";
   const [isLevelSystemModalOpen, setIsLevelSystemModalOpen] = useState(false);
 
@@ -45,7 +64,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
     return (
       <div className="min-h-screen bg-[#fffef5] pb-24">
         {/* Header */}
-        <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-[#6b8e6f] bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
           <div className="max-w-md mx-auto px-6">
             <Logo className="mb-6" variant="white" />
             <h1 className="text-white mb-2">
@@ -61,7 +80,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
           {/* Business Profile Card */}
           <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0] shadow-lg">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-linear-to-br from-[#6b8e6f] to-[#8fa893] flex items-center justify-center">
                 <Store size={32} className="text-white" />
               </div>
               <div className="flex-1">
@@ -113,7 +132,10 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
           <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0]">
             <h3 className="text-[#2d3e2d] mb-4">빠른 메뉴</h3>
             
-            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors">
+            <button 
+              onClick={onNavigateToDashboard}
+              className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <BarChart3 size={20} className="text-[#6b8e6f]" />
                 <span className="text-[#2d3e2d]">통계 보기</span>
@@ -121,7 +143,10 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
               <ChevronRight size={20} className="text-[#6b8e6f]" />
             </button>
 
-            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors">
+            <button 
+              onClick={() => alert('가게 정보 수정 기능은 준비중입니다')}
+              className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <Store size={20} className="text-[#6b8e6f]" />
                 <span className="text-[#2d3e2d]">가게 정보 수정</span>
@@ -129,7 +154,10 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
               <ChevronRight size={20} className="text-[#6b8e6f]" />
             </button>
 
-            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] hover:bg-[#ebe5cc] transition-colors">
+            <button 
+              onClick={() => alert('설정 기능은 준비중입니다')}
+              className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] hover:bg-[#ebe5cc] transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <Settings size={20} className="text-[#6b8e6f]" />
                 <span className="text-[#2d3e2d]">설정</span>
@@ -149,7 +177,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
           </div>
 
           {/* Performance */}
-          <div className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-6 mb-6 text-white">
+          <div className="bg-linear-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-6 mb-6 text-white">
             <div className="flex items-start gap-4 mb-4">
               <div className="bg-white/20 rounded-full p-3">
                 <TrendingUp size={24} />
@@ -176,7 +204,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
             <div className="space-y-4">
               <div className="bg-white rounded-[1.5rem] p-4 border-2 border-[#d4c5a0]">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center text-white">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center text-white">
                     김
                   </div>
                   <div className="flex-1">
@@ -199,16 +227,16 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
   }
 
   // Reviewer Profile
-  const currentLevel = getLevelInfo(userProfile.totalPoints);
-  const progress = getLevelProgress(userProfile.totalPoints);
-  const pointsToNext = getPointsToNextLevel(userProfile.totalPoints);
+  const currentLevel = getLevelInfo(userPoints);
+  const progress = getLevelProgress(userPoints);
+  const pointsToNext = getPointsToNextLevel(userPoints);
   const nextLevel = LEVELS[currentLevel.level];
   const [showLevelModal, setShowLevelModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-[#6b8e6f] bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">
           <Logo className="mb-6" variant="white" />
           <h1 className="text-white mb-2">
@@ -224,7 +252,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
         {/* User Profile Card */}
         <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0] shadow-lg">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-linear-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                 <circle cx="16" cy="12" r="6" fill="white" />
                 <path d="M8 26c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="white" />
@@ -232,21 +260,21 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
             </div>
             <div className="flex-1">
               <h3 className="text-[#2d3e2d] mb-1">{userInfo.name}</h3>
-              <LevelBadge level={userProfile.level} showName={true} />
+              <LevelBadge level={userLevel} showName={true} />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#d4c5a0]">
             <div className="text-center">
-              <div className="text-[#2d3e2d] mb-1">{userProfile.reviewCount}</div>
+              <div className="text-[#2d3e2d] mb-1">{completedReviews.length}</div>
               <div className="text-sm text-[#9ca89d]">리뷰</div>
             </div>
             <div className="text-center">
-              <div className="text-[#2d3e2d] mb-1">{userProfile.likeReceived}</div>
+              <div className="text-[#2d3e2d] mb-1">0</div>
               <div className="text-sm text-[#9ca89d]">받은 좋아요</div>
             </div>
             <div className="text-center">
-              <div className="text-[#f5a145] mb-1">{userProfile.totalPoints.toLocaleString()}P</div>
+              <div className="text-[#f5a145] mb-1">{userPoints.toLocaleString()}P</div>
               <div className="text-sm text-[#9ca89d]">포인트</div>
             </div>
           </div>
@@ -296,7 +324,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
               {nextLevel && (
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-xs text-[#9ca89d]">
-                    현재: {userProfile.totalPoints}P
+                    현재: {userPoints}P
                   </span>
                   <span className="text-xs" style={{ color: nextLevel.color }}>
                     {nextLevel.icon} {nextLevel.name}: {nextLevel.minPoints}P
@@ -327,7 +355,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
         <div className="grid grid-cols-2 gap-3 mb-6">
           <button 
             onClick={onNavigateToPointShop}
-            className="bg-gradient-to-r from-[#f5a145] to-[#e89535] rounded-[1.5rem] p-5 text-white hover:opacity-90 transition-opacity"
+            className="bg-linear-to-r from-[#f5a145] to-[#e89535] rounded-[1.5rem] p-5 text-white hover:opacity-90 transition-opacity"
           >
             <div className="flex flex-col items-center text-center">
               <div className="bg-white/20 rounded-full p-3 mb-3">
@@ -340,7 +368,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
 
           <button 
             onClick={onNavigateToPointHistory}
-            className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-5 text-white hover:opacity-90 transition-opacity"
+            className="bg-linear-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-5 text-white hover:opacity-90 transition-opacity"
           >
             <div className="flex flex-col items-center text-center">
               <div className="bg-white/20 rounded-full p-3 mb-3">
@@ -366,6 +394,17 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
             <ChevronRight size={20} className="text-[#6b8e6f]" />
           </button>
 
+          <div className="border-t border-[#d4c5a0] my-3"></div>
+
+          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToTerms}>
+            <span className="text-[#2d3e2d]">이용약관</span>
+            <ChevronRight size={20} className="text-[#6b8e6f]" />
+          </button>
+          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToPrivacy}>
+            <span className="text-[#2d3e2d]">개인정보 처리방침</span>
+            <ChevronRight size={20} className="text-[#6b8e6f]" />
+          </button>
+
           <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] hover:bg-[#ebe5cc] transition-colors" onClick={onLogout}>
             <div className="flex items-center gap-3">
               <LogOut size={20} className="text-[#6b8e6f]" />
@@ -376,7 +415,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
         </div>
 
         {/* Benefits Section */}
-        <div className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-6 mb-6 text-white">
+  <div className="bg-linear-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-6 mb-6 text-white">
           <div className="flex items-start gap-4 mb-4">
             <div className="bg-white/20 rounded-full p-3">
               <Download size={24} />
@@ -484,7 +523,7 @@ export function ProfilePage({ userInfo, completedReviews = [], onNavigateToAppli
       <LevelSystemModal
         isOpen={showLevelModal}
         onClose={() => setShowLevelModal(false)}
-        currentLevel={userProfile.level}
+        currentLevel={userLevel}
       />
     </div>
   );

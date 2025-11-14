@@ -46,7 +46,7 @@ export function ManageApplicantsPage({ selectedProduct, applications, onBack, on
   return (
     <div className="min-h-screen bg-[#fffef5] pb-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">
           <button onClick={onBack} className="mb-6 text-white hover:opacity-80">
             <ChevronLeft size={24} />
@@ -131,7 +131,7 @@ export function ManageApplicantsPage({ selectedProduct, applications, onBack, on
                 <div key={app.id} className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
                   {/* User Info */}
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center text-white shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center text-white shrink-0">
                       <User size={24} />
                     </div>
                     <div className="flex-1 min-w-0">

@@ -12,9 +12,10 @@ interface BusinessHomePageProps {
   onManageApplicants?: (product: Product) => void;
   onManageReviews?: () => void;
   onViewDashboard?: () => void;
+  onDeleteProduct?: (productId: string) => void;
 }
 
-export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreateProduct, onManageApplicants, onManageReviews, onViewDashboard }: BusinessHomePageProps) {
+export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreateProduct, onManageApplicants, onManageReviews, onViewDashboard, onDeleteProduct }: BusinessHomePageProps) {
   // Mock data for business dashboard
   const stats = [
     { label: "진행중인 체험단", value: "1", color: "#f5a145" },
@@ -25,7 +26,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">
           <Logo className="mb-6" variant="white" />
           <h1 className="text-white mb-2">
@@ -55,7 +56,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
       <div className="max-w-md mx-auto px-6 mb-6">
         <div className="space-y-3">
           <button 
-            className="w-full bg-gradient-to-rrom-[#f5a145] to-[#e89535] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-glow" 
+            className="w-full bg-linear-to-r from-[#f5a145] to-[#e89535] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-glow" 
             onClick={onCreateProduct}
           >
             <div className="flex items-center gap-3">
@@ -71,7 +72,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
           </button>
 
           <button 
-            className="w-full bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-lift" 
+            className="w-full bg-linear-to-r from-[#6b8e6f] to-[#8fa893] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-lift" 
             onClick={onViewDashboard}
           >
             <div className="flex items-center gap-3">
@@ -151,6 +152,17 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
                     className="flex-1 bg-[#6b8e6f] text-white py-3 rounded-[1rem] hover:bg-[#5a7a5e] transition-colors text-center"
                   >
                     리뷰 확인
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm(`"${product.name}" 체험단을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+                        onDeleteProduct && onDeleteProduct(product.id);
+                      }
+                    }}
+                    className="bg-red-50 text-red-600 px-4 py-3 rounded-[1rem] hover:bg-red-100 transition-colors"
+                    title="체험단 삭제"
+                  >
+                    🗑️
                   </button>
                 </div>
               </div>
@@ -236,7 +248,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
 
       {/* Tips */}
       <div className="max-w-md mx-auto px-6 mb-6">
-        <div className="bg-gradient-to-br from-[#f5f0dc] to-[#ebe5d0] rounded-[1.5rem] p-5 border-2 border-[#d4c5a0]">
+  <div className="bg-linear-to-br from-[#f5f0dc] to-[#ebe5d0] rounded-[1.5rem] p-5 border-2 border-[#d4c5a0]">
           <div className="flex items-start gap-3">
             <span className="text-2xl">💡</span>
             <div>

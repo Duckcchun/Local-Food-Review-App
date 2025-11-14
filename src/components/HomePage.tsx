@@ -110,7 +110,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-[#f5f0dc] to-[#fffef5] px-6 pt-8 pb-12">
+  <div className="bg-linear-to-b from-[#f5f0dc] to-[#fffef5] px-6 pt-8 pb-12">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between mb-6">
             <Logo />
@@ -177,7 +177,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
             </div>
             <button
               onClick={resetFilters}
-              className="flex items-center gap-1 text-sm text-[#6b8e6f] hover:text-[#5a7a5e] transition-colors flex-shrink-0 ml-2"
+              className="flex items-center gap-1 text-sm text-[#6b8e6f] hover:text-[#5a7a5e] transition-colors shrink-0 ml-2"
             >
               <FilterX size={16} />
               <span>초기화</span>
@@ -198,7 +198,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
         <div className="flex gap-2 overflow-x-auto pb-2">
           <button
             onClick={() => setDistanceFilter(null)}
-            className={`flex-shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
+            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
               distanceFilter === null
                 ? "bg-[#6b8e6f] text-white shadow-md"
                 : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
@@ -208,7 +208,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
           </button>
           <button
             onClick={() => setDistanceFilter(0.5)}
-            className={`flex-shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
+            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
               distanceFilter === 0.5
                 ? "bg-[#6b8e6f] text-white shadow-md"
                 : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
@@ -218,7 +218,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
           </button>
           <button
             onClick={() => setDistanceFilter(1)}
-            className={`flex-shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
+            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
               distanceFilter === 1
                 ? "bg-[#6b8e6f] text-white shadow-md"
                 : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
@@ -228,7 +228,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
           </button>
           <button
             onClick={() => setDistanceFilter(3)}
-            className={`flex-shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
+            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
               distanceFilter === 3
                 ? "bg-[#6b8e6f] text-white shadow-md"
                 : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
@@ -238,7 +238,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
           </button>
           <button
             onClick={() => setDistanceFilter(5)}
-            className={`flex-shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
+            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
               distanceFilter === 5
                 ? "bg-[#6b8e6f] text-white shadow-md"
                 : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"

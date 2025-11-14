@@ -174,7 +174,7 @@ export function StoreRegistrationPage({ onBack, onComplete, userId, accessToken 
   return (
     <div className="min-h-screen bg-[#fffef5]">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-16">
+  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-16">
         <div className="max-w-md mx-auto px-6">
           <button onClick={onBack} className="text-white mb-6 hover:opacity-80">
             <ArrowLeft size={24} />
@@ -339,7 +339,7 @@ export function StoreRegistrationPage({ onBack, onComplete, userId, accessToken 
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity disabled:opacity-50 text-center"
+            className="w-full bg-linear-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity disabled:opacity-50 text-center"
           >
             {isLoading ? "등록 중..." : "가게 등록 완료"}
           </button>

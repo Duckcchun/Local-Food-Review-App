@@ -127,7 +127,7 @@ export function ReviewWritePage({ product, onBack, userName = "회원", onSubmit
         </div>
 
         {/* Guide */}
-        <div className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-6 mb-6 text-white">
+  <div className="bg-linear-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-6 mb-6 text-white">
           <h3 className="mb-3">솔직한 평가를 부탁드려요</h3>
           <p className="text-sm opacity-90">
             중소 사업자님들이 더 나은 제품을 만들 수 있도록 장점, 단점, 개선점을 솔직하게 작성해주세요.
@@ -220,7 +220,7 @@ export function ReviewWritePage({ product, onBack, userName = "회원", onSubmit
         <div className="flex justify-center">
           <button
             onClick={handleSubmitReview}
-            className="w-full bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity text-center"
+            className="w-full bg-linear-to-r from-[#6b8e6f] to-[#8fa893] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-opacity text-center"
           >
             리뷰 등록하기
           </button>

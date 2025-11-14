@@ -1,16 +1,13 @@
-// @deno-types="https://deno.land/x/hono@v3.1.7/mod.ts"
-import { Hono } from "https://deno.land/x/hono@v3.1.7/mod.ts";
-// @deno-types="https://deno.land/x/hono@v3.1.7/middleware/cors.ts"
-import { cors } from "https://deno.land/x/hono@v3.1.7/middleware/cors.ts";
-// @deno-types="https://deno.land/x/hono@v3.1.7/middleware/logger.ts"
-import { logger } from "https://deno.land/x/hono@v3.1.7/middleware/logger.ts";
-// @deno-types="https://esm.sh/@supabase/supabase-js@2.39.3"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import * as kv from "./kv_store.tsx";
+// @deno-types="npm:@types/hono"
+import { Hono } from "npm:hono@4";
+import { cors } from "npm:hono@4/cors";
+import { logger } from "npm:hono@4/logger";
+import { createClient } from "jsr:@supabase/supabase-js@2";
+import * as kv from "./kv_store.ts";
 
 declare const Deno: any;
 
-const app = new Hono();
+const app = new Hono().basePath('/make-server-98b21042');
 
 // Enable logger
 app.use('*', logger(console.log));
@@ -40,12 +37,13 @@ const supabaseAuth = createClient(
 );
 
 // Health check endpoint
-app.get("/make-server-98b21042/health", (c: { json: (arg0: { status: string; }) => any; }) => {
+// NOTE: Removed duplicate function name prefix from all routes.
+app.get("/health", (c: { json: (arg0: { status: string; }) => any; }) => {
   return c.json({ status: "ok" });
 });
 
 // Sign up endpoint
-app.post("/make-server-98b21042/signup", async (c: { req: { json: () => any; }; json: (arg0: { error?: string; success?: boolean; user?: { id: any; email: any; name: any; phone: any; userType: any; businessName: any; businessNumber: any; businessAddress: any; createdAt: string; }; message?: string; }, arg1: number | undefined) => any; }) => {
+app.post("/signup", async (c: { req: { json: () => any; }; json: (arg0: { error?: string; success?: boolean; user?: { id: any; email: any; name: any; phone: any; userType: any; businessName: any; businessNumber: any; businessAddress: any; createdAt: string; }; message?: string; }, arg1: number | undefined) => any; }) => {
   try {
     const body = await c.req.json();
     const { email, password, name, phone, userType, businessName, businessNumber, businessAddress } = body;
@@ -115,7 +113,7 @@ interface SignInResponse {
   message: string;
 }
 
-app.post("/make-server-98b21042/signin", async (c: { req: { json: () => Promise<SignInRequest> }; json: (arg0: { error?: string; success?: boolean; user?: any; accessToken?: string; message?: string }, arg1: number) => any }) => {
+app.post("/signin", async (c: { req: { json: () => Promise<SignInRequest> }; json: (arg0: { error?: string; success?: boolean; user?: any; accessToken?: string; message?: string }, arg1: number) => any }) => {
   try {
     const body: SignInRequest = await c.req.json();
     const { email, password } = body;
@@ -158,7 +156,7 @@ app.post("/make-server-98b21042/signin", async (c: { req: { json: () => Promise<
 });
 
 // Get user profile endpoint (requires auth)
-app.get("/make-server-98b21042/profile", async (c: { req: { header: (arg0: string) => string; }; json: (arg0: { error?: string; success?: boolean; user?: any; }, arg1: number) => any; }) => {
+app.get("/profile", async (c: { req: { header: (arg0: string) => string; }; json: (arg0: { error?: string; success?: boolean; user?: any; }, arg1: number) => any; }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -187,7 +185,7 @@ app.get("/make-server-98b21042/profile", async (c: { req: { header: (arg0: strin
 });
 
 // Create or update product (체험단 등록)
-app.post("/make-server-98b21042/products", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; product?: any }, arg1: number) => any }) => {
+app.post("/products", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; product?: any }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -224,7 +222,7 @@ app.post("/make-server-98b21042/products", async (c: { req: { header: (arg0: str
 });
 
 // Get user's products
-app.get("/make-server-98b21042/products", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; products?: any[] }, arg1: number) => any }) => {
+app.get("/products", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; products?: any[] }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -252,7 +250,7 @@ app.get("/make-server-98b21042/products", async (c: { req: { header: (arg0: stri
 });
 
 // Create application (체험단 신청)
-app.post("/make-server-98b21042/applications", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; application?: any }, arg1: number) => any }) => {
+app.post("/applications", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; application?: any }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -280,14 +278,6 @@ app.post("/make-server-98b21042/applications", async (c: { req: { header: (arg0:
     userApplications.push(applicationData.id);
     await kv.set(`user:${user.id}:applications`, userApplications);
 
-    // Index by product for business owner lookup
-    const productAppsKey = `product:${applicationData.productId}:applications`;
-    const productApplications = await kv.get(productAppsKey) || [];
-    if (!productApplications.includes(applicationData.id)) {
-      productApplications.push(applicationData.id);
-      await kv.set(productAppsKey, productApplications);
-    }
-
     return c.json({ success: true, application: applicationData }, 200);
   } catch (error: unknown) {
     console.log(`Error creating application:`, error);
@@ -297,7 +287,7 @@ app.post("/make-server-98b21042/applications", async (c: { req: { header: (arg0:
 });
 
 // Get user's applications
-app.get("/make-server-98b21042/applications", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; applications?: any[] }, arg1: number) => any }) => {
+app.get("/applications", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; applications?: any[] }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -325,7 +315,7 @@ app.get("/make-server-98b21042/applications", async (c: { req: { header: (arg0: 
 });
 
 // Update application status (사업자가 승인/거절)
-app.put("/make-server-98b21042/applications/:id", async (c: { req: { header: (arg0: string) => string; json: () => any; param: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; application?: any }, arg1: number) => any }) => {
+app.put("/applications/:id", async (c: { req: { header: (arg0: string) => string; json: () => any; param: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; application?: any }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -363,57 +353,8 @@ app.put("/make-server-98b21042/applications/:id", async (c: { req: { header: (ar
   }
 });
 
-// Delete application (reviewer can cancel; business owner can remove)
-app.delete("/make-server-98b21042/applications/:id", async (c: any) => {
-  try {
-    const accessToken = c.req.header('Authorization')?.split(' ')[1];
-    if (!accessToken) {
-      return c.json({ error: "인증 토큰이 필요합니다" }, 401);
-    }
-
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(accessToken);
-    if (error || !user) {
-      return c.json({ error: "유효하지 않은 토큰입니다" }, 401);
-    }
-
-    const applicationId = c.req.param('id');
-    const application = await kv.get(`application:${applicationId}`);
-    if (!application) {
-      return c.json({ error: "신청 정보를 찾을 수 없습니다" }, 404);
-    }
-
-    const product = await kv.get(`product:${application.productId}`);
-    const isApplicant = application.userId === user.id;
-    const isOwner = product && product.userId === user.id;
-    if (!isApplicant && !isOwner) {
-      return c.json({ error: "삭제 권한이 없습니다" }, 403);
-    }
-
-    // Remove from application store
-    await kv.del(`application:${applicationId}`);
-
-    // Remove from applicant's list
-    const applicantListKey = `user:${application.userId}:applications`;
-    const applicantList = (await kv.get(applicantListKey)) || [];
-    const filteredApplicantList = applicantList.filter((id: string) => id !== applicationId);
-    await kv.set(applicantListKey, filteredApplicantList);
-
-    // Remove from product index
-    const productAppsKey = `product:${application.productId}:applications`;
-    const productApplications = (await kv.get(productAppsKey)) || [];
-    const filteredProductApps = productApplications.filter((id: string) => id !== applicationId);
-    await kv.set(productAppsKey, filteredProductApps);
-
-    return c.json({ success: true }, 200);
-  } catch (error: unknown) {
-    console.log(`Error deleting application:`, error);
-    const message = error instanceof Error ? error.message : String(error);
-    return c.json({ error: `서버 오류: ${message}` }, 500);
-  }
-});
-
 // Add/Remove favorite (찜하기)
-app.post("/make-server-98b21042/favorites", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; favorites?: string[] }, arg1: number) => any }) => {
+app.post("/favorites", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; favorites?: string[] }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -451,7 +392,7 @@ app.post("/make-server-98b21042/favorites", async (c: { req: { header: (arg0: st
 });
 
 // Get user's favorites
-app.get("/make-server-98b21042/favorites", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; favorites?: string[] }, arg1: number) => any }) => {
+app.get("/favorites", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; favorites?: string[] }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -476,7 +417,7 @@ app.get("/make-server-98b21042/favorites", async (c: { req: { header: (arg0: str
 });
 
 // Create review (리뷰 작성)
-app.post("/make-server-98b21042/reviews", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; review?: any }, arg1: number) => any }) => {
+app.post("/reviews", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; review?: any }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -513,7 +454,7 @@ app.post("/make-server-98b21042/reviews", async (c: { req: { header: (arg0: stri
 });
 
 // Get user's reviews
-app.get("/make-server-98b21042/reviews", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; reviews?: any[] }, arg1: number) => any }) => {
+app.get("/reviews", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; reviews?: any[] }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -541,7 +482,7 @@ app.get("/make-server-98b21042/reviews", async (c: { req: { header: (arg0: strin
 });
 
 // Create notification (알림 생성)
-app.post("/make-server-98b21042/notifications", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; notification?: any }, arg1: number) => any }) => {
+app.post("/notifications", async (c: { req: { header: (arg0: string) => string; json: () => any }; json: (arg0: { error?: string; success?: boolean; notification?: any }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -578,7 +519,7 @@ app.post("/make-server-98b21042/notifications", async (c: { req: { header: (arg0
 });
 
 // Get user's notifications
-app.get("/make-server-98b21042/notifications", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; notifications?: any[] }, arg1: number) => any }) => {
+app.get("/notifications", async (c: { req: { header: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; notifications?: any[] }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -606,7 +547,7 @@ app.get("/make-server-98b21042/notifications", async (c: { req: { header: (arg0:
 });
 
 // Mark notification as read
-app.put("/make-server-98b21042/notifications/:id", async (c: { req: { header: (arg0: string) => string; param: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; notification?: any }, arg1: number) => any }) => {
+app.put("/notifications/:id", async (c: { req: { header: (arg0: string) => string; param: (arg0: string) => string }; json: (arg0: { error?: string; success?: boolean; notification?: any }, arg1: number) => any }) => {
   try {
     const accessToken = c.req.header('Authorization')?.split(' ')[1];
     
@@ -642,52 +583,5 @@ app.put("/make-server-98b21042/notifications/:id", async (c: { req: { header: (a
   }
 });
 
-// Business: Get applications for products owned by the authenticated user
-app.get("/make-server-98b21042/business/applications", async (c: any) => {
-  try {
-    const accessToken = c.req.header('Authorization')?.split(' ')[1];
-    if (!accessToken) {
-      return c.json({ error: "인증 토큰이 필요합니다" }, 401);
-    }
-
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(accessToken);
-    if (error || !user) {
-      return c.json({ error: "유효하지 않은 토큰입니다" }, 401);
-    }
-
-    const productId = typeof c.req.query === 'function' ? c.req.query('productId') : undefined;
-
-    // If productId is specified, verify ownership and return its applications
-    if (productId) {
-      const product = await kv.get(`product:${productId}`);
-      if (!product) {
-        return c.json({ error: "상품을 찾을 수 없습니다" }, 404);
-      }
-      if (product.userId !== user.id) {
-        return c.json({ error: "해당 상품에 대한 권한이 없습니다" }, 403);
-      }
-
-      const ids = await kv.get(`product:${productId}:applications`) || [];
-      const apps = await Promise.all(ids.map((id: string) => kv.get(`application:${id}`)));
-      return c.json({ success: true, applications: apps.filter(Boolean) }, 200);
-    }
-
-    // Otherwise, aggregate across all owned products
-    const productIds = await kv.get(`user:${user.id}:products`) || [];
-    const allIds: string[] = [];
-    for (const pid of productIds) {
-      const ids = await kv.get(`product:${pid}:applications`) || [];
-      for (const id of ids) allIds.push(id);
-    }
-    const uniqueIds = Array.from(new Set(allIds));
-    const apps = await Promise.all(uniqueIds.map((id: string) => kv.get(`application:${id}`)));
-
-    return c.json({ success: true, applications: apps.filter(Boolean) }, 200);
-  } catch (error: unknown) {
-    console.log(`Error getting business applications:`, error);
-    const message = error instanceof Error ? error.message : String(error);
-    return c.json({ error: `서버 오류: ${message}` }, 500);
-  }
-});
-
-// Create or
+// Export the Hono app as a Deno.serve handler
+Deno.serve(app.fetch);
