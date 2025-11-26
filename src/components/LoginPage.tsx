@@ -43,13 +43,33 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
         timeoutMs: 12000,
       });
 
+      // Explicitly handle cases where 계정이 없음/비밀번호 불일치 등
       if (!response.ok) {
-        toast.error(data.error || "로그인에 실패했습니다");
+        // HTTP 404 or backend provided error means account not found or invalid
+        const message =
+          data?.error === 'USER_NOT_FOUND' || response.status === 404
+            ? '해당 이메일의 계정을 찾을 수 없습니다'
+            : data?.error === 'INVALID_CREDENTIALS' || response.status === 401
+            ? '이메일 또는 비밀번호가 올바르지 않습니다'
+            : data?.error?.includes?.('non-JSON response')
+            ? '서버가 응답하지 않습니다. 나중에 다시 시도해주세요'
+            : data?.error || '로그인에 실패했습니다';
+        toast.error(message);
         return;
       }
 
-      toast.success(data.message || "로그인 성공!");
-      
+      // Validate presence of user object and token
+      if (!data?.user || !data?.user?.email) {
+        toast.error('계정 정보를 찾을 수 없습니다');
+        return;
+      }
+      if (!data?.accessToken) {
+        toast.error('인증 토큰이 없습니다. 다시 시도해주세요');
+        return;
+      }
+
+      toast.success(data.message || '로그인 성공!');
+
       // Convert backend user data to UserInfo format
       const userData: UserInfo = {
         name: data.user.name,

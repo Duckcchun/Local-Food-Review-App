@@ -105,6 +105,7 @@ const pageTransition: any = {
 };
 
 export default function App() {
+
   const [currentPage, setCurrentPage] = useState<Page>("signup");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -116,54 +117,106 @@ export default function App() {
       return "";
     }
   });
+  // Helpers: user-scoped localStorage access (namespace per email)
+  const localKey = useCallback((key: string, email?: string | null) => {
+    const id = (email || userInfo?.email || '').trim();
+    return id ? `${key}:${id}` : key;
+  }, [userInfo?.email]);
+
+  const localGet = useCallback((key: string, email?: string | null) => {
+    try {
+      const raw = localStorage.getItem(localKey(key, email));
+      return raw;
+    } catch { return null; }
+  }, [localKey]);
+
+  const localSet = useCallback((key: string, value: string, email?: string | null) => {
+    try { localStorage.setItem(localKey(key, email), value); } catch {}
+  }, [localKey]);
+
+  const localRemove = useCallback((key: string, email?: string | null) => {
+    try { localStorage.removeItem(localKey(key, email)); } catch {}
+  }, [localKey]);
+
+  // Global localStorage helpers (not user-scoped) for shared data like products
+  const globalGet = useCallback((key: string) => {
+    try {
+      return localStorage.getItem(key);
+    } catch { return null; }
+  }, []);
+
+  const globalSet = useCallback((key: string, value: string) => {
+    try { localStorage.setItem(key, value); } catch {}
+  }, []);
+
+  const globalRemove = useCallback((key: string) => {
+    try { localStorage.removeItem(key); } catch {}
+  }, []);
   const [applications, setApplications] = useState<Application[]>(() => {
-    const saved = localStorage.getItem('applications');
+    const saved = localGet('applications');
     return saved ? JSON.parse(saved) : [];
   });
   const [favorites, setFavorites] = useState<string[]>(() => {
-    const saved = localStorage.getItem('favorites');
+    const saved = localGet('favorites');
     return saved ? JSON.parse(saved) : [];
   });
   
   // Track product likes by user
   const [productLikes, setProductLikes] = useState<string[]>(() => {
-    const saved = localStorage.getItem('productLikes');
+    const saved = localGet('productLikes');
     return saved ? JSON.parse(saved) : [];
   });
   
-  // Load business products from localStorage on mount
+  // Load business products from localStorage on mount (GLOBAL - shared across all users)
   const [businessProducts, setBusinessProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('businessProducts');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('businessProducts');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
-  
+
+  // allProducts는 businessProducts에 따라 자동 동기화
   const [allProducts, setAllProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('businessProducts');
-    const savedProducts = saved ? JSON.parse(saved) : [];
-    return [...savedProducts, ...mockProducts];
+    try {
+      const saved = localStorage.getItem('businessProducts');
+      const savedProducts = saved ? JSON.parse(saved) : [];
+      // mockProducts와 businessProducts를 항상 합쳐서 표시
+      return [...mockProducts, ...savedProducts];
+    } catch {
+      return [...mockProducts];
+    }
   });
+
+  // businessProducts가 바뀔 때마다 allProducts 동기화
+  useEffect(() => {
+    // mockProducts와 businessProducts를 항상 합쳐서 표시
+    setAllProducts([...mockProducts, ...businessProducts]);
+  }, [businessProducts]);
   
   const [completedReviews, setCompletedReviews] = useState<Review[]>(() => {
-    const saved = localStorage.getItem('completedReviews');
+    const saved = localGet('completedReviews');
     return saved ? JSON.parse(saved) : [];
   });
   const [notifications, setNotifications] = useState<Notification[]>(() => {
-    const saved = localStorage.getItem('notifications');
+    const saved = localGet('notifications');
     return saved ? JSON.parse(saved) : [];
   });
   const [pointProducts, setPointProducts] = useState<PointProduct[]>([]);
   const [pointTransactions, setPointTransactions] = useState<PointTransaction[]>(() => {
-    const saved = localStorage.getItem('pointTransactions');
+    const saved = localGet('pointTransactions');
     return saved ? JSON.parse(saved) : [];
   });
   const [userPoints, setUserPoints] = useState<number>(() => {
-    const saved = localStorage.getItem('userPoints');
+    const saved = localGet('userPoints');
     return saved ? parseInt(saved) : 0;
   });
   const [userLevel, setUserLevel] = useState<number>(() => {
-    const saved = localStorage.getItem('userLevel');
+    const saved = localGet('userLevel');
     return saved ? parseInt(saved) : 1;
   });
+
 
   // Persist access token to localStorage
   useEffect(() => {
@@ -246,11 +299,11 @@ export default function App() {
       if (appsData?.success) {
         anySuccess = true;
         const localApps: Application[] = (() => {
-          try { return JSON.parse(localStorage.getItem('applications') || '[]'); } catch { return []; }
+          try { return JSON.parse(localGet('applications') || '[]'); } catch { return []; }
         })();
         const mergedApps = mergeById<Application>(appsData.applications, localApps);
         setApplications(mergedApps);
-        localStorage.setItem('applications', JSON.stringify(mergedApps));
+        localSet('applications', JSON.stringify(mergedApps));
       }
     } catch (e) { console.warn('Failed to load applications:', e); }
 
@@ -260,11 +313,11 @@ export default function App() {
       if (favsData.success) {
         anySuccess = true;
         const localFavs: string[] = (() => {
-          try { return JSON.parse(localStorage.getItem('favorites') || '[]'); } catch { return []; }
+          try { return JSON.parse(localGet('favorites') || '[]'); } catch { return []; }
         })();
         const mergedFavs = mergeStrings(favsData.favorites, localFavs);
         setFavorites(mergedFavs);
-        localStorage.setItem('favorites', JSON.stringify(mergedFavs));
+        localSet('favorites', JSON.stringify(mergedFavs));
       }
     } catch (e) { console.warn('Failed to load favorites:', e); }
 
@@ -274,11 +327,11 @@ export default function App() {
       if (reviewsData.success) {
         anySuccess = true;
         const localReviews: Review[] = (() => {
-          try { return JSON.parse(localStorage.getItem('completedReviews') || '[]'); } catch { return []; }
+          try { return JSON.parse(localGet('completedReviews') || '[]'); } catch { return []; }
         })();
         const mergedReviews = mergeById<Review>(reviewsData.reviews, localReviews);
         setCompletedReviews(mergedReviews);
-        localStorage.setItem('completedReviews', JSON.stringify(mergedReviews));
+        localSet('completedReviews', JSON.stringify(mergedReviews));
       }
     } catch (e) { console.warn('Failed to load reviews:', e); }
 
@@ -288,32 +341,57 @@ export default function App() {
       if (notifsData.success) {
         anySuccess = true;
         const localNotifs: Notification[] = (() => {
-          try { return JSON.parse(localStorage.getItem('notifications') || '[]'); } catch { return []; }
+          try { return JSON.parse(localGet('notifications') || '[]'); } catch { return []; }
         })();
         const mergedNotifs = mergeById<Notification>(notifsData.notifications, localNotifs);
         setNotifications(mergedNotifs);
-        localStorage.setItem('notifications', JSON.stringify(mergedNotifs));
+        localSet('notifications', JSON.stringify(mergedNotifs));
       }
     } catch (e) { console.warn('Failed to load notifications:', e); }
 
-    // Business products
-    if (userInfo?.userType === "business") {
-      try {
-        const productsData = await productsApi.getAll(accessToken);
-        if (productsData.success) {
-          anySuccess = true;
-          const localBiz: Product[] = (() => {
-            try { return JSON.parse(localStorage.getItem('businessProducts') || '[]'); } catch { return []; }
-          })();
-          const mergedBiz = mergeById<Product>(productsData.products, localBiz);
-          setBusinessProducts(mergedBiz);
-          const mergedAllMap = new Map<string, Product>();
-          for (const p of [...mergedBiz, ...mockProducts]) mergedAllMap.set(p.id, p);
-          const mergedAll = Array.from(mergedAllMap.values());
-          setAllProducts(mergedAll);
-          localStorage.setItem('businessProducts', JSON.stringify(mergedBiz));
-        }
-      } catch (e) { console.warn('Failed to load business products:', e); }
+    // Business products (load for ALL users, not just business)
+    try {
+      const productsData = await productsApi.getAll(accessToken);
+      let useLocal = false;
+      let mergedBiz: Product[] = [];
+      if (!productsData.success || !Array.isArray(productsData.products) || productsData.products.length === 0) {
+        // 서버 실패 또는 빈 배열이면 localStorage만 사용
+        useLocal = true;
+        mergedBiz = (() => {
+          try { return JSON.parse(globalGet('businessProducts') || '[]'); } catch { return []; }
+        })();
+      } else {
+        // 서버 데이터가 있으면 서버+로컬 병합
+        anySuccess = true;
+        const localBiz: Product[] = (() => {
+          try { return JSON.parse(globalGet('businessProducts') || '[]'); } catch { return []; }
+        })();
+        mergedBiz = mergeById<Product>(productsData.products, localBiz);
+        globalSet('businessProducts', JSON.stringify(mergedBiz));
+      }
+      setBusinessProducts(mergedBiz);
+      // businessProducts가 비어있을 때만 mockProducts 추가
+      let mergedAll: Product[];
+      if (mergedBiz.length > 0) {
+        mergedAll = mergedBiz;
+      } else {
+        mergedAll = [...mockProducts];
+      }
+      setAllProducts(mergedAll);
+    } catch (e) {
+      console.warn('Failed to load business products from server, using localStorage:', e);
+      // 서버 완전 실패 시에도 localStorage만 사용
+      const localBiz: Product[] = (() => {
+        try { return JSON.parse(globalGet('businessProducts') || '[]'); } catch { return []; }
+      })();
+      setBusinessProducts(localBiz);
+      let mergedAll: Product[];
+      if (localBiz.length > 0) {
+        mergedAll = localBiz;
+      } else {
+        mergedAll = [...mockProducts];
+      }
+      setAllProducts(mergedAll);
     }
 
     if (anySuccess) {
@@ -338,23 +416,15 @@ export default function App() {
     const levelInfo = getLevelInfo(userPoints);
     if (levelInfo.level !== userLevel) {
       setUserLevel(levelInfo.level);
-      localStorage.setItem('userLevel', levelInfo.level.toString());
+      localSet('userLevel', levelInfo.level.toString());
       if (levelInfo.level > userLevel) {
         toast.success(`🎉 레벨 ${levelInfo.level}로 승급했습니다!`);
       }
     }
   }, [userPoints]);
 
-  // Save products to localStorage when they change
-  useEffect(() => {
-    localStorage.setItem('businessProducts', JSON.stringify(businessProducts));
-  }, [businessProducts]);
-
-  useEffect(() => {
-    // Save only businessProducts to avoid duplicating mockProducts
-    const businessOnly = allProducts.filter(p => p.id.startsWith('business-'));
-    localStorage.setItem('businessProducts', JSON.stringify(businessOnly));
-  }, [allProducts]);
+  // Note: businessProducts는 추가/삭제 시 직접 globalSet으로 저장하므로
+  // 여기서 useEffect로 저장하지 않음 (중복 저장 및 의도치 않은 덮어쓰기 방지)
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -398,7 +468,7 @@ export default function App() {
 
         // Save to localStorage
         const updatedApplications = [...applications, newApplication];
-        localStorage.setItem('applications', JSON.stringify(updatedApplications));
+        localSet('applications', JSON.stringify(updatedApplications));
 
         // Save to backend
         if (accessToken) {
@@ -434,7 +504,7 @@ export default function App() {
     // Remove locally
     const updated = applications.filter(a => a.id !== app.id);
     setApplications(updated);
-    localStorage.setItem('applications', JSON.stringify(updated));
+    localSet('applications', JSON.stringify(updated));
 
     // Decrement product applicants count
     setAllProducts(prev => prev.map(p => 
@@ -464,7 +534,7 @@ export default function App() {
     setFavorites(newFavorites);
     
     // Save to localStorage
-    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+    localSet('favorites', JSON.stringify(newFavorites));
     
     if (isCurrentlyFavorite) {
       toast.success("찜 목록에서 제거되었습니다");
@@ -509,7 +579,7 @@ export default function App() {
     ));
     
     // Save to localStorage
-    localStorage.setItem('productLikes', JSON.stringify(newLikes));
+    localSet('productLikes', JSON.stringify(newLikes));
     
     if (isCurrentlyLiked) {
       toast.success("좋아요를 취소했습니다");
@@ -526,10 +596,9 @@ export default function App() {
     
     const updatedBusinessProducts = [...businessProducts, newProduct];
     setBusinessProducts(updatedBusinessProducts);
-    setAllProducts(prev => [newProduct, ...prev]);
-    
+    // allProducts는 businessProducts useEffect에서 자동 동기화
     // Save to localStorage (backup)
-    localStorage.setItem('businessProducts', JSON.stringify(updatedBusinessProducts));
+    globalSet('businessProducts', JSON.stringify(updatedBusinessProducts));
 
     // Save to backend (optional - fails silently)
     if (accessToken) {
@@ -540,23 +609,22 @@ export default function App() {
   };
 
   const handleDeleteProduct = async (productId: string) => {
+    console.log('🗑️ Deleting product:', productId);
+    console.log('📦 Before delete - businessProducts:', businessProducts.length);
+    
     // Remove from businessProducts
     const updatedBusinessProducts = businessProducts.filter(p => p.id !== productId);
     setBusinessProducts(updatedBusinessProducts);
-    
-    // Remove from allProducts
-    setAllProducts(prev => prev.filter(p => p.id !== productId));
-    
+    // allProducts는 businessProducts useEffect에서 자동 동기화
     // Remove related applications
     const updatedApplications = applications.filter(app => app.productId !== productId);
     setApplications(updatedApplications);
-    
     // Save to localStorage
-    localStorage.setItem('businessProducts', JSON.stringify(updatedBusinessProducts));
-    localStorage.setItem('applications', JSON.stringify(updatedApplications));
-    
+    globalSet('businessProducts', JSON.stringify(updatedBusinessProducts));
+    console.log('💾 After delete - saved to localStorage:', updatedBusinessProducts.length);
+    console.log('✅ localStorage check:', JSON.parse(localStorage.getItem('businessProducts') || '[]').length);
+    localSet('applications', JSON.stringify(updatedApplications));
     toast.success("체험단이 삭제되었습니다");
-    
     // Delete from backend (optional - fails silently)
     if (accessToken) {
       // Backend delete API would go here
@@ -604,16 +672,82 @@ export default function App() {
   };
 
   const handleSignupComplete = (userData: UserInfo, token?: string) => {
+    // loadUserData 실행 방지를 위해 lastLoadKeyRef 초기화
+    lastLoadKeyRef.current = "";
+    
+    // 사용자별 데이터만 삭제 (businessProducts는 전역 데이터이므로 유지)
+    try {
+      localStorage.removeItem('applications');
+      localStorage.removeItem('favorites');
+      localStorage.removeItem('completedReviews');
+      localStorage.removeItem('notifications');
+      localStorage.removeItem('productLikes');
+      localStorage.removeItem('userPoints');
+      localStorage.removeItem('userLevel');
+      localStorage.removeItem('pointTransactions');
+    } catch {}
+    
+    // businessProducts는 기존 값 유지 (전역 공유 데이터)
+    const existingProducts = (() => {
+      try { return JSON.parse(localStorage.getItem('businessProducts') || '[]'); } catch { return []; }
+    })();
+    setBusinessProducts(existingProducts);
+    
+    // 사용자별 상태 초기화
+    setApplications([]);
+    setFavorites([]);
+    setProductLikes([]);
+    setCompletedReviews([]);
+    setNotifications([]);
+    setUserPoints(0);
+    setUserLevel(1);
+    
+    // userInfo와 accessToken 설정
     setUserInfo(userData);
     if (token) {
       setAccessToken(token);
+      // loadUserData가 실행되도록 lastLoadKeyRef 설정
+      lastLoadKeyRef.current = `${token}:${userData.userType}`;
     }
     setCurrentPage("home");
   };
 
   const handleLoginComplete = (userData: UserInfo, token: string) => {
+    // loadUserData 실행 방지를 위해 lastLoadKeyRef 초기화
+    lastLoadKeyRef.current = "";
+    
+    // 사용자별 데이터만 삭제 (businessProducts는 전역 데이터이므로 유지)
+    try {
+      localStorage.removeItem('applications');
+      localStorage.removeItem('favorites');
+      localStorage.removeItem('completedReviews');
+      localStorage.removeItem('notifications');
+      localStorage.removeItem('productLikes');
+      localStorage.removeItem('userPoints');
+      localStorage.removeItem('userLevel');
+      localStorage.removeItem('pointTransactions');
+    } catch {}
+    
+    // businessProducts는 기존 값 유지 (전역 공유 데이터)
+    const existingProducts = (() => {
+      try { return JSON.parse(localStorage.getItem('businessProducts') || '[]'); } catch { return []; }
+    })();
+    setBusinessProducts(existingProducts);
+    
+    // 사용자별 상태 초기화
+    setApplications([]);
+    setFavorites([]);
+    setProductLikes([]);
+    setCompletedReviews([]);
+    setNotifications([]);
+    setUserPoints(0);
+    setUserLevel(1);
+    
+    // userInfo와 accessToken 설정
     setUserInfo(userData);
     setAccessToken(token);
+    // loadUserData가 실행되도록 lastLoadKeyRef 설정
+    lastLoadKeyRef.current = `${token}:${userData.userType}`;
     setCurrentPage("home");
   };
 
@@ -638,7 +772,7 @@ export default function App() {
     setCompletedReviews(updatedReviews);
     
     // Save to localStorage
-    localStorage.setItem('completedReviews', JSON.stringify(updatedReviews));
+    localSet('completedReviews', JSON.stringify(updatedReviews));
     
     // Update product's reviewCount
     setAllProducts(prev => prev.map(p => 
@@ -660,7 +794,7 @@ export default function App() {
     // Update points
     const newPoints = userPoints + earnedPoints;
     setUserPoints(newPoints);
-    localStorage.setItem('userPoints', newPoints.toString());
+    localSet('userPoints', newPoints.toString());
     
     // Add transaction
     const transaction: PointTransaction = {
@@ -673,7 +807,7 @@ export default function App() {
     };
     const updatedTransactions = [transaction, ...pointTransactions];
     setPointTransactions(updatedTransactions);
-    localStorage.setItem('pointTransactions', JSON.stringify(updatedTransactions));
+    localSet('pointTransactions', JSON.stringify(updatedTransactions));
     
     toast.success(`리뷰가 등록되었습니다! +${earnedPoints}P 적립`);
 
@@ -765,7 +899,7 @@ export default function App() {
       setNotifications(updatedNotifications);
       
       // Save to localStorage
-      localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+      localSet('notifications', JSON.stringify(updatedNotifications));
 
       // Save notification to backend (optional - fails silently)
       if (accessToken) {

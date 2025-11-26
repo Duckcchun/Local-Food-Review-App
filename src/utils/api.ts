@@ -41,7 +41,20 @@ async function apiCall<T>(
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-  const data = await response.json();
+  
+  // Check if response is JSON before parsing
+  const contentType = response.headers.get('content-type');
+  let data: any;
+  
+  if (contentType && contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    const text = await response.text();
+    data = { 
+      error: `Server returned non-JSON response: ${response.status} ${response.statusText}`,
+      details: text.substring(0, 200)
+    };
+  }
 
   if (!response.ok) {
     throw new Error(data.error || 'API 요청 실패');
