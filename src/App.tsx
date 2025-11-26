@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Toaster } from "./components/ui/sonner";
 import { HomePage } from "./components/HomePage";
@@ -177,22 +177,9 @@ export default function App() {
     }
   });
 
-  // allProducts는 businessProducts에 따라 자동 동기화
-  const [allProducts, setAllProducts] = useState<Product[]>(() => {
-    try {
-      const saved = localStorage.getItem('businessProducts');
-      const savedProducts = saved ? JSON.parse(saved) : [];
-      // mockProducts와 businessProducts를 항상 합쳐서 표시
-      return [...mockProducts, ...savedProducts];
-    } catch {
-      return [...mockProducts];
-    }
-  });
-
-  // businessProducts가 바뀔 때마다 allProducts 동기화
-  useEffect(() => {
-    // mockProducts와 businessProducts를 항상 합쳐서 표시
-    setAllProducts([...mockProducts, ...businessProducts]);
+  // allProducts는 businessProducts에 따라 자동으로 계산 (useMemo로 최적화)
+  const allProducts = useMemo(() => {
+    return [...mockProducts, ...businessProducts];
   }, [businessProducts]);
   
   const [completedReviews, setCompletedReviews] = useState<Review[]>(() => {
@@ -400,8 +387,7 @@ export default function App() {
   }, [accessToken, userInfo?.userType]);
 
   // Avoid duplicate loads/toasts when dependencies change rapidly
-  const lastLoadKeyRef = (typeof window !== 'undefined' ? (window as any).__lastLoadKeyRef : undefined) || { current: "" };
-  if (typeof window !== 'undefined') (window as any).__lastLoadKeyRef = lastLoadKeyRef;
+  const lastLoadKeyRef = useRef<string>("");
 
   useEffect(() => {
     if (!userInfo || !accessToken) return;
@@ -671,48 +657,8 @@ export default function App() {
     }
   };
 
-  const handleSignupComplete = (userData: UserInfo, token?: string) => {
-    // loadUserData 실행 방지를 위해 lastLoadKeyRef 초기화
-    lastLoadKeyRef.current = "";
-    
-    // 사용자별 데이터만 삭제 (businessProducts는 전역 데이터이므로 유지)
-    try {
-      localStorage.removeItem('applications');
-      localStorage.removeItem('favorites');
-      localStorage.removeItem('completedReviews');
-      localStorage.removeItem('notifications');
-      localStorage.removeItem('productLikes');
-      localStorage.removeItem('userPoints');
-      localStorage.removeItem('userLevel');
-      localStorage.removeItem('pointTransactions');
-    } catch {}
-    
-    // businessProducts는 기존 값 유지 (전역 공유 데이터)
-    const existingProducts = (() => {
-      try { return JSON.parse(localStorage.getItem('businessProducts') || '[]'); } catch { return []; }
-    })();
-    setBusinessProducts(existingProducts);
-    
-    // 사용자별 상태 초기화
-    setApplications([]);
-    setFavorites([]);
-    setProductLikes([]);
-    setCompletedReviews([]);
-    setNotifications([]);
-    setUserPoints(0);
-    setUserLevel(1);
-    
-    // userInfo와 accessToken 설정
-    setUserInfo(userData);
-    if (token) {
-      setAccessToken(token);
-      // loadUserData가 실행되도록 lastLoadKeyRef 설정
-      lastLoadKeyRef.current = `${token}:${userData.userType}`;
-    }
-    setCurrentPage("home");
-  };
-
-  const handleLoginComplete = (userData: UserInfo, token: string) => {
+  // 공통 사용자 데이터 초기화 로직
+  const resetUserData = useCallback((userData: UserInfo, token: string) => {
     // loadUserData 실행 방지를 위해 lastLoadKeyRef 초기화
     lastLoadKeyRef.current = "";
     
@@ -748,6 +694,20 @@ export default function App() {
     setAccessToken(token);
     // loadUserData가 실행되도록 lastLoadKeyRef 설정
     lastLoadKeyRef.current = `${token}:${userData.userType}`;
+  }, []);
+
+  const handleSignupComplete = (userData: UserInfo, token?: string) => {
+    if (!token) {
+      setUserInfo(userData);
+      setCurrentPage("home");
+      return;
+    }
+    resetUserData(userData, token);
+    setCurrentPage("home");
+  };
+
+  const handleLoginComplete = (userData: UserInfo, token: string) => {
+    resetUserData(userData, token);
     setCurrentPage("home");
   };
 
@@ -852,7 +812,7 @@ export default function App() {
     }
     
     // Save to localStorage
-    localStorage.setItem('applications', JSON.stringify(updatedApplications));
+    localSet('applications', JSON.stringify(updatedApplications));
 
     // Update in backend (optional - fails silently)
     if (accessToken) {
@@ -1313,7 +1273,7 @@ export default function App() {
                 // Deduct points
                 const newPoints = userPoints - product.price;
                 setUserPoints(newPoints);
-                localStorage.setItem('userPoints', newPoints.toString());
+                localSet('userPoints', newPoints.toString());
                 
                 // Add transaction
                 const transaction: PointTransaction = {
@@ -1326,7 +1286,7 @@ export default function App() {
                 };
                 const updatedTransactions = [transaction, ...pointTransactions];
                 setPointTransactions(updatedTransactions);
-                localStorage.setItem('pointTransactions', JSON.stringify(updatedTransactions));
+                localSet('pointTransactions', JSON.stringify(updatedTransactions));
                 
                 toast.success(`${product.name} 구매가 완료되었습니다!`);
               }}
