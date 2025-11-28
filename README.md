@@ -60,12 +60,6 @@ useState와 useEffect를 결합하여 allProducts, applications, reviews, userIn
 * Prototype DB: localStorage (브라우저 영구 저장)
 * State Management: React Hooks (useState, useEffect) (컴포넌트 props drilling)
 
-네, 알겠습니다.
-
-프로젝트의 기술 스택(React, Vite, Supabase, Tailwind)과 B2B/B2C 기능 흐름을 바탕으로 예상되는 폴더 구조를 만들어봤습니다.
-
-README에 이어서 바로 붙여넣으시면 됩니다.
-
 ## 📂 폴더 구조
 
 ```
