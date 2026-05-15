@@ -561,6 +561,7 @@ export default function App() {
 
   const handleToggleProductLike = async (productId: string) => {
     const isCurrentlyLiked = productLikes.includes(productId);
+    const delta = isCurrentlyLiked ? -1 : 1;
     
     const newLikes = isCurrentlyLiked
       ? productLikes.filter(id => id !== productId)
@@ -571,15 +572,21 @@ export default function App() {
     // Update product's likeCount
     setAllProducts(prev => prev.map(p => 
       p.id === productId 
-        ? { ...p, likeCount: p.likeCount + (isCurrentlyLiked ? -1 : 1) }
+        ? { ...p, likeCount: Math.max(0, (p.likeCount || 0) + delta) }
         : p
     ));
     
     setBusinessProducts(prev => prev.map(p => 
       p.id === productId 
-        ? { ...p, likeCount: p.likeCount + (isCurrentlyLiked ? -1 : 1) }
+        ? { ...p, likeCount: Math.max(0, (p.likeCount || 0) + delta) }
         : p
     ));
+
+    // 상세 페이지에서 보여주는 selectedProduct도 즉시 동기화
+    setSelectedProduct(prev => {
+      if (!prev || prev.id !== productId) return prev;
+      return { ...prev, likeCount: Math.max(0, (prev.likeCount || 0) + delta) };
+    });
     
     // Save to localStorage
     localSet('productLikes', JSON.stringify(newLikes));
