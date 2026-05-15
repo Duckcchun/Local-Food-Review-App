@@ -35,63 +35,12 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 
 type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy";
 
-export interface UserInfo {
-  name: string;
-  email: string;
-  phone: string;
-  userType: "reviewer" | "business";
-  businessName?: string;
-  businessNumber?: string;
-  businessAddress?: string;
-}
-
-export type NotificationType = "selection" | "rejection" | "review-request" | "review-received" | "application";
-
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  productId?: string;
-  productName?: string;
-  productImage?: string;
-  createdAt: string;
-  read: boolean;
-}
-
-export type ApplicationStatus = "pending" | "accepted" | "rejected" | "review-completed";
-
-export interface Application {
-  id: string;
-  productId: string;
-  productName: string;
-  productImage: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
-  userPhone: string;
-  userLevel: number;
-  status: ApplicationStatus;
-  appliedAt: string;
-}
-
-export interface Review {
-  id: string;
-  productId: string;
-  productName: string;
-  productImage: string;
-  pros: string;
-  cons: string;
-  improvements: string;
-  photos: string[];
-  createdAt: string;
-  userId?: string;
-  userName?: string;
-  status: "published" | "hidden";
-  reported: boolean;
-  reportReason?: string;
-  reportedAt?: string;
-}
+// Domain types — canonical definitions live in src/types/index.ts.
+// Re-exported here so existing `import { X } from "../App"` statements
+// continue to work without modification. New code should import from
+// "../types" (or "@/types") directly.
+export type { UserInfo, NotificationType, Notification, ApplicationStatus, Application, Review } from "./types";
+import type { UserInfo, Notification, Application, ApplicationStatus, Review } from "./types";
 
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
