@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { productsApi, applicationsApi, favoritesApi, reviewsApi, notificationsApi, businessApplicationsApi } from "./utils/api";
 import { getLevelInfo } from "./data/levelSystem";
 import { projectId } from "./utils/supabase/info";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy";
 
@@ -117,41 +118,13 @@ export default function App() {
       return "";
     }
   });
-  // Helpers: user-scoped localStorage access (namespace per email)
-  const localKey = useCallback((key: string, email?: string | null) => {
-    const id = (email || userInfo?.email || '').trim();
-    return id ? `${key}:${id}` : key;
-  }, [userInfo?.email]);
-
-  const localGet = useCallback((key: string, email?: string | null) => {
-    try {
-      const raw = localStorage.getItem(localKey(key, email));
-      return raw;
-    } catch { return null; }
-  }, [localKey]);
-
-  const localSet = useCallback((key: string, value: string, email?: string | null) => {
-    try { localStorage.setItem(localKey(key, email), value); } catch {}
-  }, [localKey]);
-
-  const localRemove = useCallback((key: string, email?: string | null) => {
-    try { localStorage.removeItem(localKey(key, email)); } catch {}
-  }, [localKey]);
-
-  // Global localStorage helpers (not user-scoped) for shared data like products
-  const globalGet = useCallback((key: string) => {
-    try {
-      return localStorage.getItem(key);
-    } catch { return null; }
-  }, []);
-
-  const globalSet = useCallback((key: string, value: string) => {
-    try { localStorage.setItem(key, value); } catch {}
-  }, []);
-
-  const globalRemove = useCallback((key: string) => {
-    try { localStorage.removeItem(key); } catch {}
-  }, []);
+  // localStorage access (user-scoped + global). Centralized in a hook so
+  // try/catch + namespacing logic isn't duplicated inline.
+  // (localRemove/globalRemove are exported by the hook for future use but
+  // aren't needed at App.tsx level today.)
+  const { localGet, localSet, globalGet, globalSet } = useLocalStorage(
+    userInfo?.email
+  );
   const [applications, setApplications] = useState<Application[]>(() => {
     const saved = localGet('applications');
     return saved ? JSON.parse(saved) : [];
