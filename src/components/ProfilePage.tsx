@@ -18,7 +18,6 @@ function ImageWithFallback({ src, alt, className }: { src?: string; alt?: string
     />
   );
 }
-import { mockReviews, userProfile } from "../data/mockData";
 import type { UserInfo, Review } from "../App";
 import type { Product } from "../data/mockData";
 import { getLevelInfo, getLevelProgress, getPointsToNextLevel, LEVELS } from "../data/levelSystem";
