@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Toaster } from "./components/ui/sonner";
 import { HomePage } from "./components/HomePage";
@@ -177,9 +177,26 @@ export default function App() {
     }
   });
 
-  // allProducts는 businessProducts에 따라 자동으로 계산 (useMemo로 최적화)
-  const allProducts = useMemo(() => {
+  const [allProducts, setAllProducts] = useState<Product[]>(() => {
     return [...mockProducts, ...businessProducts];
+  });
+
+  // businessProducts 변경 시 allProducts를 동기화하되,
+  // 기존 카운트(currentApplicants/likeCount/reviewCount)는 최대한 유지한다.
+  useEffect(() => {
+    setAllProducts(prev => {
+      const prevById = new Map(prev.map(product => [product.id, product]));
+      return [...mockProducts, ...businessProducts].map(product => {
+        const prevProduct = prevById.get(product.id);
+        if (!prevProduct) return product;
+        return {
+          ...product,
+          currentApplicants: prevProduct.currentApplicants ?? product.currentApplicants,
+          likeCount: prevProduct.likeCount ?? product.likeCount,
+          reviewCount: prevProduct.reviewCount ?? product.reviewCount,
+        };
+      });
+    });
   }, [businessProducts]);
   
   const [completedReviews, setCompletedReviews] = useState<Review[]>(() => {
