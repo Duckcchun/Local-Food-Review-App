@@ -18,20 +18,6 @@ export interface Product {
   badge?: string;
 }
 
-export interface Review {
-  id: string;
-  productId: string;
-  productName: string;
-  productImage: string;
-  comment: string;
-  pros: string;
-  cons: string;
-  suggestions: string;
-  date: string;
-  userName: string;
-  userLevel: number;
-}
-
 export const mockProducts: Product[] = [
   {
     id: "1",
@@ -271,39 +257,3 @@ export const mockProducts: Product[] = [
 
 ];
 
-export const mockReviews: Review[] = [
-  {
-    id: "1",
-    productId: "1",
-    productName: "할머니 손맛 김치찌개",
-    productImage: "https://images.unsplash.com/photo-1760228865341-675704c22a5b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxrb3JlYW4lMjBraW1jaGklMjBqamlnYWUlMjBzdGV3fGVufDF8fHx8MTc2Mjc3MjAxMHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    comment: "진짜 집에서 먹는 것처럼 푸근한 맛이에요. 김치도 직접 담그신다고 하는데 정말 맛있었습니다.",
-    pros: "김치가 정말 맛있고, 고기도 푸짐하게 들어있어요. 밑반찬도 깔끔하고 맛있습니다.",
-    cons: "점심시간에는 사람이 많아서 조금 기다려야 해요.",
-    suggestions: "배달 용기를 좀 더 튼튼한 걸로 바꾸면 좋을 것 같아요.",
-    date: "2025.11.05",
-    userName: "김맛평",
-    userLevel: 3
-  },
-  {
-    id: "2",
-    productId: "2",
-    productName: "손으로 빚은 왕교자",
-    productImage: "https://images.unsplash.com/photo-1583224994076-ae951d019af7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxrb3JlYW4lMjBkdW1wbGluZ3MlMjBtYW5kdXxlbnwxfHx8fDE3NjI4MjY2NzB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    comment: "만두 크기가 정말 크고 속이 꽉 차있어요! 재주문 의사 100%입니다.",
-    pros: "만두가 크고 속재료가 가득해요. 피도 쫄깃하고 맛있습니다.",
-    cons: "배달 시간이 조금 걸려요. 만들어서 보내주시는 것 같아요.",
-    suggestions: "소스를 한두 개 더 주시면 좋을 것 같아요.",
-    date: "2025.11.03",
-    userName: "김맛평",
-    userLevel: 3
-  }
-];
-
-export const userProfile = {
-  name: "김맛평",
-  level: 3,
-  reviewCount: 12,
-  likeReceived: 45,
-  totalPoints: 1250
-};
