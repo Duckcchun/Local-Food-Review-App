@@ -339,11 +339,9 @@ export default function App() {
     // Business products (load for ALL users, not just business)
     try {
       const productsData = await productsApi.getAll(accessToken);
-      let useLocal = false;
       let mergedBiz: Product[] = [];
       if (!productsData.success || !Array.isArray(productsData.products) || productsData.products.length === 0) {
         // 서버 실패 또는 빈 배열이면 localStorage만 사용
-        useLocal = true;
         mergedBiz = (() => {
           try { return JSON.parse(globalGet('businessProducts') || '[]'); } catch { return []; }
         })();
@@ -357,28 +355,13 @@ export default function App() {
         globalSet('businessProducts', JSON.stringify(mergedBiz));
       }
       setBusinessProducts(mergedBiz);
-      // businessProducts가 비어있을 때만 mockProducts 추가
-      let mergedAll: Product[];
-      if (mergedBiz.length > 0) {
-        mergedAll = mergedBiz;
-      } else {
-        mergedAll = [...mockProducts];
-      }
-      setAllProducts(mergedAll);
+      // allProducts는 useMemo로 [mockProducts + businessProducts] 자동 계산됨
     } catch (e) {
-      console.warn('Failed to load business products from server, using localStorage:', e);
       // 서버 완전 실패 시에도 localStorage만 사용
       const localBiz: Product[] = (() => {
         try { return JSON.parse(globalGet('businessProducts') || '[]'); } catch { return []; }
       })();
       setBusinessProducts(localBiz);
-      let mergedAll: Product[];
-      if (localBiz.length > 0) {
-        mergedAll = localBiz;
-      } else {
-        mergedAll = [...mockProducts];
-      }
-      setAllProducts(mergedAll);
     }
 
     if (anySuccess) {
@@ -438,12 +421,7 @@ export default function App() {
         setApplications(prev => [...prev, newApplication]);
         
         // Update product's currentApplicants count
-        setAllProducts(prev => prev.map(p => 
-          p.id === selectedProduct.id 
-            ? { ...p, currentApplicants: p.currentApplicants + 1 }
-            : p
-        ));
-        
+        // (allProducts는 businessProducts useMemo로 자동 재계산됨)
         setBusinessProducts(prev => prev.map(p => 
           p.id === selectedProduct.id 
             ? { ...p, currentApplicants: p.currentApplicants + 1 }
@@ -493,9 +471,7 @@ export default function App() {
     localSet('applications', JSON.stringify(updated));
 
     // Decrement product applicants count
-    setAllProducts(prev => prev.map(p => 
-      p.id === productId ? { ...p, currentApplicants: Math.max(0, (p.currentApplicants || 0) - 1) } : p
-    ));
+    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
     setBusinessProducts(prev => prev.map(p => 
       p.id === productId ? { ...p, currentApplicants: Math.max(0, (p.currentApplicants || 0) - 1) } : p
     ));
@@ -552,12 +528,7 @@ export default function App() {
     setProductLikes(newLikes);
     
     // Update product's likeCount
-    setAllProducts(prev => prev.map(p => 
-      p.id === productId 
-        ? { ...p, likeCount: p.likeCount + (isCurrentlyLiked ? -1 : 1) }
-        : p
-    ));
-    
+    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
     setBusinessProducts(prev => prev.map(p => 
       p.id === productId 
         ? { ...p, likeCount: p.likeCount + (isCurrentlyLiked ? -1 : 1) }
@@ -595,9 +566,6 @@ export default function App() {
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    console.log('🗑️ Deleting product:', productId);
-    console.log('📦 Before delete - businessProducts:', businessProducts.length);
-    
     // Remove from businessProducts
     const updatedBusinessProducts = businessProducts.filter(p => p.id !== productId);
     setBusinessProducts(updatedBusinessProducts);
@@ -607,15 +575,9 @@ export default function App() {
     setApplications(updatedApplications);
     // Save to localStorage
     globalSet('businessProducts', JSON.stringify(updatedBusinessProducts));
-    console.log('💾 After delete - saved to localStorage:', updatedBusinessProducts.length);
-    console.log('✅ localStorage check:', JSON.parse(localStorage.getItem('businessProducts') || '[]').length);
     localSet('applications', JSON.stringify(updatedApplications));
     toast.success("체험단이 삭제되었습니다");
-    // Delete from backend (optional - fails silently)
-    if (accessToken) {
-      // Backend delete API would go here
-      console.log("Backend delete not implemented yet");
-    }
+    // TODO: Backend delete API not implemented yet
   };
 
   const handleLogout = () => {
@@ -735,12 +697,7 @@ export default function App() {
     localSet('completedReviews', JSON.stringify(updatedReviews));
     
     // Update product's reviewCount
-    setAllProducts(prev => prev.map(p => 
-      p.id === reviewData.productId 
-        ? { ...p, reviewCount: p.reviewCount + 1 }
-        : p
-    ));
-    
+    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
     setBusinessProducts(prev => prev.map(p => 
       p.id === reviewData.productId 
         ? { ...p, reviewCount: p.reviewCount + 1 }
@@ -797,13 +754,8 @@ export default function App() {
     setApplications(updatedApplications);
     
     // Update product's currentApplicants count if rejected
+    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
     if (status === "rejected" && application) {
-      setAllProducts(prev => prev.map(p => 
-        p.id === application.productId && p.currentApplicants > 0
-          ? { ...p, currentApplicants: p.currentApplicants - 1 }
-          : p
-      ));
-      
       setBusinessProducts(prev => prev.map(p => 
         p.id === application.productId && p.currentApplicants > 0
           ? { ...p, currentApplicants: p.currentApplicants - 1 }
