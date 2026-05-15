@@ -33,7 +33,10 @@ import { getLevelInfo } from "./data/levelSystem";
 import { projectId } from "./utils/supabase/info";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
-type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy";
+import { useNavigation } from "./hooks/useNavigation";
+import type { Page } from "./hooks/useNavigation";
+
+// Re-export Page type for external consumers
 
 // Domain types — canonical definitions live in src/types/index.ts.
 // Re-exported here so existing `import { X } from "../App"` statements
@@ -56,7 +59,7 @@ const pageTransition: any = {
 
 export default function App() {
 
-  const [currentPage, setCurrentPage] = useState<Page>("signup");
+  const { currentPage, navigate, goBack, handleTabChange, showBottomNav } = useNavigation("signup");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [accessToken, setAccessToken] = useState<string>(() => {
@@ -319,7 +322,7 @@ export default function App() {
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
-    setCurrentPage("product-detail");
+    navigate("product-detail");
   };
 
   const handleApply = async () => {
@@ -368,7 +371,7 @@ export default function App() {
         // Go back to home after short delay
         setTimeout(() => {
           setSelectedProduct(null);
-          setCurrentPage("home");
+          navigate("home");
         }, 1500);
       } else {
         toast.error("이미 신청한 체험단입니다");
@@ -505,7 +508,7 @@ export default function App() {
   const handleLogout = () => {
     setUserInfo(null);
     setAccessToken("");
-    setCurrentPage("signup");
+    navigate("signup");
     try { localStorage.removeItem('accessToken'); } catch {}
     // Don't clear data - keep in localStorage for persistence
     // setApplications([]);
@@ -516,30 +519,18 @@ export default function App() {
     toast.success("로그아웃 되었습니다");
   };
 
-  const handleTabChange = (tab: "home" | "review" | "profile") => {
-    setCurrentPage(tab);
+  // handleBack and handleTabChange are provided by useNavigation hook
+  // Wrap goBack to also clear selectedProduct on page transitions
+  const handleBack = useCallback(() => {
+    goBack();
     setSelectedProduct(null);
-  };
+  }, [goBack]);
 
-  const handleBack = () => {
-    if (currentPage === "product-detail") {
-      setCurrentPage("home");
-      setSelectedProduct(null);
-    } else if (currentPage === "review-write") {
-      setCurrentPage("review");
-      setSelectedProduct(null);
-    } else if (currentPage === "edit-review") {
-      setCurrentPage("profile");
-      setSelectedProduct(null);
-    } else if (currentPage === "my-applications" || currentPage === "my-favorites" || currentPage === "terms" || currentPage === "privacy") {
-      setCurrentPage("profile");
-    } else if (currentPage === "create-product" || currentPage === "manage-applicants" || currentPage === "review-management") {
-      setCurrentPage("home");
-      setSelectedProduct(null);
-    } else if (currentPage === "notifications") {
-      setCurrentPage("home");
-    }
-  };
+  // Wrap tab change to also clear selectedProduct
+  const onTabChange = useCallback((tab: "home" | "review" | "profile") => {
+    handleTabChange(tab);
+    setSelectedProduct(null);
+  }, [handleTabChange]);
 
   // 공통 사용자 데이터 초기화 로직
   const resetUserData = useCallback((userData: UserInfo, token: string) => {
@@ -583,26 +574,26 @@ export default function App() {
   const handleSignupComplete = (userData: UserInfo, token?: string) => {
     if (!token) {
       setUserInfo(userData);
-      setCurrentPage("home");
+      navigate("home");
       return;
     }
     resetUserData(userData, token);
-    setCurrentPage("home");
+    navigate("home");
   };
 
   const handleLoginComplete = (userData: UserInfo, token: string) => {
     resetUserData(userData, token);
-    setCurrentPage("home");
+    navigate("home");
   };
 
   const handleSelectProductForReview = (product: Product) => {
     setSelectedProduct(product);
-    setCurrentPage("review-write");
+    navigate("review-write");
   };
 
   const handleEditReview = (product: Product) => {
     setSelectedProduct(product);
-    setCurrentPage("edit-review");
+    navigate("edit-review");
   };
 
   const handleSubmitReview = async (reviewData: Omit<Review, "id" | "createdAt">) => {
@@ -660,7 +651,7 @@ export default function App() {
     // Go back to review page
     setTimeout(() => {
       setSelectedProduct(null);
-      setCurrentPage("review");
+      navigate("review");
     }, 1500);
   };
 
@@ -746,7 +737,7 @@ export default function App() {
 
   const handleManageApplicants = (product: Product) => {
     setSelectedProduct(product);
-    setCurrentPage("manage-applicants");
+    navigate("manage-applicants");
   };
 
   const handleReportReview = (reviewId: string, reason: string) => {
@@ -793,9 +784,9 @@ export default function App() {
             transition={pageTransition}
           >
             <SignupPage 
-              onBack={() => setCurrentPage("home")} 
+              onBack={() => navigate("home")} 
               onSignupComplete={handleSignupComplete}
-              onSwitchToLogin={() => setCurrentPage("login")}
+              onSwitchToLogin={() => navigate("login")}
             />
           </motion.div>
         )}
@@ -810,9 +801,9 @@ export default function App() {
             transition={pageTransition}
           >
             <LoginPage 
-              onBack={() => setCurrentPage("home")} 
+              onBack={() => navigate("home")} 
               onLoginComplete={handleLoginComplete}
-              onSwitchToSignup={() => setCurrentPage("signup")}
+              onSwitchToSignup={() => navigate("signup")}
             />
           </motion.div>
         )}
@@ -827,8 +818,8 @@ export default function App() {
             transition={pageTransition}
           >
             <StoreRegistrationPage 
-              onBack={() => setCurrentPage("home")} 
-              onComplete={() => setCurrentPage("home")}
+              onBack={() => navigate("home")} 
+              onComplete={() => navigate("home")}
               userId={userInfo.email}
               accessToken={accessToken}
             />
@@ -849,10 +840,10 @@ export default function App() {
                 userInfo={userInfo} 
                 onProductClick={handleProductClick}
                 myProducts={businessProducts}
-                onCreateProduct={() => setCurrentPage("create-product")}
+                onCreateProduct={() => navigate("create-product")}
                 onManageApplicants={handleManageApplicants}
-                onManageReviews={() => setCurrentPage("review-management")}
-                onViewDashboard={() => setCurrentPage("business-dashboard")}
+                onManageReviews={() => navigate("review-management")}
+                onViewDashboard={() => navigate("business-dashboard")}
                 onDeleteProduct={handleDeleteProduct}
               />
             </motion.div>
@@ -871,7 +862,7 @@ export default function App() {
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
                 products={allProducts}
-                onNotificationsClick={() => setCurrentPage("notifications")}
+                onNotificationsClick={() => navigate("notifications")}
                 unreadNotifications={notifications.filter(n => !n.read).length}
               />
             </motion.div>
@@ -1027,14 +1018,14 @@ export default function App() {
               completedReviews={completedReviews}
               userPoints={userPoints}
               userLevel={userLevel}
-              onNavigateToApplications={() => setCurrentPage("my-applications")}
-              onNavigateToFavorites={() => setCurrentPage("my-favorites")}
-              onNavigateToPointShop={() => setCurrentPage("point-shop")}
-              onNavigateToPointHistory={() => setCurrentPage("point-history")}
+              onNavigateToApplications={() => navigate("my-applications")}
+              onNavigateToFavorites={() => navigate("my-favorites")}
+              onNavigateToPointShop={() => navigate("point-shop")}
+              onNavigateToPointHistory={() => navigate("point-history")}
               onEditReview={handleEditReview}
-              onNavigateToDashboard={() => setCurrentPage("business-dashboard")}
-              onNavigateToTerms={() => setCurrentPage("terms")}
-              onNavigateToPrivacy={() => setCurrentPage("privacy")}
+              onNavigateToDashboard={() => navigate("business-dashboard")}
+              onNavigateToTerms={() => navigate("terms")}
+              onNavigateToPrivacy={() => navigate("privacy")}
               onLogout={handleLogout}
             />
           </motion.div>
@@ -1139,7 +1130,7 @@ export default function App() {
           >
             <PointShop
               onBack={() => {
-                setCurrentPage("profile");
+                navigate("profile");
               }}
               userPoints={userPoints}
               userLevel={userLevel}
@@ -1179,7 +1170,7 @@ export default function App() {
           >
             <PointHistory
               onBack={() => {
-                setCurrentPage("profile");
+                navigate("profile");
               }}
               transactions={pointTransactions}
               currentPoints={userPoints}
@@ -1197,7 +1188,7 @@ export default function App() {
             transition={pageTransition}
           >
             <BusinessDashboard
-              onBack={() => setCurrentPage("home")}
+              onBack={() => navigate("home")}
               products={businessProducts}
               applications={applications}
               reviews={completedReviews}
@@ -1207,10 +1198,10 @@ export default function App() {
       </AnimatePresence>
 
       {/* Bottom Navigation */}
-      {userInfo && currentPage !== "signup" && currentPage !== "login" && currentPage !== "product-detail" && currentPage !== "review-write" && currentPage !== "edit-review" && currentPage !== "my-applications" && currentPage !== "my-favorites" && currentPage !== "create-product" && currentPage !== "manage-applicants" && currentPage !== "notifications" && currentPage !== "review-management" && currentPage !== "point-shop" && currentPage !== "point-history" && currentPage !== "business-dashboard" && currentPage !== "terms" && currentPage !== "privacy" && (
+      {userInfo && showBottomNav && (
         <BottomNav 
           activeTab={currentPage as "home" | "review" | "profile"} 
-          onTabChange={handleTabChange}
+          onTabChange={onTabChange}
           userType={userInfo.userType}
         />
       )}
