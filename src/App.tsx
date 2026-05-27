@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Toaster } from "./components/ui/sonner";
 import { HomePage } from "./components/HomePage";
@@ -31,19 +31,66 @@ import { toast } from "sonner";
 import { productsApi, applicationsApi, favoritesApi, reviewsApi, notificationsApi, businessApplicationsApi } from "./utils/api";
 import { getLevelInfo } from "./data/levelSystem";
 import { projectId } from "./utils/supabase/info";
-import { useLocalStorage } from "./hooks/useLocalStorage";
 
-import { useNavigation } from "./hooks/useNavigation";
-import type { Page } from "./hooks/useNavigation";
+type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy";
 
-// Re-export Page type for external consumers
+export interface UserInfo {
+  name: string;
+  email: string;
+  phone: string;
+  userType: "reviewer" | "business";
+  businessName?: string;
+  businessNumber?: string;
+  businessAddress?: string;
+}
 
-// Domain types — canonical definitions live in src/types/index.ts.
-// Re-exported here so existing `import { X } from "../App"` statements
-// continue to work without modification. New code should import from
-// "../types" (or "@/types") directly.
-export type { UserInfo, NotificationType, Notification, ApplicationStatus, Application, Review } from "./types";
-import type { UserInfo, Notification, Application, ApplicationStatus, Review } from "./types";
+export type NotificationType = "selection" | "rejection" | "review-request" | "review-received" | "application";
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  productId?: string;
+  productName?: string;
+  productImage?: string;
+  createdAt: string;
+  read: boolean;
+}
+
+export type ApplicationStatus = "pending" | "accepted" | "rejected" | "review-completed";
+
+export interface Application {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  userPhone: string;
+  userLevel: number;
+  status: ApplicationStatus;
+  appliedAt: string;
+}
+
+export interface Review {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  pros: string;
+  cons: string;
+  improvements: string;
+  photos: string[];
+  createdAt: string;
+  userId?: string;
+  userName?: string;
+  status: "published" | "hidden";
+  reported: boolean;
+  reportReason?: string;
+  reportedAt?: string;
+}
 
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
@@ -59,7 +106,7 @@ const pageTransition: any = {
 
 export default function App() {
 
-  const { currentPage, navigate, goBack, handleTabChange, showBottomNav } = useNavigation("signup");
+  const [currentPage, setCurrentPage] = useState<Page>("signup");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [accessToken, setAccessToken] = useState<string>(() => {
@@ -70,13 +117,41 @@ export default function App() {
       return "";
     }
   });
-  // localStorage access (user-scoped + global). Centralized in a hook so
-  // try/catch + namespacing logic isn't duplicated inline.
-  // (localRemove/globalRemove are exported by the hook for future use but
-  // aren't needed at App.tsx level today.)
-  const { localGet, localSet, globalGet, globalSet } = useLocalStorage(
-    userInfo?.email
-  );
+  // Helpers: user-scoped localStorage access (namespace per email)
+  const localKey = useCallback((key: string, email?: string | null) => {
+    const id = (email || userInfo?.email || '').trim();
+    return id ? `${key}:${id}` : key;
+  }, [userInfo?.email]);
+
+  const localGet = useCallback((key: string, email?: string | null) => {
+    try {
+      const raw = localStorage.getItem(localKey(key, email));
+      return raw;
+    } catch { return null; }
+  }, [localKey]);
+
+  const localSet = useCallback((key: string, value: string, email?: string | null) => {
+    try { localStorage.setItem(localKey(key, email), value); } catch {}
+  }, [localKey]);
+
+  const localRemove = useCallback((key: string, email?: string | null) => {
+    try { localStorage.removeItem(localKey(key, email)); } catch {}
+  }, [localKey]);
+
+  // Global localStorage helpers (not user-scoped) for shared data like products
+  const globalGet = useCallback((key: string) => {
+    try {
+      return localStorage.getItem(key);
+    } catch { return null; }
+  }, []);
+
+  const globalSet = useCallback((key: string, value: string) => {
+    try { localStorage.setItem(key, value); } catch {}
+  }, []);
+
+  const globalRemove = useCallback((key: string) => {
+    try { localStorage.removeItem(key); } catch {}
+  }, []);
   const [applications, setApplications] = useState<Application[]>(() => {
     const saved = localGet('applications');
     return saved ? JSON.parse(saved) : [];
@@ -102,9 +177,26 @@ export default function App() {
     }
   });
 
-  // allProducts는 businessProducts에 따라 자동으로 계산 (useMemo로 최적화)
-  const allProducts = useMemo(() => {
+  const [allProducts, setAllProducts] = useState<Product[]>(() => {
     return [...mockProducts, ...businessProducts];
+  });
+
+  // businessProducts 변경 시 allProducts를 동기화하되,
+  // 기존 카운트(currentApplicants/likeCount/reviewCount)는 최대한 유지한다.
+  useEffect(() => {
+    setAllProducts(prev => {
+      const prevById = new Map(prev.map(product => [product.id, product]));
+      return [...mockProducts, ...businessProducts].map(product => {
+        const prevProduct = prevById.get(product.id);
+        if (!prevProduct) return product;
+        return {
+          ...product,
+          currentApplicants: prevProduct.currentApplicants ?? product.currentApplicants,
+          likeCount: prevProduct.likeCount ?? product.likeCount,
+          reviewCount: prevProduct.reviewCount ?? product.reviewCount,
+        };
+      });
+    });
   }, [businessProducts]);
   
   const [completedReviews, setCompletedReviews] = useState<Review[]>(() => {
@@ -264,9 +356,11 @@ export default function App() {
     // Business products (load for ALL users, not just business)
     try {
       const productsData = await productsApi.getAll(accessToken);
+      let useLocal = false;
       let mergedBiz: Product[] = [];
       if (!productsData.success || !Array.isArray(productsData.products) || productsData.products.length === 0) {
         // 서버 실패 또는 빈 배열이면 localStorage만 사용
+        useLocal = true;
         mergedBiz = (() => {
           try { return JSON.parse(globalGet('businessProducts') || '[]'); } catch { return []; }
         })();
@@ -280,13 +374,28 @@ export default function App() {
         globalSet('businessProducts', JSON.stringify(mergedBiz));
       }
       setBusinessProducts(mergedBiz);
-      // allProducts는 useMemo로 [mockProducts + businessProducts] 자동 계산됨
+      // businessProducts가 비어있을 때만 mockProducts 추가
+      let mergedAll: Product[];
+      if (mergedBiz.length > 0) {
+        mergedAll = mergedBiz;
+      } else {
+        mergedAll = [...mockProducts];
+      }
+      setAllProducts(mergedAll);
     } catch (e) {
+      console.warn('Failed to load business products from server, using localStorage:', e);
       // 서버 완전 실패 시에도 localStorage만 사용
       const localBiz: Product[] = (() => {
         try { return JSON.parse(globalGet('businessProducts') || '[]'); } catch { return []; }
       })();
       setBusinessProducts(localBiz);
+      let mergedAll: Product[];
+      if (localBiz.length > 0) {
+        mergedAll = localBiz;
+      } else {
+        mergedAll = [...mockProducts];
+      }
+      setAllProducts(mergedAll);
     }
 
     if (anySuccess) {
@@ -322,7 +431,7 @@ export default function App() {
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
-    navigate("product-detail");
+    setCurrentPage("product-detail");
   };
 
   const handleApply = async () => {
@@ -346,7 +455,12 @@ export default function App() {
         setApplications(prev => [...prev, newApplication]);
         
         // Update product's currentApplicants count
-        // (allProducts는 businessProducts useMemo로 자동 재계산됨)
+        setAllProducts(prev => prev.map(p => 
+          p.id === selectedProduct.id 
+            ? { ...p, currentApplicants: p.currentApplicants + 1 }
+            : p
+        ));
+        
         setBusinessProducts(prev => prev.map(p => 
           p.id === selectedProduct.id 
             ? { ...p, currentApplicants: p.currentApplicants + 1 }
@@ -371,7 +485,7 @@ export default function App() {
         // Go back to home after short delay
         setTimeout(() => {
           setSelectedProduct(null);
-          navigate("home");
+          setCurrentPage("home");
         }, 1500);
       } else {
         toast.error("이미 신청한 체험단입니다");
@@ -396,7 +510,9 @@ export default function App() {
     localSet('applications', JSON.stringify(updated));
 
     // Decrement product applicants count
-    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
+    setAllProducts(prev => prev.map(p => 
+      p.id === productId ? { ...p, currentApplicants: Math.max(0, (p.currentApplicants || 0) - 1) } : p
+    ));
     setBusinessProducts(prev => prev.map(p => 
       p.id === productId ? { ...p, currentApplicants: Math.max(0, (p.currentApplicants || 0) - 1) } : p
     ));
@@ -445,6 +561,7 @@ export default function App() {
 
   const handleToggleProductLike = async (productId: string) => {
     const isCurrentlyLiked = productLikes.includes(productId);
+    const delta = isCurrentlyLiked ? -1 : 1;
     
     const newLikes = isCurrentlyLiked
       ? productLikes.filter(id => id !== productId)
@@ -453,12 +570,23 @@ export default function App() {
     setProductLikes(newLikes);
     
     // Update product's likeCount
-    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
-    setBusinessProducts(prev => prev.map(p => 
+    setAllProducts(prev => prev.map(p => 
       p.id === productId 
-        ? { ...p, likeCount: p.likeCount + (isCurrentlyLiked ? -1 : 1) }
+        ? { ...p, likeCount: Math.max(0, (p.likeCount || 0) + delta) }
         : p
     ));
+    
+    setBusinessProducts(prev => prev.map(p => 
+      p.id === productId 
+        ? { ...p, likeCount: Math.max(0, (p.likeCount || 0) + delta) }
+        : p
+    ));
+
+    // 상세 페이지에서 보여주는 selectedProduct도 즉시 동기화
+    setSelectedProduct(prev => {
+      if (!prev || prev.id !== productId) return prev;
+      return { ...prev, likeCount: Math.max(0, (prev.likeCount || 0) + delta) };
+    });
     
     // Save to localStorage
     localSet('productLikes', JSON.stringify(newLikes));
@@ -491,6 +619,9 @@ export default function App() {
   };
 
   const handleDeleteProduct = async (productId: string) => {
+    console.log('🗑️ Deleting product:', productId);
+    console.log('📦 Before delete - businessProducts:', businessProducts.length);
+    
     // Remove from businessProducts
     const updatedBusinessProducts = businessProducts.filter(p => p.id !== productId);
     setBusinessProducts(updatedBusinessProducts);
@@ -500,15 +631,21 @@ export default function App() {
     setApplications(updatedApplications);
     // Save to localStorage
     globalSet('businessProducts', JSON.stringify(updatedBusinessProducts));
+    console.log('💾 After delete - saved to localStorage:', updatedBusinessProducts.length);
+    console.log('✅ localStorage check:', JSON.parse(localStorage.getItem('businessProducts') || '[]').length);
     localSet('applications', JSON.stringify(updatedApplications));
     toast.success("체험단이 삭제되었습니다");
-    // TODO: Backend delete API not implemented yet
+    // Delete from backend (optional - fails silently)
+    if (accessToken) {
+      // Backend delete API would go here
+      console.log("Backend delete not implemented yet");
+    }
   };
 
   const handleLogout = () => {
     setUserInfo(null);
     setAccessToken("");
-    navigate("signup");
+    setCurrentPage("signup");
     try { localStorage.removeItem('accessToken'); } catch {}
     // Don't clear data - keep in localStorage for persistence
     // setApplications([]);
@@ -519,18 +656,30 @@ export default function App() {
     toast.success("로그아웃 되었습니다");
   };
 
-  // handleBack and handleTabChange are provided by useNavigation hook
-  // Wrap goBack to also clear selectedProduct on page transitions
-  const handleBack = useCallback(() => {
-    goBack();
+  const handleTabChange = (tab: "home" | "review" | "profile") => {
+    setCurrentPage(tab);
     setSelectedProduct(null);
-  }, [goBack]);
+  };
 
-  // Wrap tab change to also clear selectedProduct
-  const onTabChange = useCallback((tab: "home" | "review" | "profile") => {
-    handleTabChange(tab);
-    setSelectedProduct(null);
-  }, [handleTabChange]);
+  const handleBack = () => {
+    if (currentPage === "product-detail") {
+      setCurrentPage("home");
+      setSelectedProduct(null);
+    } else if (currentPage === "review-write") {
+      setCurrentPage("review");
+      setSelectedProduct(null);
+    } else if (currentPage === "edit-review") {
+      setCurrentPage("profile");
+      setSelectedProduct(null);
+    } else if (currentPage === "my-applications" || currentPage === "my-favorites" || currentPage === "terms" || currentPage === "privacy") {
+      setCurrentPage("profile");
+    } else if (currentPage === "create-product" || currentPage === "manage-applicants" || currentPage === "review-management") {
+      setCurrentPage("home");
+      setSelectedProduct(null);
+    } else if (currentPage === "notifications") {
+      setCurrentPage("home");
+    }
+  };
 
   // 공통 사용자 데이터 초기화 로직
   const resetUserData = useCallback((userData: UserInfo, token: string) => {
@@ -574,26 +723,26 @@ export default function App() {
   const handleSignupComplete = (userData: UserInfo, token?: string) => {
     if (!token) {
       setUserInfo(userData);
-      navigate("home");
+      setCurrentPage("home");
       return;
     }
     resetUserData(userData, token);
-    navigate("home");
+    setCurrentPage("home");
   };
 
   const handleLoginComplete = (userData: UserInfo, token: string) => {
     resetUserData(userData, token);
-    navigate("home");
+    setCurrentPage("home");
   };
 
   const handleSelectProductForReview = (product: Product) => {
     setSelectedProduct(product);
-    navigate("review-write");
+    setCurrentPage("review-write");
   };
 
   const handleEditReview = (product: Product) => {
     setSelectedProduct(product);
-    navigate("edit-review");
+    setCurrentPage("edit-review");
   };
 
   const handleSubmitReview = async (reviewData: Omit<Review, "id" | "createdAt">) => {
@@ -610,7 +759,12 @@ export default function App() {
     localSet('completedReviews', JSON.stringify(updatedReviews));
     
     // Update product's reviewCount
-    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
+    setAllProducts(prev => prev.map(p => 
+      p.id === reviewData.productId 
+        ? { ...p, reviewCount: p.reviewCount + 1 }
+        : p
+    ));
+    
     setBusinessProducts(prev => prev.map(p => 
       p.id === reviewData.productId 
         ? { ...p, reviewCount: p.reviewCount + 1 }
@@ -651,7 +805,7 @@ export default function App() {
     // Go back to review page
     setTimeout(() => {
       setSelectedProduct(null);
-      navigate("review");
+      setCurrentPage("review");
     }, 1500);
   };
 
@@ -667,8 +821,13 @@ export default function App() {
     setApplications(updatedApplications);
     
     // Update product's currentApplicants count if rejected
-    // (allProducts는 businessProducts useMemo로 자동 재계산됨)
     if (status === "rejected" && application) {
+      setAllProducts(prev => prev.map(p => 
+        p.id === application.productId && p.currentApplicants > 0
+          ? { ...p, currentApplicants: p.currentApplicants - 1 }
+          : p
+      ));
+      
       setBusinessProducts(prev => prev.map(p => 
         p.id === application.productId && p.currentApplicants > 0
           ? { ...p, currentApplicants: p.currentApplicants - 1 }
@@ -737,7 +896,7 @@ export default function App() {
 
   const handleManageApplicants = (product: Product) => {
     setSelectedProduct(product);
-    navigate("manage-applicants");
+    setCurrentPage("manage-applicants");
   };
 
   const handleReportReview = (reviewId: string, reason: string) => {
@@ -784,9 +943,9 @@ export default function App() {
             transition={pageTransition}
           >
             <SignupPage 
-              onBack={() => navigate("home")} 
+              onBack={() => setCurrentPage("home")} 
               onSignupComplete={handleSignupComplete}
-              onSwitchToLogin={() => navigate("login")}
+              onSwitchToLogin={() => setCurrentPage("login")}
             />
           </motion.div>
         )}
@@ -801,9 +960,9 @@ export default function App() {
             transition={pageTransition}
           >
             <LoginPage 
-              onBack={() => navigate("home")} 
+              onBack={() => setCurrentPage("home")} 
               onLoginComplete={handleLoginComplete}
-              onSwitchToSignup={() => navigate("signup")}
+              onSwitchToSignup={() => setCurrentPage("signup")}
             />
           </motion.div>
         )}
@@ -818,8 +977,8 @@ export default function App() {
             transition={pageTransition}
           >
             <StoreRegistrationPage 
-              onBack={() => navigate("home")} 
-              onComplete={() => navigate("home")}
+              onBack={() => setCurrentPage("home")} 
+              onComplete={() => setCurrentPage("home")}
               userId={userInfo.email}
               accessToken={accessToken}
             />
@@ -840,10 +999,10 @@ export default function App() {
                 userInfo={userInfo} 
                 onProductClick={handleProductClick}
                 myProducts={businessProducts}
-                onCreateProduct={() => navigate("create-product")}
+                onCreateProduct={() => setCurrentPage("create-product")}
                 onManageApplicants={handleManageApplicants}
-                onManageReviews={() => navigate("review-management")}
-                onViewDashboard={() => navigate("business-dashboard")}
+                onManageReviews={() => setCurrentPage("review-management")}
+                onViewDashboard={() => setCurrentPage("business-dashboard")}
                 onDeleteProduct={handleDeleteProduct}
               />
             </motion.div>
@@ -862,7 +1021,7 @@ export default function App() {
                 favorites={favorites}
                 onToggleFavorite={handleToggleFavorite}
                 products={allProducts}
-                onNotificationsClick={() => navigate("notifications")}
+                onNotificationsClick={() => setCurrentPage("notifications")}
                 unreadNotifications={notifications.filter(n => !n.read).length}
               />
             </motion.div>
@@ -1018,14 +1177,14 @@ export default function App() {
               completedReviews={completedReviews}
               userPoints={userPoints}
               userLevel={userLevel}
-              onNavigateToApplications={() => navigate("my-applications")}
-              onNavigateToFavorites={() => navigate("my-favorites")}
-              onNavigateToPointShop={() => navigate("point-shop")}
-              onNavigateToPointHistory={() => navigate("point-history")}
+              onNavigateToApplications={() => setCurrentPage("my-applications")}
+              onNavigateToFavorites={() => setCurrentPage("my-favorites")}
+              onNavigateToPointShop={() => setCurrentPage("point-shop")}
+              onNavigateToPointHistory={() => setCurrentPage("point-history")}
               onEditReview={handleEditReview}
-              onNavigateToDashboard={() => navigate("business-dashboard")}
-              onNavigateToTerms={() => navigate("terms")}
-              onNavigateToPrivacy={() => navigate("privacy")}
+              onNavigateToDashboard={() => setCurrentPage("business-dashboard")}
+              onNavigateToTerms={() => setCurrentPage("terms")}
+              onNavigateToPrivacy={() => setCurrentPage("privacy")}
               onLogout={handleLogout}
             />
           </motion.div>
@@ -1130,7 +1289,7 @@ export default function App() {
           >
             <PointShop
               onBack={() => {
-                navigate("profile");
+                setCurrentPage("profile");
               }}
               userPoints={userPoints}
               userLevel={userLevel}
@@ -1170,7 +1329,7 @@ export default function App() {
           >
             <PointHistory
               onBack={() => {
-                navigate("profile");
+                setCurrentPage("profile");
               }}
               transactions={pointTransactions}
               currentPoints={userPoints}
@@ -1188,7 +1347,7 @@ export default function App() {
             transition={pageTransition}
           >
             <BusinessDashboard
-              onBack={() => navigate("home")}
+              onBack={() => setCurrentPage("home")}
               products={businessProducts}
               applications={applications}
               reviews={completedReviews}
@@ -1198,10 +1357,10 @@ export default function App() {
       </AnimatePresence>
 
       {/* Bottom Navigation */}
-      {userInfo && showBottomNav && (
+      {userInfo && currentPage !== "signup" && currentPage !== "login" && currentPage !== "product-detail" && currentPage !== "review-write" && currentPage !== "edit-review" && currentPage !== "my-applications" && currentPage !== "my-favorites" && currentPage !== "create-product" && currentPage !== "manage-applicants" && currentPage !== "notifications" && currentPage !== "review-management" && currentPage !== "point-shop" && currentPage !== "point-history" && currentPage !== "business-dashboard" && currentPage !== "terms" && currentPage !== "privacy" && (
         <BottomNav 
           activeTab={currentPage as "home" | "review" | "profile"} 
-          onTabChange={onTabChange}
+          onTabChange={handleTabChange}
           userType={userInfo.userType}
         />
       )}
