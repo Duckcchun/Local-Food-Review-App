@@ -7,6 +7,7 @@
  * presentation layer and type definitions.
  */
 
+/** 사용자 기본 정보 (리뷰어/사업자 공통) */
 export interface UserInfo {
   name: string;
   email: string;
@@ -16,6 +17,7 @@ export interface UserInfo {
   businessNumber?: string;
   businessAddress?: string;
 }
+
 
 export type NotificationType = "selection" | "rejection" | "review-request" | "review-received" | "application";
 
@@ -31,8 +33,10 @@ export interface Notification {
   read: boolean;
 }
 
+/** 체험단 신청 상태 */
 export type ApplicationStatus = "pending" | "accepted" | "rejected" | "review-completed";
 
+/** 체험단 신청 내역 */
 export interface Application {
   id: string;
   productId: string;
