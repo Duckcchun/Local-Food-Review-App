@@ -254,6 +254,4 @@ export const mockProducts: Product[] = [
     distance: "1.8km",
     calculatedDistance: undefined
   },
-
 ];
-
