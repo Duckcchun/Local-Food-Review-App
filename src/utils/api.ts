@@ -8,7 +8,7 @@
  */
 
 import { projectId, publicAnonKey } from './supabase/info';
-import type { Application, Review, Notification } from '../App';
+import type { Application, Review, Notification } from '../types';
 import type { Product } from '../data/mockData';
 
 const API_BASE_URL = `https://${projectId}.supabase.co/functions/v1/make-server-98b21042`;
