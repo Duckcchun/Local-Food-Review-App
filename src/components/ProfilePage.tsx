@@ -471,7 +471,7 @@ export function ProfilePage({
                   name: review.productName,
                   image: review.productImage,
                   seller: "동네식당",
-                  category: "한식",
+                  category: "korean",
                   location: "서울시 마포구",
                   reviewCount: 32,
                   description: review.pros || review.cons || review.improvements,

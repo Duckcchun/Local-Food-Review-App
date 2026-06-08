@@ -1,6 +1,7 @@
 import { ArrowLeft, MapPin, Heart, ThumbsUp, Share2, Calendar, Users, Star } from "lucide-react";
 import type { Product } from "../data/mockData";
 import type { Review } from "../App";
+import { getCategoryName } from "../data/categories";
 
 // Simple ImageWithFallback component to avoid missing module error
 function ImageWithFallback({
@@ -171,7 +172,7 @@ export function ProductDetailPage({
                   </button>
                 </div>
               </div>
-              <div className="text-sm text-[#6b8e6f]">{product.category}</div>
+              <div className="text-sm text-[#6b8e6f]">{getCategoryName(product.category)}</div>
             </div>
           </div>
 
