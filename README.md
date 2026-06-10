@@ -6,9 +6,9 @@
 
 <p align="center">
 
-<img width="637" height="600" alt="스크린샷 2025-11-14 오후 8 23 49" src="https://github.com/user-attachments/assets/c4f8df4c-f029-40fb-a0d7-3ed4d3af4306" />
-<br>
-<img width="560" height="673" alt="스크린샷 2025-11-14 오후 8 24 08" src="https://github.com/user-attachments/assets/2216baa6-80cd-48bc-b24d-a9bfa2e455a4" />
+<img width="1236" height="824" alt="ChatGPT Image 2026년 6월 10일 오후 06_36_31" src="https://github.com/user-attachments/assets/f618d540-8e29-4aa3-8161-f1f6206d9bcf" />
+
+
 
 -----
 
