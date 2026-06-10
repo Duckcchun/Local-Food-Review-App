@@ -12,6 +12,43 @@
 
 -----
 
+## 🚀 빠른 시작
+
+### 요구사항
+
+- Node.js 20+ 권장
+- npm
+- Supabase 프로젝트 정보
+
+### 로컬 실행
+
+```bash
+git clone https://github.com/Duckcchun/Local-Food-Review-App.git
+cd Local-Food-Review-App
+
+npm install
+```
+
+프로젝트 루트에 `.env.local` 파일을 생성하고, 아래 값을 채워 넣습니다.
+
+```bash
+VITE_SUPABASE_PROJECT_ID=your-project-id
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+```bash
+npm run dev
+```
+
+브라우저에서 **[http://localhost:3000](http://localhost:3000/)** 접속
+
+### 프로덕션 빌드 확인
+
+```bash
+npm run build
+npm run preview
+```
+
 ## 🤔 문제점 (Problem)
 
 대기업 및 유명 상품이 마케팅을 독점하고 있어, 중소 식품 사업자(자영업자 포함)는 인지도를 쌓기 어렵고 마케팅 비용에 부담을 느낍니다.
