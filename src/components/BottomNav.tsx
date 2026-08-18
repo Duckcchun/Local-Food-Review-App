@@ -30,7 +30,7 @@ export function BottomNav({ activeTab, onTabChange, userType }: BottomNavProps) 
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#fffef5] border-t border-[#d4c5a0] z-50 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-md mx-auto h-14 flex items-stretch">
         <NavButton tab="home" icon={Home} label="홈" />
         {!isBusiness && <NavButton tab="review" icon={FileText} label="리뷰" />}

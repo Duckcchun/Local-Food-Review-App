@@ -27,7 +27,7 @@ export function ProductDetailPage({
   const fillingRate = Math.round((product.currentApplicants / product.requiredReviewers) * 100);
 
   return (
-    <div className="min-h-screen bg-white pb-[88px]">
+    <div className="min-h-screen bg-[#fffef5] pb-[88px]">
       {/* Hero Image */}
       <div className="relative aspect-[4/3] bg-gray-100">
         {!imageLoaded && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
@@ -158,7 +158,7 @@ export function ProductDetailPage({
       </div>
 
       {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-20 pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#fffef5] border-t border-[#d4c5a0] z-20 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-md mx-auto px-5 py-3">
           {hasApplied ? (
             canCancel ? (
@@ -171,7 +171,7 @@ export function ProductDetailPage({
               </button>
             )
           ) : (
-            <button onClick={onApply} className="w-full h-[52px] bg-gray-900 text-white rounded-xl font-semibold text-[15px] hover:bg-gray-800 active:scale-[0.98] transition-all">
+            <button onClick={onApply} className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-[15px] hover:bg-[#e89535] active:scale-[0.98] transition-all">
               체험단 신청하기
             </button>
           )}

@@ -11,7 +11,7 @@ export function SearchBar({ value, onChange, placeholder = "맛집, 체험단 �
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <div className={`flex items-center gap-2.5 bg-gray-100 rounded-xl px-3.5 py-2.5 transition-all ${isFocused ? "bg-white ring-1 ring-gray-900" : ""}`}>
+    <div className={`flex items-center gap-2.5 bg-gray-100 rounded-xl px-3.5 py-2.5 transition-all ${isFocused ? "bg-white ring-1 ring-[#6b8e6f]" : ""}`}>
       <Search size={18} className="text-gray-400 shrink-0" />
       <input
         type="text"

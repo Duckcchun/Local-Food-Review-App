@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react'; // React import 추가
 
 export function Logo({ className = "", variant = "orange" }: { className?: string; variant?: "orange" | "green" | "white" }) {
-  const color = variant === "white" ? "#ffffff" : variant === "green" ? "#6b8e6f" : "#f5a145";
-  const textColor = variant === "white" ? "#ffffff" : variant === "green" ? "#6b8e6f" : "#f5a145";
+  // 마스코트는 항상 주황색, 텍스트만 variant에 따라 변경
+  const color = "#f5a145"; // 마스코트 항상 주황
+  const textColor = variant === "white" ? "#ffffff" : "#f5a145";
   // Some browsers/environments fail to honor background-clip:text and render a solid background box.
   // Detect support and gracefully fall back to solid text color when not supported to avoid the "highlight box" look.
   const supportsTextClip = useMemo(() => {

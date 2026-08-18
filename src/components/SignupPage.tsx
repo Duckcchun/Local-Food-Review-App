@@ -72,7 +72,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
   // ─── 첫 화면: 웰컴 페이지 ───
   if (userType === null) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-[#fffef5] flex flex-col">
         {/* Hero */}
         <div className="flex-1 flex flex-col items-center justify-center px-8 pt-20 pb-10">
           <Logo className="mb-8 scale-125" />
@@ -89,7 +89,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
           {/* 로그인 (주 버튼) */}
           <button
             onClick={onSwitchToLogin}
-            className="w-full h-[52px] bg-gray-900 text-white rounded-xl font-semibold text-[15px] hover:bg-gray-800 active:scale-[0.98] transition-all mb-3"
+            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-[15px] hover:bg-[#e89535] active:scale-[0.98] transition-all mb-3"
           >
             로그인
           </button>
@@ -121,7 +121,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
 
   // ─── 회원가입 폼 ───
   return (
-    <div className="min-h-screen bg-white pb-28">
+    <div className="min-h-screen bg-[#fffef5] pb-28">
       {/* Header */}
       <div className="sticky top-0 bg-white border-b border-gray-100 z-10">
         <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
@@ -178,7 +178,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full h-[52px] bg-gray-900 text-white rounded-xl font-semibold text-[15px] hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-[15px] hover:bg-[#e89535] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
             {isLoading ? "회원가입 중..." : "회원가입 완료"}
@@ -205,7 +205,7 @@ function FormInput({ icon: Icon, label, type = "text", value, onChange, placehol
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-all"
+          className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#6b8e6f] focus:ring-1 focus:ring-[#6b8e6f] transition-all"
         />
       </div>
     </div>

@@ -16,7 +16,7 @@ export function CategoryFilter({ selectedCategory, onSelectCategory }: CategoryF
               key={category.id}
               onClick={() => onSelectCategory(category.id)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap transition-all text-[13px] font-medium ${
-                isSelected ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                isSelected ? "bg-[#6b8e6f] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               <span className="text-sm">{category.icon}</span>

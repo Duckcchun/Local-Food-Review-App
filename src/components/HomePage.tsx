@@ -68,9 +68,9 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
   ];
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-30 bg-white">
+      <div className="sticky top-0 z-30 bg-[#fffef5]">
         <div className="max-w-md mx-auto px-5 pt-4 pb-2 flex items-center justify-between">
           <Logo />
           {onNotificationsClick && (
@@ -102,7 +102,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
                 key={String(opt.value)}
                 onClick={() => setDistanceFilter(opt.value)}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all ${
-                  distanceFilter === opt.value ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  distanceFilter === opt.value ? "bg-[#6b8e6f] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 {opt.label}
@@ -144,7 +144,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
             </h3>
             <p className="text-[13px] text-gray-400 mb-5">{hasActiveFilters ? "다른 조건으로 검색해보세요" : "곧 새로운 체험단이 등록됩니다"}</p>
             {hasActiveFilters && (
-              <button onClick={resetFilters} className="inline-flex items-center gap-1.5 bg-gray-900 text-white text-[13px] font-medium px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors">
+              <button onClick={resetFilters} className="inline-flex items-center gap-1.5 bg-[#6b8e6f] text-white text-[13px] font-medium px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors">
                 <FilterX size={14} />필터 초기화
               </button>
             )}
