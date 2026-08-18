@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { ImgHTMLAttributes } from "react";
 import { ArrowLeft, Upload, X, ThumbsUp, ThumbsDown, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
@@ -45,28 +45,49 @@ export function ReviewWritePage({ product, onBack, userName = "회원", onSubmit
   const [cons, setCons] = useState("");
   const [suggestions, setSuggestions] = useState("");
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = () => {
-    // Mock image upload - in real app, would handle file upload
-    const mockImages = [
-      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400",
-      "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400",
-      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
-    ];
-    
     if (uploadedImages.length >= 5) {
       toast.error("최대 5장까지 업로드 가능합니다");
       return;
     }
+    fileInputRef.current?.click();
+  };
 
-    const randomImage = mockImages[Math.floor(Math.random() * mockImages.length)];
-    setUploadedImages(prev => [...prev, randomImage]);
-    toast.success("이미지가 추가되었습니다");
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const remaining = 5 - uploadedImages.length;
+    const filesToProcess = Array.from(files).slice(0, remaining);
+
+    for (const file of filesToProcess) {
+      // Validate
+      if (!file.type.startsWith('image/')) {
+        toast.error("이미지 파일만 업로드 가능합니다");
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("파일 크기는 10MB 이하만 가능합니다");
+        continue;
+      }
+
+      // Create local preview (works offline too)
+      const previewUrl = URL.createObjectURL(file);
+      setUploadedImages(prev => [...prev, previewUrl]);
+    }
+
+    toast.success(`${filesToProcess.length}장 추가됨`);
+    // Reset input
+    e.target.value = '';
   };
 
   const handleRemoveImage = (index: number) => {
+    const url = uploadedImages[index];
+    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
     setUploadedImages(prev => prev.filter((_, i) => i !== index));
-    toast.success("이미지가 삭제되었습니다");
   };
 
   const handleSubmitReview = () => {
@@ -172,6 +193,15 @@ export function ReviewWritePage({ product, onBack, userName = "회원", onSubmit
           >
             {uploadedImages.length >= 5 ? "최대 5장까지 업로드 가능" : `사진 추가 (${uploadedImages.length}/5)`}
           </button>
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileSelect}
+            className="hidden"
+          />
         </div>
 
         {/* Pros */}

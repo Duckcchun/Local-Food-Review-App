@@ -9,9 +9,10 @@ interface LoginPageProps {
   onBack: () => void;
   onLoginComplete: (userData: UserInfo, accessToken: string) => void;
   onSwitchToSignup: () => void;
+  onForgotPassword?: () => void;
 }
 
-export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPageProps) {
+export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup, onForgotPassword }: LoginPageProps) {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -128,6 +129,15 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
               />
             </div>
           </div>
+
+          {/* Forgot password link */}
+          {onForgotPassword && (
+            <div className="text-right">
+              <button type="button" onClick={onForgotPassword} className="text-sm text-gray-500 hover:text-[#6b8e6f]">
+                비밀번호를 잊으셨나요?
+              </button>
+            </div>
+          )}
 
           {/* Submit */}
           <button

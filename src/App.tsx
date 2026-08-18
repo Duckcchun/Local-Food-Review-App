@@ -23,6 +23,8 @@ import { ReviewManagementPage } from "./components/ReviewManagementPage";
 import { BottomNav } from "./components/BottomNav";
 import { TermsPage } from "./components/TermsPage";
 import { PrivacyPage } from "./components/PrivacyPage";
+import { ForgotPasswordPage } from "./components/ForgotPasswordPage";
+import { EditProfilePage } from "./components/EditProfilePage";
 import type { Product } from "./data/mockData";
 import type { PointProduct, PointTransaction } from "./data/pointShop";
 import { mockProducts } from "./data/mockData";
@@ -32,7 +34,7 @@ import { productsApi, applicationsApi, favoritesApi, reviewsApi, notificationsAp
 import { getLevelInfo } from "./data/levelSystem";
 import { projectId } from "./utils/supabase/info";
 
-type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy";
+type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "forgot-password" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy" | "edit-profile";
 
 export interface UserInfo {
   name: string;
@@ -671,7 +673,7 @@ export default function App() {
     } else if (currentPage === "edit-review") {
       setCurrentPage("profile");
       setSelectedProduct(null);
-    } else if (currentPage === "my-applications" || currentPage === "my-favorites" || currentPage === "terms" || currentPage === "privacy") {
+    } else if (currentPage === "my-applications" || currentPage === "my-favorites" || currentPage === "terms" || currentPage === "privacy" || currentPage === "edit-profile") {
       setCurrentPage("profile");
     } else if (currentPage === "create-product" || currentPage === "manage-applicants" || currentPage === "review-management") {
       setCurrentPage("home");
@@ -973,6 +975,23 @@ export default function App() {
               onBack={() => setCurrentPage("signup")} 
               onLoginComplete={handleLoginComplete}
               onSwitchToSignup={() => setCurrentPage("signup")}
+              onForgotPassword={() => setCurrentPage("forgot-password")}
+            />
+          </motion.div>
+        )}
+
+        {currentPage === "forgot-password" && (
+          <motion.div
+            key="forgot-password"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <ForgotPasswordPage
+              onBack={() => setCurrentPage("login")}
+              onSwitchToLogin={() => setCurrentPage("login")}
             />
           </motion.div>
         )}
@@ -1195,6 +1214,8 @@ export default function App() {
               onNavigateToDashboard={() => setCurrentPage("business-dashboard")}
               onNavigateToTerms={() => setCurrentPage("terms")}
               onNavigateToPrivacy={() => setCurrentPage("privacy")}
+              onEditProfile={() => setCurrentPage("edit-profile")}
+              accessToken={accessToken}
               onLogout={handleLogout}
             />
           </motion.div>
@@ -1223,6 +1244,24 @@ export default function App() {
             transition={pageTransition}
           >
             <PrivacyPage onBack={handleBack} />
+          </motion.div>
+        )}
+
+        {currentPage === "edit-profile" && userInfo && (
+          <motion.div
+            key="edit-profile"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <EditProfilePage
+              userInfo={userInfo}
+              accessToken={accessToken}
+              onBack={() => setCurrentPage("profile")}
+              onSave={(updated) => setUserInfo(prev => prev ? { ...prev, ...updated } : prev)}
+            />
           </motion.div>
         )}
 

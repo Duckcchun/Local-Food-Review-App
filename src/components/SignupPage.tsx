@@ -17,6 +17,9 @@ type UserType = "reviewer" | "business" | null;
 export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: SignupPageProps) {
   const [userType, setUserType] = useState<UserType>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [agreeAll, setAgreeAll] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [formData, setFormData] = useState({
     name: "", email: "", password: "", passwordConfirm: "",
     phone: "", businessName: "", businessNumber: "", businessAddress: ""
@@ -28,6 +31,10 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
+    if (!agreeTerms || !agreePrivacy) {
+      toast.error("이용약관과 개인정보 처리방침에 동의해주세요");
+      return;
+    }
     if (!formData.name || !formData.email || !formData.password || !formData.phone) {
       toast.error("필수 정보를 모두 입력해주세요"); return;
     }
@@ -165,10 +172,49 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
             </>
           )}
 
-          {/* Terms */}
-          <p className="text-xs text-gray-400 text-center pt-2">
-            가입 시 이용약관 및 개인정보 처리방침에 동의합니다.
-          </p>
+          {/* Terms Agreement */}
+          <div className="pt-3 space-y-3">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreeAll}
+                onChange={(e) => {
+                  const v = e.target.checked;
+                  setAgreeAll(v);
+                  setAgreeTerms(v);
+                  setAgreePrivacy(v);
+                }}
+                className="mt-0.5 w-5 h-5 rounded border-gray-300 text-[#6b8e6f] focus:ring-[#6b8e6f] accent-[#6b8e6f]"
+              />
+              <span className="text-sm font-medium text-gray-900">전체 동의</span>
+            </label>
+
+            <div className="border-t border-gray-100 pt-3 pl-8 space-y-2.5">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => { setAgreeTerms(e.target.checked); if (!e.target.checked) setAgreeAll(false); }}
+                  className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#6b8e6f] focus:ring-[#6b8e6f] accent-[#6b8e6f]"
+                />
+                <span className="text-sm text-gray-600">
+                  <span className="text-[#f5a145]">(필수)</span> 이용약관 동의
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreePrivacy}
+                  onChange={(e) => { setAgreePrivacy(e.target.checked); if (!e.target.checked) setAgreeAll(false); }}
+                  className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#6b8e6f] focus:ring-[#6b8e6f] accent-[#6b8e6f]"
+                />
+                <span className="text-sm text-gray-600">
+                  <span className="text-[#f5a145]">(필수)</span> 개인정보 처리방침 동의
+                </span>
+              </label>
+            </div>
+          </div>
         </form>
       </div>
 

@@ -1,5 +1,6 @@
 import { Logo } from "./Logo";
 import { ChevronRight, Download, TrendingUp, Award, Store, BarChart3, Settings, LogOut, Star, Info, ShoppingBag, History } from "lucide-react";
+import { DeleteAccountModal } from "./DeleteAccountModal";
 
 /**
  * Lightweight ImageWithFallback component to avoid dependency on ../figma/ImageWithFallback.
@@ -38,6 +39,9 @@ interface ProfilePageProps {
   onNavigateToDashboard?: () => void;
   onNavigateToTerms?: () => void;
   onNavigateToPrivacy?: () => void;
+  onEditProfile?: () => void;
+  onDeleteAccount?: () => void;
+  accessToken?: string;
   onLogout: () => void;
 }
 
@@ -54,10 +58,14 @@ export function ProfilePage({
   onNavigateToDashboard,
   onNavigateToTerms,
   onNavigateToPrivacy,
+  onEditProfile,
+  onDeleteAccount,
+  accessToken,
   onLogout 
 }: ProfilePageProps) {
   const isBusinessUser = userInfo.userType === "business";
   const [isLevelSystemModalOpen, setIsLevelSystemModalOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   if (isBusinessUser) {
     return (
@@ -383,6 +391,13 @@ export function ProfilePage({
         <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0]">
           <h3 className="text-[#2d3e2d] mb-4">내 활동</h3>
           
+          {onEditProfile && (
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onEditProfile}>
+              <span className="text-[#2d3e2d]">프로필 수정</span>
+              <ChevronRight size={20} className="text-[#6b8e6f]" />
+            </button>
+          )}
+
           <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToApplications}>
             <span className="text-[#2d3e2d]">신청한 체험단</span>
             <ChevronRight size={20} className="text-[#6b8e6f]" />
@@ -410,6 +425,11 @@ export function ProfilePage({
               <span className="text-[#2d3e2d]">로그아웃</span>
             </div>
             <ChevronRight size={20} className="text-[#6b8e6f]" />
+          </button>
+
+          <button className="w-full flex items-center justify-between p-4 mt-2 rounded-[1rem] hover:bg-red-50 transition-colors" onClick={() => setShowDeleteModal(true)}>
+            <span className="text-sm text-red-500">회원 탈퇴</span>
+            <ChevronRight size={18} className="text-red-300" />
           </button>
         </div>
 
@@ -510,6 +530,15 @@ export function ProfilePage({
         isOpen={showLevelModal}
         onClose={() => setShowLevelModal(false)}
         currentLevel={userLevel}
+      />
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => { setShowDeleteModal(false); onDeleteAccount ? onDeleteAccount() : onLogout(); }}
+        accessToken={accessToken || ""}
+        userEmail={userInfo.email}
       />
     </div>
   );
