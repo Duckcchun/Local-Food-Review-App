@@ -1,4 +1,5 @@
 import { Home, FileText, User } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface BottomNavProps {
   activeTab: "home" | "review" | "profile";
@@ -7,13 +8,31 @@ interface BottomNavProps {
 }
 
 export function BottomNav({ activeTab, onTabChange, userType }: BottomNavProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const isBusiness = userType === "business";
 
+  // Determine active tab from URL
+  const currentTab = (() => {
+    if (location.pathname.startsWith('/review')) return 'review';
+    if (location.pathname.startsWith('/profile')) return 'profile';
+    return 'home';
+  })();
+
+  const handleNavigation = (tab: "home" | "review" | "profile") => {
+    onTabChange(tab); // Keep backward compat for old usage
+    switch (tab) {
+      case 'home': navigate('/'); break;
+      case 'review': navigate('/review'); break;
+      case 'profile': navigate('/profile'); break;
+    }
+  };
+
   const NavButton = ({ tab, icon: Icon, label }: { tab: "home" | "review" | "profile"; icon: typeof Home; label: string }) => {
-    const isActive = activeTab === tab;
+    const isActive = currentTab === tab;
     return (
       <button
-        onClick={() => onTabChange(tab)}
+        onClick={() => handleNavigation(tab)}
         className={`relative flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 active:scale-90 ${
           isActive 
             ? "text-[#6b8e6f] bg-[#6b8e6f]/10" 

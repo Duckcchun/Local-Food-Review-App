@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { ArrowLeft, Upload, X, Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner@2.0.3";
 import type { Product } from "../data/mockData";
-import type { UserInfo } from "../App";
+import type { UserInfo } from "../types";
 // Replacing Popover + custom Calendar with Dialog + react-datepicker for stability
 import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "./ui/dialog";
 import DatePicker, { registerLocale } from "react-datepicker";

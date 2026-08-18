@@ -4,7 +4,7 @@ import { Logo } from "./Logo";
 import { StatCard } from "./StatCard";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import type { Product } from "../data/mockData";
-import type { Application, Review } from "../App";
+import type { Application, Review } from "../types";
 import { calculateBusinessStats, getProductPerformances, getChartData, getPeriodLabel } from "../utils/statsUtils";
 import type { PeriodFilter, ProductPerformance } from "../utils/statsUtils";
 import { ImageWithFallback } from "../figma/ImageWithFallback";

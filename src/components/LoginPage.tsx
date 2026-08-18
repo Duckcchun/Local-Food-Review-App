@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { Logo } from "./Logo";
 import { toast } from "sonner";
-import type { UserInfo } from "../App";
+import type { UserInfo } from "../types";
 import { publicAnonKey } from "../utils/supabase/info";
 import { requestJson } from "../utils/request";
 

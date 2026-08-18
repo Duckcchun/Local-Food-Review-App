@@ -1,6 +1,6 @@
 import { ChevronLeft, CheckCircle, XCircle, MessageSquare, Bell, Star } from "lucide-react";
 import { Logo } from "./Logo";
-import type { Notification } from "../App";
+import type { Notification } from "../types";
 
 interface NotificationsPageProps {
   notifications: Notification[];

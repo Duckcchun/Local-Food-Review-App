@@ -3,7 +3,7 @@ import type { ImgHTMLAttributes } from "react";
 import { ArrowLeft, Upload, X, ThumbsUp, ThumbsDown, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import type { Product } from "../data/mockData";
-import type { Review } from "../App";
+import type { Review } from "../types";
 
 type ImageWithFallbackProps = ImgHTMLAttributes<HTMLImageElement> & {
   src?: string | undefined;

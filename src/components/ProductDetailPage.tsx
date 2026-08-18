@@ -1,6 +1,6 @@
 import { ArrowLeft, MapPin, Heart, ThumbsUp, Share2, Calendar, Users, Star } from "lucide-react";
 import type { Product } from "../data/mockData";
-import type { Review } from "../App";
+import type { Review } from "../types";
 import { getCategoryName } from "../data/categories";
 
 // Simple ImageWithFallback component to avoid missing module error

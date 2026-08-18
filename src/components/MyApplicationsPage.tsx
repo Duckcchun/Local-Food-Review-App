@@ -1,7 +1,7 @@
 import { ArrowLeft, Clock, CheckCircle, XCircle } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 // import { ImageWithFallback } from "../figma/ImageWithFallback";
-import type { Application } from "../App";
+import type { Application } from "../types";
 
 interface MyApplicationsPageProps {
   onBack: () => void;

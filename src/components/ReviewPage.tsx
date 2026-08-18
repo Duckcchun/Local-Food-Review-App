@@ -1,5 +1,5 @@
 import { FileText, ChevronRight } from "lucide-react";
-import type { Application, Review } from "../App";
+import type { Application, Review } from "../types";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Logo } from "./Logo";
 

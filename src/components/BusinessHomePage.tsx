@@ -1,7 +1,7 @@
 import { Plus, TrendingUp, Users, MessageSquare, BarChart3 } from "lucide-react";
 import { Logo } from "./Logo";
 import type { Product } from "../data/mockData";
-import type { UserInfo } from "../App";
+import type { UserInfo } from "../types";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 
 interface BusinessHomePageProps {

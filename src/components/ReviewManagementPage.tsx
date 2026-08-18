@@ -25,7 +25,7 @@ function ImageWithFallback({
     />
   );
 }
-import type { Review } from "../App";
+import type { Review } from "../types";
 
 interface ReviewManagementPageProps {
   reviews: Review[];

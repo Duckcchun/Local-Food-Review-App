@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChevronLeft, CheckCircle, XCircle, Clock, User, Phone, Mail } from "lucide-react";
 import { Logo } from "./Logo";
 import { LevelBadge } from "./LevelBadge";
-import type { Application, ApplicationStatus } from "../App";
+import type { Application, ApplicationStatus } from "../types";
 import type { Product } from "../data/mockData";
 
 interface ManageApplicantsPageProps {
