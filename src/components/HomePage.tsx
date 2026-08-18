@@ -1,4 +1,4 @@
-import { Search, MapPin, Bell, Navigation, FilterX } from "lucide-react";
+import { Search, MapPin, Bell, FilterX, SlidersHorizontal } from "lucide-react";
 import { Logo } from "./Logo";
 import { ProductCard } from "./ProductCard";
 import { SearchBar } from "./SearchBar";
@@ -20,9 +20,11 @@ interface HomePageProps {
   products?: Product[];
   onNotificationsClick?: () => void;
   unreadNotifications?: number;
+  onRefresh?: () => Promise<void>;
+  onMapView?: () => void;
 }
 
-export function HomePage({ onProductClick, userName = "회원", favorites, onToggleFavorite, products = mockProducts, onNotificationsClick, unreadNotifications = 0 }: HomePageProps) {
+export function HomePage({ onProductClick, userName = "회원", favorites, onToggleFavorite, products = mockProducts, onNotificationsClick, unreadNotifications = 0, onRefresh, onMapView }: HomePageProps) {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [distanceFilter, setDistanceFilter] = useState<number | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
@@ -51,14 +53,12 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
     if (!userLocation || !product.latitude || !product.longitude) {
       return product;
     }
-    
     const distance = calculateDistance(
       userLocation.latitude,
       userLocation.longitude,
       product.latitude,
       product.longitude
     );
-    
     return {
       ...product,
       calculatedDistance: distance,
@@ -66,10 +66,9 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
     };
   });
 
-  // Apply all filters: search, category, and distance
+  // Apply filters
   let filteredProducts = productsWithDistance;
 
-  // Search filter
   if (searchQuery.trim()) {
     const query = searchQuery.toLowerCase().trim();
     filteredProducts = filteredProducts.filter(product =>
@@ -80,177 +79,147 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
     );
   }
 
-  // Category filter
   if (selectedCategory !== "all") {
     filteredProducts = filteredProducts.filter(product =>
       product.category === selectedCategory
     );
   }
 
-  // Distance filter
   if (distanceFilter) {
     filteredProducts = filteredProducts.filter(product =>
       product.calculatedDistance && product.calculatedDistance <= distanceFilter
     );
   }
 
-  // Apply sorting
   const sortedProducts = sortProducts(filteredProducts, sortOption);
-
-  // Check if any filters are active
   const hasActiveFilters = searchQuery.trim() || selectedCategory !== "all" || distanceFilter !== null;
 
-  // Reset all filters
   const resetFilters = () => {
     setSearchQuery("");
     setSelectedCategory("all");
     setDistanceFilter(null);
   };
 
+  const distanceOptions = [
+    { value: null, label: "전체" },
+    { value: 0.5, label: "500m" },
+    { value: 1, label: "1km" },
+    { value: 3, label: "3km" },
+    { value: 5, label: "5km" },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
-      {/* Hero Section */}
-  <div className="bg-linear-to-b from-[#f5f0dc] to-[#fffef5] px-6 pt-8 pb-12">
-        <div className="max-w-md mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <Logo />
-            {onNotificationsClick && (
+    <div className="min-h-screen bg-white pb-24">
+      {/* ─── Sticky Header ─── */}
+      <div className="sticky top-0 z-30 bg-white">
+        {/* Top bar: Logo + Notification */}
+        <div className="max-w-md mx-auto px-5 pt-4 pb-2 flex items-center justify-between">
+          <Logo />
+          {onNotificationsClick && (
+            <button
+              onClick={onNotificationsClick}
+              className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
+            >
+              <Bell size={22} className="text-gray-700" />
+              {unreadNotifications > 0 && (
+                <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px]">
+                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto px-5 pb-3">
+          <SearchBar 
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
+        </div>
+
+        {/* Category chips (horizontal scroll) */}
+        <div className="max-w-md mx-auto px-5 pb-3">
+          <CategoryFilter 
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+        </div>
+
+        {/* Thin separator */}
+        <div className="h-px bg-gray-100" />
+      </div>
+
+      {/* ─── Filter & Sort Row ─── */}
+      <div className="max-w-md mx-auto px-5 pt-3 pb-2">
+        <div className="flex items-center justify-between">
+          {/* Distance filter chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {distanceOptions.map((opt) => (
               <button
-                onClick={onNotificationsClick}
-                className="relative p-2 hover:bg-white/50 rounded-full transition-colors"
+                key={String(opt.value)}
+                onClick={() => setDistanceFilter(opt.value)}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all ${
+                  distanceFilter === opt.value
+                    ? "bg-gray-900 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
               >
-                <Bell size={24} className="text-[#6b8e6f]" />
-                {unreadNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#f5a145] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                  </span>
-                )}
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort + Map toggle */}
+          <div className="flex items-center gap-1 ml-2 shrink-0">
+            {onMapView && (
+              <button
+                onClick={onMapView}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+                title="지도 보기"
+              >
+                <MapPin size={16} className="text-gray-500" />
               </button>
             )}
           </div>
-          <h1 className="text-[#2d3e2d] mb-2">
-            우리 동네 맛집을<br />솔직하게 평가해요
-          </h1>
-          <p className="text-[#6b8e6f]">
-            중소 사업자를 응원하고 숨겨진 맛집을 발굴하세요
-          </p>
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="max-w-md mx-auto px-6 mb-6">
-        <SearchBar 
-          value={searchQuery}
-          onChange={setSearchQuery}
-        />
-      </div>
-
-      {/* Category Filter */}
-      <div className="max-w-md mx-auto px-6 mb-6">
-        <CategoryFilter 
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-      </div>
-
-      {/* Active Filters Badge */}
+      {/* ─── Active Filters Banner ─── */}
       {hasActiveFilters && (
-        <div className="max-w-md mx-auto px-6 mb-4">
-          <div className="flex items-center justify-between bg-[#f5f0dc] rounded-[1rem] px-4 py-3 border-2 border-[#d4c5a0]">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-[#6b8e6f]">필터 적용중:</span>
-              {searchQuery && (
-                <span className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-xs text-[#6b8e6f] border border-[#d4c5a0]">
-                  검색: "{searchQuery}"
-                </span>
-              )}
-              {selectedCategory !== "all" && (
-                <span className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-xs text-[#6b8e6f] border border-[#d4c5a0]">
-                  카테고리: {getCategoryName(selectedCategory)}
-                </span>
-              )}
-              {distanceFilter && (
-                <span className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-xs text-[#6b8e6f] border border-[#d4c5a0]">
-                  거리: {distanceFilter}km 이내
-                </span>
-              )}
-            </div>
+        <div className="max-w-md mx-auto px-5 pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {searchQuery && (
+              <span className="shrink-0 inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[11px] font-medium px-2.5 py-1 rounded-full">
+                "{searchQuery}"
+              </span>
+            )}
+            {selectedCategory !== "all" && (
+              <span className="shrink-0 inline-flex items-center bg-emerald-50 text-emerald-700 text-[11px] font-medium px-2.5 py-1 rounded-full">
+                {getCategoryName(selectedCategory)}
+              </span>
+            )}
+            {distanceFilter && (
+              <span className="shrink-0 inline-flex items-center bg-emerald-50 text-emerald-700 text-[11px] font-medium px-2.5 py-1 rounded-full">
+                {distanceFilter}km 이내
+              </span>
+            )}
             <button
               onClick={resetFilters}
-              className="flex items-center gap-1 text-sm text-[#6b8e6f] hover:text-[#5a7a5e] transition-colors shrink-0 ml-2"
+              className="shrink-0 text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"
             >
-              <FilterX size={16} />
-              <span>초기화</span>
+              <FilterX size={12} />
+              초기화
             </button>
           </div>
         </div>
       )}
 
-      {/* Location Filter */}
-      <div className="max-w-md mx-auto px-6 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <MapPin size={18} className="text-[#6b8e6f]" />
-          <h3 className="text-[#2d3e2d]">거리로 찾기</h3>
-          {locationLoading && (
-            <span className="text-xs text-[#9ca89d]">위치 확인중...</span>
-          )}
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          <button
-            onClick={() => setDistanceFilter(null)}
-            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
-              distanceFilter === null
-                ? "bg-[#6b8e6f] text-white shadow-md"
-                : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
-            }`}
-          >
-            전체
-          </button>
-          <button
-            onClick={() => setDistanceFilter(0.5)}
-            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
-              distanceFilter === 0.5
-                ? "bg-[#6b8e6f] text-white shadow-md"
-                : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
-            }`}
-          >
-            500m 이내
-          </button>
-          <button
-            onClick={() => setDistanceFilter(1)}
-            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
-              distanceFilter === 1
-                ? "bg-[#6b8e6f] text-white shadow-md"
-                : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
-            }`}
-          >
-            1km 이내
-          </button>
-          <button
-            onClick={() => setDistanceFilter(3)}
-            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
-              distanceFilter === 3
-                ? "bg-[#6b8e6f] text-white shadow-md"
-                : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
-            }`}
-          >
-            3km 이내
-          </button>
-          <button
-            onClick={() => setDistanceFilter(5)}
-            className={`shrink-0 py-2 px-4 rounded-full transition-all text-sm ${
-              distanceFilter === 5
-                ? "bg-[#6b8e6f] text-white shadow-md"
-                : "bg-white text-[#6b8e6f] border-2 border-[#d4c5a0]"
-            }`}
-          >
-            5km 이내
-          </button>
-        </div>
-      </div>
-
-      {/* Sort Filter */}
-      <div className="max-w-md mx-auto px-6 mb-6">
+      {/* ─── Sort Row ─── */}
+      <div className="max-w-md mx-auto px-5 py-2 flex items-center justify-between">
+        <span className="text-[13px] text-gray-400">
+          {sortedProducts.length}개의 체험단
+        </span>
         <SortFilter
           selectedSort={sortOption}
           onSelectSort={setSortOption}
@@ -258,54 +227,45 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
         />
       </div>
 
-      {/* Products Grid */}
-      <div className="max-w-md mx-auto px-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[#2d3e2d]">체험단 모집중 🔥</h2>
-          <span className="text-sm text-[#9ca89d]">
-            {filteredProducts.length}개
-            {distanceFilter && ` (${distanceFilter}km 이내)`}
-          </span>
-        </div>
-        
+      {/* ─── Product List ─── */}
+      <div className="max-w-md mx-auto px-5">
         {sortedProducts.length === 0 ? (
-          <div className="bg-white rounded-[1.5rem] p-12 text-center border-2 border-[#d4c5a0]">
-            <Search size={48} className="mx-auto mb-4 text-[#d4c5a0]" />
-            <h3 className="text-[#2d3e2d] mb-2">
-              {searchQuery 
-                ? "검색 결과가 없어요" 
+          <div className="py-20 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <Search size={28} className="text-gray-300" />
+            </div>
+            <h3 className="text-[15px] font-semibold text-gray-700 mb-1">
+              {searchQuery
+                ? "검색 결과가 없어요"
                 : selectedCategory !== "all"
                   ? "해당 카테고리에 체험단이 없어요"
-                  : "근처에 체험단이 없어요"
-              }
+                  : "근처에 체험단이 없어요"}
             </h3>
-            <p className="text-sm text-[#9ca89d] mb-4">
+            <p className="text-[13px] text-gray-400 mb-5">
               {hasActiveFilters
-                ? "다른 필터 조건을 선택해보세요"
-                : "새로운 체험단이 곧 등록됩니다"
-              }
+                ? "다른 조건으로 검색해보세요"
+                : "곧 새로운 체험단이 등록됩니다"}
             </p>
             {hasActiveFilters && (
               <button
                 onClick={resetFilters}
-                className="bg-[#f5a145] text-white px-6 py-3 rounded-[1rem] hover:bg-[#e89535] transition-colors inline-flex items-center gap-2"
+                className="inline-flex items-center gap-1.5 bg-gray-900 text-white text-[13px] font-medium px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors"
               >
-                <FilterX size={18} />
+                <FilterX size={14} />
                 필터 초기화
               </button>
             )}
           </div>
         ) : (
-          <div className="space-y-6">
-            {sortedProducts.map((product, index) => (
-              <div key={product.id} className="stagger-item">
-                <ProductCard
-                  product={product}
-                  onClick={() => onProductClick(product)}
-                  isFavorite={favorites.includes(product.id)}
-                  onToggleFavorite={() => onToggleFavorite(product.id)}
-                />
-              </div>
+          <div className="space-y-4 pb-4">
+            {sortedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onClick={() => onProductClick(product)}
+                isFavorite={favorites.includes(product.id)}
+                onToggleFavorite={() => onToggleFavorite(product.id)}
+              />
             ))}
           </div>
         )}

@@ -1,31 +1,8 @@
-import { ArrowLeft, MapPin, Heart, ThumbsUp, Share2, Calendar, Users, Star } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Heart, ThumbsUp, Share2, Calendar, Users, MapPin, ChevronRight } from "lucide-react";
 import type { Product } from "../data/mockData";
-import type { Review } from "../App";
+import type { Review } from "../types";
 import { getCategoryName } from "../data/categories";
-
-// Simple ImageWithFallback component to avoid missing module error
-function ImageWithFallback({
-  src,
-  alt,
-  className,
-  ...props
-}: {
-  src: string;
-  alt?: string;
-  className?: string;
-  [key: string]: any;
-}) {
-  const handleError = (e: any) => {
-    const target = e.currentTarget as HTMLImageElement;
-    if (!target.dataset.fallbackApplied) {
-      target.dataset.fallbackApplied = "true";
-      // Update this path to a real local fallback image if you have one
-      target.src = "/images/fallback.png";
-    }
-  };
-
-  return <img src={src} alt={alt} className={className} onError={handleError} {...props} />;
-}
 
 interface ProductDetailPageProps {
   product: Product;
@@ -41,12 +18,12 @@ interface ProductDetailPageProps {
   canCancel?: boolean;
 }
 
-export function ProductDetailPage({ 
-  product, 
-  onBack, 
+export function ProductDetailPage({
+  product,
+  onBack,
   onApply,
   onCancel,
-  isFavorite = false, 
+  isFavorite = false,
   onToggleFavorite,
   isLiked = false,
   onToggleLike,
@@ -54,246 +31,246 @@ export function ProductDetailPage({
   hasApplied = false,
   canCancel = false,
 }: ProductDetailPageProps) {
-  const handleFavoriteClick = () => {
-    if (onToggleFavorite) {
-      onToggleFavorite();
-    }
-  };
-
-  const handleLikeClick = () => {
-    if (onToggleLike) {
-      onToggleLike();
-    }
-  };
-
-  // Filter reviews for this product
+  const [imageLoaded, setImageLoaded] = useState(false);
   const productReviews = reviews.filter(r => r.productId === product.id);
+  const fillingRate = Math.round((product.currentApplicants / product.requiredReviewers) * 100);
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-32">
-      {/* Header */}
-      <div className="sticky top-0 bg-white border-b-2 border-[#d4c5a0] z-10">
-        <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
-          <button onClick={onBack} className="text-[#2d3e2d] hover:text-[#6b8e6f] transition-colors">
-            <ArrowLeft size={24} />
-          </button>
-          <h4 className="text-[#2d3e2d]">체험단 상세</h4>
-          <button 
-            onClick={handleFavoriteClick}
-            className="text-[#f5a145] hover:scale-110 transition-transform"
+    <div className="min-h-screen bg-white pb-[88px]">
+      {/* ─── Hero Image ─── */}
+      <div className="relative aspect-[4/3] bg-gray-100">
+        {!imageLoaded && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
+        <img
+          src={product.image}
+          alt={product.name}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          onLoad={() => setImageLoaded(true)}
+          onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect fill="%23f3f4f6" width="100%" height="100%"/></svg>'; setImageLoaded(true); }}
+        />
+
+        {/* Overlay controls */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
+          <button
+            onClick={onBack}
+            className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
           >
-            <Heart size={24} fill={isFavorite ? "#f5a145" : "none"} stroke="#f5a145" />
+            <ArrowLeft size={20} className="text-gray-800" />
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {/* share */}}
+              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm"
+            >
+              <Share2 size={18} className="text-gray-700" />
+            </button>
+            <button
+              onClick={onToggleFavorite}
+              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+            >
+              <Heart size={18} fill={isFavorite ? "#f43f5e" : "none"} stroke={isFavorite ? "#f43f5e" : "#374151"} strokeWidth={2} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Main Info Section ─── */}
+      <div className="px-5 pt-5 pb-4">
+        {/* Category tag */}
+        <span className="inline-block text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded mb-2">
+          {getCategoryName(product.category)}
+        </span>
+
+        {/* Title */}
+        <h1 className="text-[22px] font-bold text-gray-900 leading-tight mb-1">
+          {product.name}
+        </h1>
+
+        {/* Seller */}
+        <p className="text-[14px] text-gray-500 mb-3">{product.seller}</p>
+
+        {/* Description */}
+        <p className="text-[14px] text-gray-700 leading-relaxed mb-4">
+          {product.description}
+        </p>
+
+        {/* Stats row */}
+        <div className="flex items-center gap-4 text-[13px] text-gray-400">
+          <span className="flex items-center gap-1">
+            <MapPin size={14} />
+            {product.location} · {product.distance}
+          </span>
+          <button onClick={onToggleLike} className="flex items-center gap-1 hover:text-rose-500 transition-colors">
+            <ThumbsUp size={14} fill={isLiked ? "currentColor" : "none"} className={isLiked ? "text-rose-500" : ""} />
+            {product.likeCount}
           </button>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto">
-        {/* Product Image */}
-        <div className="aspect-4/3 relative bg-[#f5f0dc]">
-          <ImageWithFallback
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
+      {/* ─── Divider ─── */}
+      <div className="h-2 bg-gray-50" />
 
-        {/* Product Info */}
-        <div className="px-6 py-6 bg-white">
-          <h2 className="text-[#2d3e2d] mb-4">{product.name}</h2>
-          
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-[#6b8e6f]">리뷰 {product.reviewCount}개</span>
+      {/* ─── Application Info ─── */}
+      <div className="px-5 py-5">
+        <h3 className="text-[15px] font-bold text-gray-900 mb-4">모집 정보</h3>
+
+        <div className="space-y-3">
+          {/* Deadline */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5 text-[14px] text-gray-600">
+              <Calendar size={16} className="text-gray-400" />
+              <span>신청 기간</span>
+            </div>
+            <span className="text-[14px] font-medium text-gray-900">{product.applicationDeadline}</span>
           </div>
 
-          <p className="text-[#2d3e2d] mb-6">{product.description}</p>
-
-          {/* Location & Stats */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="flex items-center gap-2 text-[#6b8e6f]">
-              <MapPin size={20} />
-              <span>{product.location}</span>
+          {/* Capacity */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5 text-[14px] text-gray-600">
+              <Users size={16} className="text-gray-400" />
+              <span>모집 인원</span>
             </div>
-            <div className="flex items-center gap-2 text-[#6b8e6f]">
-              <span className="text-[#2d3e2d]">{product.distance}</span>
-            </div>
+            <span className="text-[14px] font-medium text-gray-900">
+              {product.currentApplicants} / {product.requiredReviewers}명
+            </span>
           </div>
 
-          {/* Application Info */}
-          <div className="bg-[#f5f0dc] rounded-[1rem] p-4 mb-4">
-            <div className="flex items-start gap-3 mb-3">
-              <Calendar size={20} className="text-[#6b8e6f] mt-1" />
-              <div>
-                <div className="text-sm text-[#9ca89d] mb-1">신청 기간</div>
-                <div className="text-[#2d3e2d]">{product.applicationDeadline}</div>
-              </div>
+          {/* Progress */}
+          <div className="pt-2">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[12px] text-gray-400">모집 진행률</span>
+              <span className="text-[12px] font-semibold text-gray-700">{fillingRate}%</span>
             </div>
-            <div className="flex items-start gap-3">
-              <Users size={20} className="text-[#6b8e6f] mt-1" />
-              <div>
-                <div className="text-sm text-[#9ca89d] mb-1">모집 현황</div>
-                <div className="text-[#2d3e2d]">
-                  {product.currentApplicants} / {product.requiredReviewers}명
-                </div>
-              </div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${
+                  fillingRate >= 80 ? 'bg-orange-400' : 'bg-emerald-400'
+                }`}
+                style={{ width: `${Math.min(fillingRate, 100)}%` }}
+              />
             </div>
           </div>
-
-          {/* Review Mission */}
-          <div className="border-2 border-[#6b8e6f] rounded-[1rem] p-4 mb-6">
-            <h4 className="text-[#2d3e2d] mb-3">리뷰 미션</h4>
-            <ul className="space-y-2 text-sm text-[#6b8e6f]">
-              <li className="flex items-start gap-2">
-                <span className="text-[#f5a145]">•</span>
-                <span>제품을 맛보고 솔직하게 리뷰를 작성해 주세요</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#f5a145]">•</span>
-                <span>장점, 단점, 개선점을 상세히 평가해 주세요</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#f5a145]">•</span>
-                <span>사진과 함께 리뷰를 작성하면 더 좋아요</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Seller Info */}
-          <div className="mb-6">
-            <h4 className="text-[#2d3e2d] mb-3">판매자 정보</h4>
-            <div className="bg-[#f5f0dc] rounded-[1rem] p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[#2d3e2d]">{product.seller}</span>
-                <div className="flex gap-2">
-                  <button className="text-[#f5a145] hover:scale-110 transition-transform">
-                    <Heart size={20} />
-                  </button>
-                  <button className="text-[#6b8e6f] hover:scale-110 transition-transform">
-                    <Share2 size={20} />
-                  </button>
-                </div>
-              </div>
-              <div className="text-sm text-[#6b8e6f]">{getCategoryName(product.category)}</div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="flex items-center justify-around py-4 border-t-2 border-[#d4c5a0]">
-            <button 
-              onClick={handleLikeClick}
-              className="text-center hover:scale-105 transition-transform"
-            >
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <ThumbsUp 
-                  size={20} 
-                  fill={isLiked ? "#6b8e6f" : "none"} 
-                  stroke="#6b8e6f"
-                  className={isLiked ? "animate-pulse" : ""}
-                />
-                <span className="text-[#2d3e2d]">{product.likeCount}</span>
-              </div>
-              <div className="text-sm text-[#9ca89d]">좋아요</div>
-            </button>
-            <div className="w-px h-12 bg-[#d4c5a0]"></div>
-            <div className="text-center">
-              <div className="text-[#2d3e2d] mb-1">{product.reviewCount}</div>
-              <div className="text-sm text-[#9ca89d]">리뷰 수</div>
-            </div>
-          </div>
-
-          {/* Reviews Section */}
-          {productReviews.length > 0 && (
-            <div className="mt-6 mb-6">
-              <h4 className="text-[#2d3e2d] mb-4">작성된 리뷰 ({productReviews.length})</h4>
-              <div className="space-y-4">
-                {productReviews.map((review) => (
-                  <div key={review.id} className="bg-[#f5f0dc] rounded-[1rem] p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-[#6b8e6f] flex items-center justify-center text-white text-sm">
-                          {review.userName ? review.userName[0] : 'U'}
-                        </div>
-                        <div>
-                          <div className="text-sm text-[#2d3e2d] font-medium">{review.userName || '익명'}</div>
-                          <div className="text-xs text-[#9ca89d]">
-                            {new Date(review.createdAt).toLocaleDateString('ko-KR')}
-                          </div>
-                        </div>
-                      </div>
-                      {review.status === "published" && (
-                        <div className="flex items-center gap-1 text-[#f5a145]">
-                          <Star size={16} fill="#f5a145" />
-                          <span className="text-xs">공개</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2 text-sm">
-                      {review.pros && (
-                        <div>
-                          <span className="text-[#6b8e6f] font-medium">👍 장점: </span>
-                          <span className="text-[#2d3e2d]">{review.pros}</span>
-                        </div>
-                      )}
-                      {review.cons && (
-                        <div>
-                          <span className="text-[#e63946] font-medium">👎 단점: </span>
-                          <span className="text-[#2d3e2d]">{review.cons}</span>
-                        </div>
-                      )}
-                      {review.improvements && (
-                        <div>
-                          <span className="text-[#f5a145] font-medium">💡 개선점: </span>
-                          <span className="text-[#2d3e2d]">{review.improvements}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {review.photos && review.photos.length > 0 && (
-                      <div className="mt-3 flex gap-2 overflow-x-auto">
-                        {review.photos.map((photo, idx) => (
-                          <img 
-                            key={idx} 
-                            src={photo} 
-                            alt={`리뷰 사진 ${idx + 1}`}
-                            className="w-20 h-20 object-cover rounded-lg shrink-0"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#6b8e6f] z-20">
-        <div className="max-w-md mx-auto px-6 py-4">
+      {/* ─── Divider ─── */}
+      <div className="h-2 bg-gray-50" />
+
+      {/* ─── Review Mission ─── */}
+      <div className="px-5 py-5">
+        <h3 className="text-[15px] font-bold text-gray-900 mb-3">리뷰 미션</h3>
+        <div className="space-y-2.5">
+          {[
+            "제품을 체험하고 솔직한 리뷰를 작성해 주세요",
+            "장점, 단점, 개선점을 구체적으로 평가해 주세요",
+            "사진 2장 이상과 함께 작성하면 추가 포인트!"
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                {i + 1}
+              </span>
+              <span className="text-[13px] text-gray-600 leading-relaxed">{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── Divider ─── */}
+      <div className="h-2 bg-gray-50" />
+
+      {/* ─── Reviews Section ─── */}
+      <div className="px-5 py-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[15px] font-bold text-gray-900">
+            리뷰 <span className="text-emerald-600">{productReviews.length}</span>
+          </h3>
+        </div>
+
+        {productReviews.length === 0 ? (
+          <div className="py-8 text-center">
+            <p className="text-[13px] text-gray-400">아직 작성된 리뷰가 없습니다</p>
+            <p className="text-[12px] text-gray-300 mt-1">첫 리뷰어가 되어보세요!</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {productReviews.slice(0, 5).map((review) => (
+              <div key={review.id} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                {/* Reviewer info */}
+                <div className="flex items-center gap-2.5 mb-2.5">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[12px] font-bold text-gray-500">
+                    {review.userName ? review.userName[0] : 'U'}
+                  </div>
+                  <div>
+                    <span className="text-[13px] font-medium text-gray-800">{review.userName || '익명'}</span>
+                    <span className="text-[11px] text-gray-400 ml-2">
+                      {new Date(review.createdAt).toLocaleDateString('ko-KR')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Review content */}
+                <div className="space-y-1.5 text-[13px] leading-relaxed">
+                  {review.pros && (
+                    <p className="text-gray-700">
+                      <span className="text-emerald-600 font-medium">장점</span> {review.pros}
+                    </p>
+                  )}
+                  {review.cons && (
+                    <p className="text-gray-700">
+                      <span className="text-orange-500 font-medium">단점</span> {review.cons}
+                    </p>
+                  )}
+                  {review.improvements && (
+                    <p className="text-gray-700">
+                      <span className="text-blue-500 font-medium">개선</span> {review.improvements}
+                    </p>
+                  )}
+                </div>
+
+                {/* Review photos */}
+                {review.photos && review.photos.length > 0 && (
+                  <div className="mt-2.5 flex gap-1.5 overflow-x-auto no-scrollbar">
+                    {review.photos.map((photo, idx) => (
+                      <img
+                        key={idx}
+                        src={photo}
+                        alt=""
+                        className="w-16 h-16 object-cover rounded-lg shrink-0 bg-gray-100"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Bottom CTA ─── */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-20 pb-[env(safe-area-inset-bottom)]">
+        <div className="max-w-md mx-auto px-5 py-3">
           {hasApplied ? (
             canCancel ? (
               <button
                 onClick={onCancel}
-                className="w-full bg-[#f5f0dc] text-[#6b8e6f] py-4 rounded-[1rem] hover:bg-[#ebe5cc] transition-colors text-center border-2 border-[#d4c5a0]"
+                className="w-full h-[52px] bg-gray-100 text-gray-700 rounded-xl font-semibold text-[15px] hover:bg-gray-200 transition-colors active:scale-[0.98]"
               >
                 신청 취소하기
               </button>
             ) : (
               <button
                 disabled
-                className="w-full bg-[#9ca89d] text-white py-4 rounded-[1rem] opacity-80 cursor-not-allowed"
-                title="이미 신청되었습니다"
+                className="w-full h-[52px] bg-gray-100 text-gray-400 rounded-xl font-semibold text-[15px] cursor-not-allowed"
               >
-                ✅ 신청 완료됨
+                ✓ 신청 완료
               </button>
             )
           ) : (
             <button
               onClick={onApply}
-              className="w-full bg-linear-to-r from-[#f5a145] to-[#e89535] text-white py-4 rounded-[1.5rem] hover:opacity-90 transition-all active:scale-[0.97] text-center font-medium shadow-lg shadow-[#f5a145]/25"
+              className="w-full h-[52px] bg-gray-900 text-white rounded-xl font-semibold text-[15px] hover:bg-gray-800 transition-colors active:scale-[0.98]"
             >
-              체험단 신청하기 ({product.currentApplicants}/{product.requiredReviewers}명)
+              체험단 신청하기
             </button>
           )}
         </div>

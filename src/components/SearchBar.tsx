@@ -7,28 +7,16 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export function SearchBar({ value, onChange, placeholder = "제품명, 가게명으로 검색..." }: SearchBarProps) {
+export function SearchBar({ value, onChange, placeholder = "맛집, 체험단 검색" }: SearchBarProps) {
   const [isFocused, setIsFocused] = useState(false);
 
-  const handleClear = () => {
-    onChange("");
-  };
-
   return (
-    <div 
-      className={`relative flex items-center gap-3 bg-white rounded-[1rem] px-4 py-3 border-2 transition-all ${
-        isFocused 
-          ? "border-[#6b8e6f] shadow-md" 
-          : "border-[#d4c5a0]"
+    <div
+      className={`flex items-center gap-2.5 bg-gray-100 rounded-xl px-3.5 py-2.5 transition-all ${
+        isFocused ? "bg-white ring-2 ring-gray-900/10" : ""
       }`}
     >
-      <Search 
-        size={20} 
-        className={`shrink-0 transition-colors ${
-          isFocused ? "text-[#6b8e6f]" : "text-[#9ca89d]"
-        }`}
-      />
-      
+      <Search size={18} className="text-gray-400 shrink-0" />
       <input
         type="text"
         value={value}
@@ -36,15 +24,14 @@ export function SearchBar({ value, onChange, placeholder = "제품명, 가게명
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
-        className="flex-1 bg-transparent text-[#2d3e2d] placeholder:text-[#9ca89d] outline-none"
+        className="flex-1 bg-transparent text-[14px] text-gray-900 placeholder:text-gray-400 outline-none"
       />
-      
       {value && (
         <button
-          onClick={handleClear}
-          className="shrink-0 text-[#9ca89d] hover:text-[#6b8e6f] transition-colors p-1 hover:bg-[#f5f0dc] rounded-full"
+          onClick={() => onChange("")}
+          className="shrink-0 w-5 h-5 flex items-center justify-center bg-gray-300 rounded-full hover:bg-gray-400 transition-colors"
         >
-          <X size={18} />
+          <X size={12} className="text-white" />
         </button>
       )}
     </div>
