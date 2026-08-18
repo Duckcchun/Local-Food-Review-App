@@ -407,7 +407,6 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
                 ? "bg-[#f5a145] hover:bg-[#e89535]" 
                 : "bg-[#6b8e6f] hover:bg-[#5a7a5e]"
             }`}
-            disabled={isLoading}
           >
             {isLoading && (
               <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

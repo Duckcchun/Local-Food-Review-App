@@ -55,6 +55,28 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Vendor chunk splitting for better caching
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-router': ['react-router-dom'],
+            'vendor-ui': ['lucide-react', 'sonner', 'motion'],
+            'vendor-charts': ['recharts'],
+            'vendor-radix': [
+              '@radix-ui/react-dialog',
+              '@radix-ui/react-dropdown-menu',
+              '@radix-ui/react-tabs',
+              '@radix-ui/react-tooltip',
+              '@radix-ui/react-popover',
+            ],
+          },
+        },
+      },
+      // Enable source maps for error tracking
+      sourcemap: true,
+      // Chunk size warning limit
+      chunkSizeWarningLimit: 500,
     },
     server: {
       port: 3000,
