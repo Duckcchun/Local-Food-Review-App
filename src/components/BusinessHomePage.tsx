@@ -26,7 +26,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Hero Section */}
-  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">
           <Logo className="mb-6" variant="white" />
           <h1 className="text-white mb-2">
@@ -56,7 +56,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
       <div className="max-w-md mx-auto px-6 mb-6">
         <div className="space-y-3">
           <button 
-            className="w-full bg-linear-to-r from-[#f5a145] to-[#e89535] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-glow" 
+            className="w-full bg-gradient-to-r from-[#f5a145] to-[#e89535] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-glow" 
             onClick={onCreateProduct}
           >
             <div className="flex items-center gap-3">
@@ -72,7 +72,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
           </button>
 
           <button 
-            className="w-full bg-linear-to-r from-[#6b8e6f] to-[#8fa893] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-lift" 
+            className="w-full bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white rounded-[1.5rem] p-5 flex items-center justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-[0.98] hover-lift" 
             onClick={onViewDashboard}
           >
             <div className="flex items-center gap-3">
@@ -248,7 +248,7 @@ export function BusinessHomePage({ userInfo, onProductClick, myProducts, onCreat
 
       {/* Tips */}
       <div className="max-w-md mx-auto px-6 mb-6">
-  <div className="bg-linear-to-br from-[#f5f0dc] to-[#ebe5d0] rounded-[1.5rem] p-5 border-2 border-[#d4c5a0]">
+  <div className="bg-gradient-to-br from-[#f5f0dc] to-[#ebe5d0] rounded-[1.5rem] p-5 border-2 border-[#d4c5a0]">
           <div className="flex items-start gap-3">
             <span className="text-2xl">💡</span>
             <div>

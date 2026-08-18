@@ -54,7 +54,7 @@ export function BusinessDashboard({
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Header */}
-  <div className="bg-linear-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-6xl mx-auto px-6">
           <button onClick={onBack} className="mb-6 text-white hover:opacity-80">
             <ChevronLeft size={24} />
@@ -157,7 +157,7 @@ export function BusinessDashboard({
               </div>
               <div className="w-full bg-[#f5f0dc] rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-linear-to-r from-[#9d4edd] to-[#c77dff] h-full rounded-full transition-all"
+                  className="bg-gradient-to-r from-[#9d4edd] to-[#c77dff] h-full rounded-full transition-all"
                   style={{ width: `${Math.min(stats.averageFillRate, 100)}%` }}
                 />
               </div>
@@ -186,7 +186,7 @@ export function BusinessDashboard({
               </div>
               <div className="w-full bg-[#f5f0dc] rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-linear-to-r from-[#06a77d] to-[#38b2ac] h-full rounded-full transition-all"
+                  className="bg-gradient-to-r from-[#06a77d] to-[#38b2ac] h-full rounded-full transition-all"
                   style={{ width: `${Math.min(stats.reviewCompletionRate, 100)}%` }}
                 />
               </div>
@@ -316,7 +316,7 @@ export function BusinessDashboard({
                             </div>
                             <div className="w-full bg-[#f5f0dc] rounded-full h-2 overflow-hidden">
                               <div
-                                className="bg-linear-to-r from-[#f5a145] to-[#e89535] h-full rounded-full transition-all"
+                                className="bg-gradient-to-r from-[#f5a145] to-[#e89535] h-full rounded-full transition-all"
                                 style={{ width: `${Math.min(perf.fillRate, 100)}%` }}
                               />
                             </div>
@@ -330,7 +330,7 @@ export function BusinessDashboard({
                               </div>
                               <div className="w-full bg-[#f5f0dc] rounded-full h-2 overflow-hidden">
                                 <div
-                                  className="bg-linear-to-r from-[#6b8e6f] to-[#8fa893] h-full rounded-full transition-all"
+                                  className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] h-full rounded-full transition-all"
                                   style={{ width: `${Math.min(perf.reviewRate, 100)}%` }}
                                 />
                               </div>
