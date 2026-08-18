@@ -26,9 +26,10 @@ interface HomePageProps {
   onNotificationsClick?: () => void;
   unreadNotifications?: number;
   onRefresh?: () => Promise<void>;
+  onMapView?: () => void;
 }
 
-export function HomePage({ onProductClick, userName = "회원", favorites, onToggleFavorite, products = mockProducts, onNotificationsClick, unreadNotifications = 0, onRefresh }: HomePageProps) {
+export function HomePage({ onProductClick, userName = "회원", favorites, onToggleFavorite, products = mockProducts, onNotificationsClick, unreadNotifications = 0, onRefresh, onMapView }: HomePageProps) {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [distanceFilter, setDistanceFilter] = useState<number | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
@@ -295,10 +296,25 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
       <div className="max-w-md mx-auto px-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[#2d3e2d]">체험단 모집중 🔥</h2>
-          <span className="text-sm text-[#9ca89d]">
-            {filteredProducts.length}개
+          <div className="flex items-center gap-2">
+            {onMapView && (
+              <button
+                onClick={onMapView}
+                className="flex items-center gap-1 px-3 py-1.5 bg-[#f0f9f4] text-[#6b8e6f] rounded-full text-xs font-medium hover:bg-[#6b8e6f] hover:text-white transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                  <line x1="8" y1="2" x2="8" y2="18" />
+                  <line x1="16" y1="6" x2="16" y2="22" />
+                </svg>
+                지도
+              </button>
+            )}
+            <span className="text-sm text-[#9ca89d]">
+              {filteredProducts.length}개
             {distanceFilter && ` (${distanceFilter}km 이내)`}
           </span>
+          </div>
         </div>
         
         {sortedProducts.length === 0 ? (

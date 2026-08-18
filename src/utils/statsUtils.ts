@@ -1,5 +1,5 @@
 import type { Product } from "../data/mockData";
-import type { Application, Review } from "../App";
+import type { Application, Review } from "../types";
 
 export type PeriodFilter = "week" | "month" | "all";
 

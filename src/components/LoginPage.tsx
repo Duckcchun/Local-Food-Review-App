@@ -6,6 +6,7 @@ import type { UserInfo } from "../types";
 import { publicAnonKey } from "../utils/supabase/info";
 import { requestJson } from "../utils/request";
 import { loginSchema, validateForm } from "../utils/validation";
+import { SocialLoginButtons } from "./SocialLoginButtons";
 
 interface LoginPageProps {
   onBack: () => void;
@@ -208,6 +209,9 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
             >
               회원가입
             </button>
+
+            {/* Social Login */}
+            <SocialLoginButtons action="로그인" />
           </form>
         </div>
 

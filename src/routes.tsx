@@ -8,6 +8,7 @@ import { PageSkeleton } from './components/common/PageSkeleton';
 const HomePage = lazy(() => import('./pages/HomePage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
+const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'));
 const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
 const ReviewPage = lazy(() => import('./pages/ReviewPage'));
 const ReviewWritePage = lazy(() => import('./pages/ReviewWritePage'));
@@ -25,6 +26,7 @@ const BusinessDashboardPage = lazy(() => import('./pages/BusinessDashboardPage')
 const StoreRegistrationPage = lazy(() => import('./pages/StoreRegistrationPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const ReviewerProfilePage = lazy(() => import('./pages/ReviewerProfilePage'));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<PageSkeleton />}>{children}</Suspense>;
@@ -43,6 +45,10 @@ export const router = createBrowserRouter([
       {
         path: 'signup',
         element: <SuspenseWrapper><SignupPage /></SuspenseWrapper>,
+      },
+      {
+        path: 'auth/callback',
+        element: <SuspenseWrapper><AuthCallbackPage /></SuspenseWrapper>,
       },
 
       // Protected routes (auth required)
@@ -120,6 +126,10 @@ export const router = createBrowserRouter([
           {
             path: 'privacy',
             element: <SuspenseWrapper><PrivacyPage /></SuspenseWrapper>,
+          },
+          {
+            path: 'reviewer/:userId?',
+            element: <SuspenseWrapper><ReviewerProfilePage /></SuspenseWrapper>,
           },
         ],
       },

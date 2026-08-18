@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HomePage as HomePageComponent } from '../components/HomePage';
 import { BusinessHomePage } from '../components/BusinessHomePage';
+import { MapView } from '../components/MapView';
 import { useAuthStore } from '../stores/authStore';
 import { useProductStore } from '../stores/productStore';
 import { useApplicationStore } from '../stores/applicationStore';
@@ -9,7 +11,12 @@ import { useReviewStore } from '../stores/reviewStore';
 import { useFavorites } from '../hooks/useFavorites';
 import { useProducts } from '../hooks/useProducts';
 import { useDataLoader } from '../hooks/useDataLoader';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
+import { NotificationPermissionBanner } from '../components/common/NotificationPermissionBanner';
 import type { Product } from '../data/mockData';
+import { Map } from 'lucide-react';
+
+type ViewMode = 'list' | 'map';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -20,9 +27,13 @@ export default function HomePage() {
   const notifications = useNotificationStore(s => s.notifications);
   const { favorites, handleToggleFavorite } = useFavorites();
   const { handleDeleteProduct, handleUpdateApplicationStatus } = useProducts();
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   // Data loader for initial server sync
   useDataLoader();
+
+  // Real-time notification subscription
+  useRealtimeNotifications();
 
   if (!userInfo) return null;
 
@@ -49,15 +60,34 @@ export default function HomePage() {
     );
   }
 
+  // Map view for reviewer
+  if (viewMode === 'map') {
+    return (
+      <div className="min-h-screen bg-[#fffef5] pb-24">
+        <div className="max-w-md mx-auto px-4 pt-4">
+          <MapView
+            products={allProducts}
+            onProductClick={handleProductClick}
+            onToggleView={() => setViewMode('list')}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <HomePageComponent
-      onProductClick={handleProductClick}
-      userName={userInfo.name}
-      favorites={favorites}
-      onToggleFavorite={handleToggleFavorite}
-      products={allProducts}
-      onNotificationsClick={() => navigate('/notifications')}
-      unreadNotifications={notifications.filter(n => !n.read).length}
-    />
+    <>
+      <NotificationPermissionBanner />
+      <HomePageComponent
+        onProductClick={handleProductClick}
+        userName={userInfo.name}
+        favorites={favorites}
+        onToggleFavorite={handleToggleFavorite}
+        products={allProducts}
+        onNotificationsClick={() => navigate('/notifications')}
+        unreadNotifications={notifications.filter(n => !n.read).length}
+        onMapView={() => setViewMode('map')}
+      />
+    </>
   );
 }

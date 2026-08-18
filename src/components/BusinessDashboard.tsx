@@ -8,6 +8,10 @@ import type { Application, Review } from "../types";
 import { calculateBusinessStats, getProductPerformances, getChartData, getPeriodLabel } from "../utils/statsUtils";
 import type { PeriodFilter, ProductPerformance } from "../utils/statsUtils";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
+import { KeywordCloud } from "./KeywordCloud";
+import { SentimentGauge } from "./SentimentGauge";
+import { CategoryChart } from "./CategoryChart";
+import { extractKeywords, calculateSentiment, getMonthlyTrends, getCategoryPerformance } from "../utils/reviewAnalytics";
 
 interface BusinessDashboardProps {
   onBack: () => void;
@@ -33,6 +37,12 @@ export function BusinessDashboard({
   const stats = calculateBusinessStats(products || [], applications || [], businessReviews || [], period);
   const performances = getProductPerformances(products || [], applications || [], businessReviews || []);
   const chartData = getChartData(applications || [], businessReviews || [], period);
+
+  // Advanced analytics
+  const { prosKeywords, consKeywords, allKeywords } = extractKeywords(businessReviews);
+  const sentiment = calculateSentiment(businessReviews);
+  const monthlyTrends = getMonthlyTrends(businessReviews, applications);
+  const categoryPerformance = getCategoryPerformance(products || [], applications || [], businessReviews || []);
 
   const periods: Array<{ id: PeriodFilter; label: string }> = [
     { id: "week", label: "이번 주" },
@@ -429,6 +439,59 @@ export function BusinessDashboard({
             </div>
           )}
         </div>
+
+        {/* ─── Advanced Analytics Section ─── */}
+
+        {/* Sentiment Analysis */}
+        <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0] mb-6">
+          <h3 className="text-[#2d3e2d] mb-4 flex items-center gap-2">
+            <span>📊</span> 리뷰 감성 분석
+          </h3>
+          <SentimentGauge sentiment={sentiment} />
+        </div>
+
+        {/* Keyword Clouds */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
+            <KeywordCloud keywords={prosKeywords} title="👍 자주 언급된 장점" maxItems={12} />
+          </div>
+          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
+            <KeywordCloud keywords={consKeywords} title="👎 개선 요청 키워드" maxItems={12} />
+          </div>
+        </div>
+
+        {/* Monthly Trends */}
+        {monthlyTrends.length > 0 && (
+          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0] mb-6">
+            <h3 className="text-[#2d3e2d] mb-4 flex items-center gap-2">
+              <span>📈</span> 월별 트렌드
+            </h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={monthlyTrends} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="monthLabel" tick={{ fontSize: 12, fill: '#9ca89d' }} />
+                <YAxis tick={{ fontSize: 12, fill: '#9ca89d' }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: '1px solid #d4c5a0' }}
+                  labelStyle={{ color: '#2d3e2d', fontWeight: 600 }}
+                />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <Bar dataKey="applications" name="신청자" fill="#6b8e6f" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="reviews" name="리뷰" fill="#f5a145" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Category Performance */}
+        {categoryPerformance.length > 0 && (
+          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0] mb-6">
+            <h3 className="text-[#2d3e2d] mb-4 flex items-center gap-2">
+              <span>🏷️</span> 카테고리별 성과
+            </h3>
+            <CategoryChart categories={categoryPerformance} />
+          </div>
+        )}
 
         {/* Info Card */}
         <div className="mt-6 bg-[#f5f0dc] rounded-[1.5rem] p-5 border-2 border-[#d4c5a0]">

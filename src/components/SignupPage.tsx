@@ -6,6 +6,7 @@ import type { UserInfo } from "../types";
 import { publicAnonKey } from "../utils/supabase/info";
 import { requestJson } from "../utils/request";
 import { signupSchema, validateForm, getFieldError } from "../utils/validation";
+import { SocialLoginButtons } from "./SocialLoginButtons";
 
 interface SignupPageProps {
   onBack: () => void;
@@ -441,6 +442,9 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
             )}
             {isLoading ? "회원가입 중..." : "회원가입 완료"}
           </button>
+
+          {/* Social Login */}
+          <SocialLoginButtons action="회원가입" className="mt-4" />
         </div>
       </div>
     </div>
