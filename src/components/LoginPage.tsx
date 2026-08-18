@@ -3,6 +3,7 @@ import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { Logo } from "./Logo";
 import { toast } from "sonner";
 import type { UserInfo } from "../App";
+import { SocialLoginButtons } from "./SocialLoginButtons";
 import { publicAnonKey } from "../utils/supabase/info";
 import { requestJson } from "../utils/request";
 
@@ -188,6 +189,9 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
             >
               회원가입
             </button>
+
+            {/* Social Login */}
+            <SocialLoginButtons action="로그인" />
           </form>
         </div>
 

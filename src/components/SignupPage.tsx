@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, User, Store, Mail, Lock, Phone, Building } from "lucide-react";
 import { Logo } from "./Logo";
+import { SocialLoginButtons } from "./SocialLoginButtons";
 import { toast } from "sonner";
 import type { UserInfo } from "../App";
 import { publicAnonKey } from "../utils/supabase/info";
@@ -416,6 +417,9 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
             )}
             {isLoading ? "회원가입 중..." : "회원가입 완료"}
           </button>
+
+          {/* Social Login */}
+          <SocialLoginButtons action="회원가입" />
         </div>
       </div>
     </div>

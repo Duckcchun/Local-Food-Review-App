@@ -930,7 +930,17 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffef5]">
+    <div className="min-h-screen bg-white">
+      {/* Session Restoring Indicator */}
+      {!userInfo && accessToken && currentPage !== "signup" && currentPage !== "login" && (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-gray-500">로딩 중...</p>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <AnimatePresence mode="wait">
         {currentPage === "signup" && (
@@ -943,7 +953,7 @@ export default function App() {
             transition={pageTransition}
           >
             <SignupPage 
-              onBack={() => setCurrentPage("home")} 
+              onBack={() => setCurrentPage("login")} 
               onSignupComplete={handleSignupComplete}
               onSwitchToLogin={() => setCurrentPage("login")}
             />
@@ -960,7 +970,7 @@ export default function App() {
             transition={pageTransition}
           >
             <LoginPage 
-              onBack={() => setCurrentPage("home")} 
+              onBack={() => setCurrentPage("signup")} 
               onLoginComplete={handleLoginComplete}
               onSwitchToSignup={() => setCurrentPage("signup")}
             />
