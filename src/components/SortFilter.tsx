@@ -9,7 +9,7 @@ interface SortFilterProps {
   resultCount?: number;
 }
 
-export function SortFilter({ selectedSort, onSelectSort, resultCount }: SortFilterProps) {
+export function SortFilter({ selectedSort, onSelectSort }: SortFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const currentSort = getSortOption(selectedSort);
@@ -24,39 +24,28 @@ export function SortFilter({ selectedSort, onSelectSort, resultCount }: SortFilt
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const handleSelect = (sortId: SortOption) => {
-    onSelectSort(sortId);
-    setIsOpen(false);
-  };
-
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 text-[13px] text-[#6b7280] hover:text-[#374151] transition-colors"
+        className="flex items-center gap-1 text-[13px] text-gray-500 hover:text-gray-700 transition-colors"
       >
         <span>{currentSort.name}</span>
         <ChevronDown size={14} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-44 bg-white rounded-[0.75rem] shadow-lg border border-[#f3f4f6] z-50 overflow-hidden py-1">
+        <div className="absolute top-full right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden py-1">
           {SORT_OPTIONS.map((option) => {
             const isSelected = option.id === selectedSort;
             return (
               <button
                 key={option.id}
-                onClick={() => handleSelect(option.id)}
-                className={`w-full flex items-center gap-2 px-3.5 py-2.5 text-left transition-colors ${
-                  isSelected ? "bg-[#f9fafb]" : "hover:bg-[#f9fafb]"
-                }`}
+                onClick={() => { onSelectSort(option.id); setIsOpen(false); }}
+                className={`w-full flex items-center gap-2 px-3.5 py-2.5 text-left transition-colors ${isSelected ? "bg-gray-50" : "hover:bg-gray-50"}`}
               >
                 <span className="text-sm">{option.icon}</span>
-                <span className={`flex-1 text-[13px] ${isSelected ? "font-semibold text-[#1f2937]" : "text-[#4b5563]"}`}>
-                  {option.name}
-                </span>
+                <span className={`flex-1 text-[13px] ${isSelected ? "font-semibold text-gray-900" : "text-gray-600"}`}>{option.name}</span>
                 {isSelected && <Check size={14} className="text-emerald-600 shrink-0" />}
               </button>
             );

@@ -2,47 +2,28 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}", 
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        'linear-to-b': 'linear-gradient(to bottom, var(--tw-gradient-stops))',
-        'linear-to-br': 'linear-gradient(to bottom right, var(--tw-gradient-stops))',
-        'linear-to-r': 'linear-gradient(to right, var(--tw-gradient-stops))',
-        'linear-to-l': 'linear-gradient(to left, var(--tw-gradient-stops))',
+      colors: {
+        // 앱 브랜드 색상
+        brand: {
+          green: '#6b8e6f',
+          'green-dark': '#5a7a5e',
+          'green-light': '#8fa893',
+          orange: '#f5a145',
+          'orange-dark': '#e89535',
+          beige: '#f5f0dc',
+          'beige-dark': '#d4c5a0',
+          cream: '#fffef5',
+        },
       },
-    
-      animation: {
-        'float': 'float 3s ease-in-out infinite',
-        'wiggle': 'wiggle 0.5s ease-in-out infinite',
-        'heartbeat': 'heartbeat 1s ease-in-out infinite',
-        'shimmer': 'shimmer 2s infinite linear',
-        'spin-slow': 'spin 3s linear infinite',
-      },
-      keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-5px)' },
-        },
-        wiggle: {
-          '0%, 100%': { transform: 'rotate(-3deg)' },
-          '50%': { transform: 'rotate(3deg)' },
-        },
-        heartbeat: {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.2)' },
-        },
-        shimmer: {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100%)' },
-        },
-        spin: {
-          'from': { transform: 'rotate(0deg)' },
-          'to': { transform: 'rotate(360deg)' },
-        },
+      borderRadius: {
+        '2xl': '1rem',
+        '3xl': '1.5rem',
       },
     },
   },
   plugins: [],
-}
+};

@@ -22,9 +22,7 @@ export function BottomNav({ activeTab, onTabChange, userType }: BottomNavProps) 
           stroke={isActive ? "#1f2937" : "#9ca3af"}
           strokeWidth={isActive ? 2 : 1.8}
         />
-        <span className={`text-[10px] leading-tight ${
-          isActive ? "font-bold text-[#1f2937]" : "font-medium text-[#9ca3af]"
-        }`}>
+        <span className={`text-[10px] leading-tight ${isActive ? "font-bold text-gray-900" : "font-medium text-gray-400"}`}>
           {label}
         </span>
       </button>
@@ -32,12 +30,10 @@ export function BottomNav({ activeTab, onTabChange, userType }: BottomNavProps) 
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] z-50 pb-[env(safe-area-inset-bottom)]">
-      <div className="max-w-md mx-auto h-[3.5rem] flex items-stretch">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 pb-[env(safe-area-inset-bottom)]">
+      <div className="max-w-md mx-auto h-14 flex items-stretch">
         <NavButton tab="home" icon={Home} label="홈" />
-        {!isBusiness && (
-          <NavButton tab="review" icon={FileText} label="리뷰" />
-        )}
+        {!isBusiness && <NavButton tab="review" icon={FileText} label="리뷰" />}
         <NavButton tab="profile" icon={User} label="MY" />
       </div>
     </nav>
