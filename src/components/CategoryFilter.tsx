@@ -16,10 +16,10 @@ export function CategoryFilter({ selectedCategory, onSelectCategory }: CategoryF
             <button
               key={category.id}
               onClick={() => onSelectCategory(category.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap transition-all text-[13px] font-medium ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-[0.5rem] whitespace-nowrap transition-all text-[13px] font-medium ${
                 isSelected
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-[#1f2937] text-white"
+                  : "bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]"
               }`}
             >
               <span className="text-sm">{category.icon}</span>

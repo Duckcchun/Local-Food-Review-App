@@ -38,8 +38,8 @@ export function ProductDetailPage({
   return (
     <div className="min-h-screen bg-white pb-[88px]">
       {/* ─── Hero Image ─── */}
-      <div className="relative aspect-[4/3] bg-gray-100">
-        {!imageLoaded && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
+      <div className="relative aspect-[4/3] bg-[#f3f4f6]">
+        {!imageLoaded && <div className="absolute inset-0 bg-[#f3f4f6] animate-pulse" />}
         <img
           src={product.image}
           alt={product.name}
@@ -52,20 +52,20 @@ export function ProductDetailPage({
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
           <button
             onClick={onBack}
-            className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+            className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md active:scale-90 transition-transform"
           >
-            <ArrowLeft size={20} className="text-gray-800" />
+            <ArrowLeft size={20} className="text-[#1f2937]" />
           </button>
           <div className="flex items-center gap-2">
             <button
               onClick={() => {/* share */}}
-              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm"
+              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md"
             >
-              <Share2 size={18} className="text-gray-700" />
+              <Share2 size={18} className="text-[#374151]" />
             </button>
             <button
               onClick={onToggleFavorite}
-              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md active:scale-90 transition-transform"
             >
               <Heart size={18} fill={isFavorite ? "#f43f5e" : "none"} stroke={isFavorite ? "#f43f5e" : "#374151"} strokeWidth={2} />
             </button>
@@ -76,60 +76,60 @@ export function ProductDetailPage({
       {/* ─── Main Info Section ─── */}
       <div className="px-5 pt-5 pb-4">
         {/* Category tag */}
-        <span className="inline-block text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded mb-2">
+        <span className="inline-block text-[11px] font-semibold text-[#047857] bg-[#ecfdf5] px-2 py-0.5 rounded mb-2">
           {getCategoryName(product.category)}
         </span>
 
         {/* Title */}
-        <h1 className="text-[22px] font-bold text-gray-900 leading-tight mb-1">
+        <h1 className="text-[22px] font-bold text-[#1f2937] leading-tight mb-1">
           {product.name}
         </h1>
 
         {/* Seller */}
-        <p className="text-[14px] text-gray-500 mb-3">{product.seller}</p>
+        <p className="text-[14px] text-[#6b7280] mb-3">{product.seller}</p>
 
         {/* Description */}
-        <p className="text-[14px] text-gray-700 leading-relaxed mb-4">
+        <p className="text-[14px] text-[#374151] leading-relaxed mb-4">
           {product.description}
         </p>
 
         {/* Stats row */}
-        <div className="flex items-center gap-4 text-[13px] text-gray-400">
+        <div className="flex items-center gap-4 text-[13px] text-[#9ca3af]">
           <span className="flex items-center gap-1">
             <MapPin size={14} />
             {product.location} · {product.distance}
           </span>
-          <button onClick={onToggleLike} className="flex items-center gap-1 hover:text-rose-500 transition-colors">
-            <ThumbsUp size={14} fill={isLiked ? "currentColor" : "none"} className={isLiked ? "text-rose-500" : ""} />
+          <button onClick={onToggleLike} className="flex items-center gap-1 hover:text-[#f43f5e] transition-colors">
+            <ThumbsUp size={14} fill={isLiked ? "currentColor" : "none"} className={isLiked ? "text-[#f43f5e]" : ""} />
             {product.likeCount}
           </button>
         </div>
       </div>
 
       {/* ─── Divider ─── */}
-      <div className="h-2 bg-gray-50" />
+      <div className="h-2 bg-[#f9fafb]" />
 
       {/* ─── Application Info ─── */}
       <div className="px-5 py-5">
-        <h3 className="text-[15px] font-bold text-gray-900 mb-4">모집 정보</h3>
+        <h3 className="text-[15px] font-bold text-[#1f2937] mb-4">모집 정보</h3>
 
         <div className="space-y-3">
           {/* Deadline */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 text-[14px] text-gray-600">
-              <Calendar size={16} className="text-gray-400" />
+            <div className="flex items-center gap-2.5 text-[14px] text-[#4b5563]">
+              <Calendar size={16} className="text-[#9ca3af]" />
               <span>신청 기간</span>
             </div>
-            <span className="text-[14px] font-medium text-gray-900">{product.applicationDeadline}</span>
+            <span className="text-[14px] font-medium text-[#1f2937]">{product.applicationDeadline}</span>
           </div>
 
           {/* Capacity */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 text-[14px] text-gray-600">
-              <Users size={16} className="text-gray-400" />
+            <div className="flex items-center gap-2.5 text-[14px] text-[#4b5563]">
+              <Users size={16} className="text-[#9ca3af]" />
               <span>모집 인원</span>
             </div>
-            <span className="text-[14px] font-medium text-gray-900">
+            <span className="text-[14px] font-medium text-[#1f2937]">
               {product.currentApplicants} / {product.requiredReviewers}명
             </span>
           </div>
@@ -137,13 +137,13 @@ export function ProductDetailPage({
           {/* Progress */}
           <div className="pt-2">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[12px] text-gray-400">모집 진행률</span>
-              <span className="text-[12px] font-semibold text-gray-700">{fillingRate}%</span>
+              <span className="text-[12px] text-[#9ca3af]">모집 진행률</span>
+              <span className="text-[12px] font-semibold text-[#374151]">{fillingRate}%</span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-700 ${
-                  fillingRate >= 80 ? 'bg-orange-400' : 'bg-emerald-400'
+                  fillingRate >= 80 ? 'bg-[#fb923c]' : 'bg-[#34d399]'
                 }`}
                 style={{ width: `${Math.min(fillingRate, 100)}%` }}
               />
@@ -153,11 +153,11 @@ export function ProductDetailPage({
       </div>
 
       {/* ─── Divider ─── */}
-      <div className="h-2 bg-gray-50" />
+      <div className="h-2 bg-[#f9fafb]" />
 
       {/* ─── Review Mission ─── */}
       <div className="px-5 py-5">
-        <h3 className="text-[15px] font-bold text-gray-900 mb-3">리뷰 미션</h3>
+        <h3 className="text-[15px] font-bold text-[#1f2937] mb-3">리뷰 미션</h3>
         <div className="space-y-2.5">
           {[
             "제품을 체험하고 솔직한 리뷰를 작성해 주세요",
@@ -165,43 +165,43 @@ export function ProductDetailPage({
             "사진 2장 이상과 함께 작성하면 추가 포인트!"
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+              <span className="w-5 h-5 rounded-full bg-[#ecfdf5] text-[#059669] text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                 {i + 1}
               </span>
-              <span className="text-[13px] text-gray-600 leading-relaxed">{item}</span>
+              <span className="text-[13px] text-[#4b5563] leading-relaxed">{item}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* ─── Divider ─── */}
-      <div className="h-2 bg-gray-50" />
+      <div className="h-2 bg-[#f9fafb]" />
 
       {/* ─── Reviews Section ─── */}
       <div className="px-5 py-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[15px] font-bold text-gray-900">
-            리뷰 <span className="text-emerald-600">{productReviews.length}</span>
+          <h3 className="text-[15px] font-bold text-[#1f2937]">
+            리뷰 <span className="text-[#059669]">{productReviews.length}</span>
           </h3>
         </div>
 
         {productReviews.length === 0 ? (
           <div className="py-8 text-center">
-            <p className="text-[13px] text-gray-400">아직 작성된 리뷰가 없습니다</p>
-            <p className="text-[12px] text-gray-300 mt-1">첫 리뷰어가 되어보세요!</p>
+            <p className="text-[13px] text-[#9ca3af]">아직 작성된 리뷰가 없습니다</p>
+            <p className="text-[12px] text-[#d1d5db] mt-1">첫 리뷰어가 되어보세요!</p>
           </div>
         ) : (
           <div className="space-y-4">
             {productReviews.slice(0, 5).map((review) => (
-              <div key={review.id} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+              <div key={review.id} className="pb-4 border-b border-[#f3f4f6] last:border-0 last:pb-0">
                 {/* Reviewer info */}
                 <div className="flex items-center gap-2.5 mb-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[12px] font-bold text-gray-500">
+                  <div className="w-8 h-8 rounded-full bg-[#e5e7eb] flex items-center justify-center text-[12px] font-bold text-[#6b7280]">
                     {review.userName ? review.userName[0] : 'U'}
                   </div>
                   <div>
-                    <span className="text-[13px] font-medium text-gray-800">{review.userName || '익명'}</span>
-                    <span className="text-[11px] text-gray-400 ml-2">
+                    <span className="text-[13px] font-medium text-[#1f2937]">{review.userName || '익명'}</span>
+                    <span className="text-[11px] text-[#9ca3af] ml-2">
                       {new Date(review.createdAt).toLocaleDateString('ko-KR')}
                     </span>
                   </div>
@@ -210,17 +210,17 @@ export function ProductDetailPage({
                 {/* Review content */}
                 <div className="space-y-1.5 text-[13px] leading-relaxed">
                   {review.pros && (
-                    <p className="text-gray-700">
-                      <span className="text-emerald-600 font-medium">장점</span> {review.pros}
+                    <p className="text-[#374151]">
+                      <span className="text-[#059669] font-medium">장점</span> {review.pros}
                     </p>
                   )}
                   {review.cons && (
-                    <p className="text-gray-700">
-                      <span className="text-orange-500 font-medium">단점</span> {review.cons}
+                    <p className="text-[#374151]">
+                      <span className="text-[#f97316] font-medium">단점</span> {review.cons}
                     </p>
                   )}
                   {review.improvements && (
-                    <p className="text-gray-700">
+                    <p className="text-[#374151]">
                       <span className="text-blue-500 font-medium">개선</span> {review.improvements}
                     </p>
                   )}
@@ -234,7 +234,7 @@ export function ProductDetailPage({
                         key={idx}
                         src={photo}
                         alt=""
-                        className="w-16 h-16 object-cover rounded-lg shrink-0 bg-gray-100"
+                        className="w-16 h-16 object-cover rounded-[0.5rem] shrink-0 bg-[#f3f4f6]"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
                     ))}
@@ -247,20 +247,20 @@ export function ProductDetailPage({
       </div>
 
       {/* ─── Bottom CTA ─── */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-20 pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] z-20 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-md mx-auto px-5 py-3">
           {hasApplied ? (
             canCancel ? (
               <button
                 onClick={onCancel}
-                className="w-full h-[52px] bg-gray-100 text-gray-700 rounded-xl font-semibold text-[15px] hover:bg-gray-200 transition-colors active:scale-[0.98]"
+                className="w-full h-[52px] bg-[#f3f4f6] text-[#374151] rounded-[0.75rem] font-semibold text-[15px] hover:bg-[#e5e7eb] transition-colors active:scale-[0.98]"
               >
                 신청 취소하기
               </button>
             ) : (
               <button
                 disabled
-                className="w-full h-[52px] bg-gray-100 text-gray-400 rounded-xl font-semibold text-[15px] cursor-not-allowed"
+                className="w-full h-[52px] bg-[#f3f4f6] text-[#9ca3af] rounded-[0.75rem] font-semibold text-[15px] cursor-not-allowed"
               >
                 ✓ 신청 완료
               </button>
@@ -268,7 +268,7 @@ export function ProductDetailPage({
           ) : (
             <button
               onClick={onApply}
-              className="w-full h-[52px] bg-gray-900 text-white rounded-xl font-semibold text-[15px] hover:bg-gray-800 transition-colors active:scale-[0.98]"
+              className="w-full h-[52px] bg-[#1f2937] text-white rounded-[0.75rem] font-semibold text-[15px] hover:bg-[#1f2937] transition-colors active:scale-[0.98]"
             >
               체험단 신청하기
             </button>

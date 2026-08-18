@@ -49,9 +49,9 @@ export function SocialLoginButtons({ action = '로그인', className = '' }: Soc
     <div className={`space-y-3 ${className}`}>
       {/* Divider */}
       <div className="flex items-center gap-3 my-4">
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-gray-400">간편 {action}</span>
-        <div className="flex-1 h-px bg-gray-200" />
+        <div className="flex-1 h-px bg-[#e5e7eb]" />
+        <span className="text-xs text-[#9ca3af]">간편 {action}</span>
+        <div className="flex-1 h-px bg-[#e5e7eb]" />
       </div>
 
       {/* Buttons */}
@@ -60,11 +60,11 @@ export function SocialLoginButtons({ action = '로그인', className = '' }: Soc
           <button
             onClick={handleKakaoLogin}
             disabled={isLoading !== null}
-            className="w-full flex items-center justify-center gap-2 h-[48px] rounded-xl font-medium text-sm transition-all hover:opacity-90 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 h-[48px] rounded-[0.75rem] font-medium text-sm transition-all hover:opacity-90 disabled:opacity-50"
             style={{ backgroundColor: '#FEE500', color: '#191919' }}
           >
             {isLoading === 'kakao' ? (
-              <div className="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-[#1f2937] border-t-transparent rounded-full animate-spin" />
             ) : (
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path fillRule="evenodd" clipRule="evenodd" d="M9 1.5C4.86 1.5 1.5 4.14 1.5 7.38C1.5 9.42 2.88 11.22 4.92 12.24L4.2 15.06C4.14 15.3 4.38 15.48 4.56 15.36L7.86 13.2C8.22 13.26 8.6 13.26 9 13.26C13.14 13.26 16.5 10.62 16.5 7.38C16.5 4.14 13.14 1.5 9 1.5Z" fill="#191919"/>
@@ -78,10 +78,10 @@ export function SocialLoginButtons({ action = '로그인', className = '' }: Soc
           <button
             onClick={handleGoogleLogin}
             disabled={isLoading !== null}
-            className="w-full flex items-center justify-center gap-2 h-[48px] rounded-xl font-medium text-sm border border-gray-200 bg-white text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 h-[48px] rounded-[0.75rem] font-medium text-sm border border-[#e5e7eb] bg-white text-[#374151] transition-all hover:bg-[#f9fafb] disabled:opacity-50"
           >
             {isLoading === 'google' ? (
-              <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-[#4b5563] border-t-transparent rounded-full animate-spin" />
             ) : (
               <svg width="18" height="18" viewBox="0 0 18 18">
                 <path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.92a8.78 8.78 0 0 0 2.68-6.62z" fill="#4285F4"/>

@@ -101,14 +101,14 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
       {/* Header */}
       <div className="pt-14 pb-10 px-6">
         <div className="max-w-md mx-auto">
-          <button onClick={onBack} className="text-gray-800 mb-8 hover:opacity-70 -ml-1">
+          <button onClick={onBack} className="text-[#1f2937] mb-8 hover:opacity-70 -ml-1">
             <ArrowLeft size={22} />
           </button>
 
-          <h1 className="text-[26px] font-bold text-gray-900 mb-2">
+          <h1 className="text-[26px] font-bold text-[#1f2937] mb-2">
             로그인
           </h1>
-          <p className="text-[15px] text-gray-500">
+          <p className="text-[15px] text-[#6b7280]">
             밥터뷰에 오신 것을 환영합니다
           </p>
         </div>
@@ -120,18 +120,18 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+              <label className="block text-[13px] font-medium text-[#374151] mb-1.5">
                 이메일
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9ca3af]" size={18} />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="example@email.com"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-[14px] focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300 transition-all"
+                  className="w-full pl-11 pr-4 py-3 rounded-[0.75rem] border border-[#e5e7eb] bg-white text-[14px] focus:outline-none focus:ring-2 focus:ring-[#1f2937]/10 focus:border-gray-300 transition-all"
                   disabled={isLoading}
                 />
               </div>
@@ -139,18 +139,18 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
 
             {/* Password */}
             <div>
-              <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+              <label className="block text-[13px] font-medium text-[#374151] mb-1.5">
                 비밀번호
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9ca3af]" size={18} />
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="비밀번호를 입력하세요"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-[14px] focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300 transition-all"
+                  className="w-full pl-11 pr-4 py-3 rounded-[0.75rem] border border-[#e5e7eb] bg-white text-[14px] focus:outline-none focus:ring-2 focus:ring-[#1f2937]/10 focus:border-gray-300 transition-all"
                   disabled={isLoading}
                 />
               </div>
@@ -160,7 +160,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-[52px] bg-gray-900 text-white rounded-xl font-semibold text-[15px] hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full h-[52px] bg-[#1f2937] text-white rounded-[0.75rem] font-semibold text-[15px] hover:bg-[#1f2937] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading && (
                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -174,10 +174,10 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+                <div className="w-full border-t border-[#e5e7eb]"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-400">또는</span>
+                <span className="px-4 bg-white text-[#9ca3af]">또는</span>
               </div>
             </div>
 
@@ -185,7 +185,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
             <button
               type="button"
               onClick={onSwitchToSignup}
-              className="w-full h-[52px] border border-gray-200 text-gray-700 rounded-xl font-semibold text-[15px] hover:bg-gray-50 transition-colors"
+              className="w-full h-[52px] border border-[#e5e7eb] text-[#374151] rounded-[0.75rem] font-semibold text-[15px] hover:bg-[#f9fafb] transition-colors"
             >
               회원가입
             </button>

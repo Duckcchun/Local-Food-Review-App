@@ -118,11 +118,11 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
           {onNotificationsClick && (
             <button
               onClick={onNotificationsClick}
-              className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
+              className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f9fafb] transition-colors"
             >
-              <Bell size={22} className="text-gray-700" />
+              <Bell size={22} className="text-[#374151]" />
               {unreadNotifications > 0 && (
-                <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px]">
+                <span className="absolute top-1 right-1 w-4.5 h-4.5 bg-[#ef4444] text-white text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px]">
                   {unreadNotifications > 9 ? '9+' : unreadNotifications}
                 </span>
               )}
@@ -147,7 +147,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
         </div>
 
         {/* Thin separator */}
-        <div className="h-px bg-gray-100" />
+        <div className="h-px bg-[#f3f4f6]" />
       </div>
 
       {/* ─── Filter & Sort Row ─── */}
@@ -161,8 +161,8 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
                 onClick={() => setDistanceFilter(opt.value)}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all ${
                   distanceFilter === opt.value
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    ? "bg-[#1f2937] text-white"
+                    : "bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]"
                 }`}
               >
                 {opt.label}
@@ -175,10 +175,10 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
             {onMapView && (
               <button
                 onClick={onMapView}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-[0.5rem] hover:bg-[#f3f4f6] transition-colors"
                 title="지도 보기"
               >
-                <MapPin size={16} className="text-gray-500" />
+                <MapPin size={16} className="text-[#6b7280]" />
               </button>
             )}
           </div>
@@ -190,23 +190,23 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
         <div className="max-w-md mx-auto px-5 pb-2">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
             {searchQuery && (
-              <span className="shrink-0 inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[11px] font-medium px-2.5 py-1 rounded-full">
+              <span className="shrink-0 inline-flex items-center gap-1 bg-[#ecfdf5] text-[#047857] text-[11px] font-medium px-2.5 py-1 rounded-full">
                 "{searchQuery}"
               </span>
             )}
             {selectedCategory !== "all" && (
-              <span className="shrink-0 inline-flex items-center bg-emerald-50 text-emerald-700 text-[11px] font-medium px-2.5 py-1 rounded-full">
+              <span className="shrink-0 inline-flex items-center bg-[#ecfdf5] text-[#047857] text-[11px] font-medium px-2.5 py-1 rounded-full">
                 {getCategoryName(selectedCategory)}
               </span>
             )}
             {distanceFilter && (
-              <span className="shrink-0 inline-flex items-center bg-emerald-50 text-emerald-700 text-[11px] font-medium px-2.5 py-1 rounded-full">
+              <span className="shrink-0 inline-flex items-center bg-[#ecfdf5] text-[#047857] text-[11px] font-medium px-2.5 py-1 rounded-full">
                 {distanceFilter}km 이내
               </span>
             )}
             <button
               onClick={resetFilters}
-              className="shrink-0 text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"
+              className="shrink-0 text-[11px] text-[#9ca3af] hover:text-[#4b5563] flex items-center gap-0.5"
             >
               <FilterX size={12} />
               초기화
@@ -217,7 +217,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
 
       {/* ─── Sort Row ─── */}
       <div className="max-w-md mx-auto px-5 py-2 flex items-center justify-between">
-        <span className="text-[13px] text-gray-400">
+        <span className="text-[13px] text-[#9ca3af]">
           {sortedProducts.length}개의 체험단
         </span>
         <SortFilter
@@ -231,17 +231,17 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
       <div className="max-w-md mx-auto px-5">
         {sortedProducts.length === 0 ? (
           <div className="py-20 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <Search size={28} className="text-gray-300" />
+            <div className="w-16 h-16 mx-auto mb-4 bg-[#f3f4f6] rounded-full flex items-center justify-center">
+              <Search size={28} className="text-[#d1d5db]" />
             </div>
-            <h3 className="text-[15px] font-semibold text-gray-700 mb-1">
+            <h3 className="text-[15px] font-semibold text-[#374151] mb-1">
               {searchQuery
                 ? "검색 결과가 없어요"
                 : selectedCategory !== "all"
                   ? "해당 카테고리에 체험단이 없어요"
                   : "근처에 체험단이 없어요"}
             </h3>
-            <p className="text-[13px] text-gray-400 mb-5">
+            <p className="text-[13px] text-[#9ca3af] mb-5">
               {hasActiveFilters
                 ? "다른 조건으로 검색해보세요"
                 : "곧 새로운 체험단이 등록됩니다"}
@@ -249,7 +249,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
             {hasActiveFilters && (
               <button
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1.5 bg-gray-900 text-white text-[13px] font-medium px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors"
+                className="inline-flex items-center gap-1.5 bg-[#1f2937] text-white text-[13px] font-medium px-5 py-2.5 rounded-[0.75rem] hover:bg-[#1f2937] transition-colors"
               >
                 <FilterX size={14} />
                 필터 초기화
