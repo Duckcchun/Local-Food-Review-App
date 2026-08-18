@@ -1,6 +1,7 @@
 import { Logo } from "./Logo";
 import { ChevronRight, Download, TrendingUp, Award, Store, BarChart3, Settings, LogOut, Star, Info, ShoppingBag, History } from "lucide-react";
 import { DeleteAccountModal } from "./DeleteAccountModal";
+import { getOwnedBadges, getActiveItems } from "../utils/inventory";
 
 /**
  * Lightweight ImageWithFallback component to avoid dependency on ../figma/ImageWithFallback.
@@ -35,6 +36,7 @@ interface ProfilePageProps {
   onNavigateToFavorites: () => void;
   onNavigateToPointShop?: () => void;
   onNavigateToPointHistory?: () => void;
+  onNavigateToMyItems?: () => void;
   onEditReview?: (product: Product) => void;
   onNavigateToDashboard?: () => void;
   onNavigateToTerms?: () => void;
@@ -53,7 +55,8 @@ export function ProfilePage({
   onNavigateToApplications, 
   onNavigateToFavorites, 
   onNavigateToPointShop, 
-  onNavigateToPointHistory, 
+  onNavigateToPointHistory,
+  onNavigateToMyItems, 
   onEditReview, 
   onNavigateToDashboard,
   onNavigateToTerms,
@@ -239,6 +242,7 @@ export function ProfilePage({
   const pointsToNext = getPointsToNextLevel(userPoints);
   const nextLevel = LEVELS[currentLevel.level];
   const [showLevelModal, setShowLevelModal] = useState(false);
+  const ownedBadges = getOwnedBadges(userInfo.email);
 
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
@@ -286,6 +290,24 @@ export function ProfilePage({
             </div>
           </div>
         </div>
+
+        {/* Owned Badges */}
+        {ownedBadges.length > 0 && (
+          <div className="bg-white rounded-[1.5rem] p-5 mb-6 border-2 border-[#d4c5a0]">
+            <h4 className="text-[#2d3e2d] text-sm font-semibold mb-3">🏅 내 배지</h4>
+            <div className="flex flex-wrap gap-2">
+              {ownedBadges.map((badge) => (
+                <span
+                  key={badge.id}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fffbf0] border border-[#f5a145]/30 rounded-full text-sm"
+                >
+                  <span>{badge.icon}</span>
+                  <span className="text-[#2d3e2d] font-medium">{badge.name}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Level Progress Dashboard */}
         <div 
@@ -394,6 +416,18 @@ export function ProfilePage({
           {onEditProfile && (
             <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onEditProfile}>
               <span className="text-[#2d3e2d]">프로필 수정</span>
+              <ChevronRight size={20} className="text-[#6b8e6f]" />
+            </button>
+          )}
+
+          {onNavigateToMyItems && (
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToMyItems}>
+              <div className="flex items-center gap-2">
+                <span className="text-[#2d3e2d]">내 아이템함</span>
+                {ownedBadges.length > 0 && (
+                  <span className="text-xs bg-[#f5a145] text-white px-1.5 py-0.5 rounded-full">{getActiveItems(userInfo.email).length}</span>
+                )}
+              </div>
               <ChevronRight size={20} className="text-[#6b8e6f]" />
             </button>
           )}

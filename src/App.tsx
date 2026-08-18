@@ -25,6 +25,7 @@ import { TermsPage } from "./components/TermsPage";
 import { PrivacyPage } from "./components/PrivacyPage";
 import { ForgotPasswordPage } from "./components/ForgotPasswordPage";
 import { EditProfilePage } from "./components/EditProfilePage";
+import { MyItemsPage } from "./components/MyItemsPage";
 import type { Product } from "./data/mockData";
 import type { PointProduct, PointTransaction } from "./data/pointShop";
 import { mockProducts } from "./data/mockData";
@@ -33,8 +34,9 @@ import { toast } from "sonner";
 import { productsApi, applicationsApi, favoritesApi, reviewsApi, notificationsApi, businessApplicationsApi } from "./utils/api";
 import { getLevelInfo } from "./data/levelSystem";
 import { projectId } from "./utils/supabase/info";
+import { addPurchasedItem, hasPriorityPass, usePriorityPass, getOwnedBadges } from "./utils/inventory";
 
-type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "forgot-password" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy" | "edit-profile";
+type Page = "home" | "product-detail" | "review" | "review-write" | "edit-review" | "profile" | "signup" | "login" | "forgot-password" | "store-registration" | "my-applications" | "my-favorites" | "create-product" | "manage-applicants" | "notifications" | "review-management" | "point-shop" | "point-history" | "business-dashboard" | "terms" | "privacy" | "edit-profile" | "my-items";
 
 export interface UserInfo {
   name: string;
@@ -74,6 +76,7 @@ export interface Application {
   userLevel: number;
   status: ApplicationStatus;
   appliedAt: string;
+  hasPriority?: boolean;
 }
 
 export interface Review {
@@ -440,6 +443,15 @@ export default function App() {
     if (selectedProduct) {
       // Add to applications if not already applied
       if (!applications.find(app => app.productId === selectedProduct.id && app.userEmail === userInfo?.email)) {
+        // 우선 선정권 확인 및 자동 적용
+        let usedPriority = false;
+        if (userInfo?.email) {
+          const priorityPass = hasPriorityPass(userInfo.email);
+          if (priorityPass) {
+            usedPriority = usePriorityPass(userInfo.email);
+          }
+        }
+
         const newApplication: Application = {
           id: `application-${Date.now()}`,
           productId: selectedProduct.id,
@@ -449,9 +461,10 @@ export default function App() {
           userName: userInfo?.name || "",
           userEmail: userInfo?.email || "",
           userPhone: userInfo?.phone || "",
-          userLevel: 1, // Default user level
+          userLevel: 1,
           status: "pending",
           appliedAt: new Date().toISOString(),
+          hasPriority: usedPriority,
         };
 
         setApplications(prev => [...prev, newApplication]);
@@ -469,7 +482,7 @@ export default function App() {
             : p
         ));
         
-        toast.success("체험단 신청이 완료되었습니다!");
+        toast.success(usedPriority ? "⭐ 우선 선정권이 적용되어 신청되었습니다!" : "체험단 신청이 완료되었습니다!");
 
         // Save to localStorage
         const updatedApplications = [...applications, newApplication];
@@ -673,7 +686,7 @@ export default function App() {
     } else if (currentPage === "edit-review") {
       setCurrentPage("profile");
       setSelectedProduct(null);
-    } else if (currentPage === "my-applications" || currentPage === "my-favorites" || currentPage === "terms" || currentPage === "privacy" || currentPage === "edit-profile") {
+    } else if (currentPage === "my-applications" || currentPage === "my-favorites" || currentPage === "terms" || currentPage === "privacy" || currentPage === "edit-profile" || currentPage === "my-items") {
       setCurrentPage("profile");
     } else if (currentPage === "create-product" || currentPage === "manage-applicants" || currentPage === "review-management") {
       setCurrentPage("home");
@@ -1215,6 +1228,7 @@ export default function App() {
               onNavigateToTerms={() => setCurrentPage("terms")}
               onNavigateToPrivacy={() => setCurrentPage("privacy")}
               onEditProfile={() => setCurrentPage("edit-profile")}
+              onNavigateToMyItems={() => setCurrentPage("my-items")}
               accessToken={accessToken}
               onLogout={handleLogout}
             />
@@ -1261,6 +1275,22 @@ export default function App() {
               accessToken={accessToken}
               onBack={() => setCurrentPage("profile")}
               onSave={(updated) => setUserInfo(prev => prev ? { ...prev, ...updated } : prev)}
+            />
+          </motion.div>
+        )}
+
+        {currentPage === "my-items" && userInfo && (
+          <motion.div
+            key="my-items"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={pageVariants}
+            transition={pageTransition}
+          >
+            <MyItemsPage
+              onBack={() => setCurrentPage("profile")}
+              userEmail={userInfo.email}
             />
           </motion.div>
         )}
@@ -1360,8 +1390,13 @@ export default function App() {
                 const updatedTransactions = [transaction, ...pointTransactions];
                 setPointTransactions(updatedTransactions);
                 localSet('pointTransactions', JSON.stringify(updatedTransactions));
+
+                // 인벤토리에 아이템 저장
+                if (userInfo?.email) {
+                  addPurchasedItem(userInfo.email, product);
+                }
                 
-                toast.success(`${product.name} 구매가 완료되었습니다!`);
+                toast.success(`${product.name} 구매가 완료되었습니다! 내 아이템함에서 확인하세요`);
               }}
             />
           </motion.div>
@@ -1406,7 +1441,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Bottom Navigation */}
-      {userInfo && currentPage !== "signup" && currentPage !== "login" && currentPage !== "product-detail" && currentPage !== "review-write" && currentPage !== "edit-review" && currentPage !== "my-applications" && currentPage !== "my-favorites" && currentPage !== "create-product" && currentPage !== "manage-applicants" && currentPage !== "notifications" && currentPage !== "review-management" && currentPage !== "point-shop" && currentPage !== "point-history" && currentPage !== "business-dashboard" && currentPage !== "terms" && currentPage !== "privacy" && (
+      {userInfo && currentPage !== "signup" && currentPage !== "login" && currentPage !== "forgot-password" && currentPage !== "product-detail" && currentPage !== "review-write" && currentPage !== "edit-review" && currentPage !== "my-applications" && currentPage !== "my-favorites" && currentPage !== "create-product" && currentPage !== "manage-applicants" && currentPage !== "notifications" && currentPage !== "review-management" && currentPage !== "point-shop" && currentPage !== "point-history" && currentPage !== "business-dashboard" && currentPage !== "terms" && currentPage !== "privacy" && currentPage !== "edit-profile" && currentPage !== "my-items" && (
         <BottomNav 
           activeTab={currentPage as "home" | "review" | "profile"} 
           onTabChange={handleTabChange}

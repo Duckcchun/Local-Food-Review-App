@@ -138,6 +138,11 @@ export function ManageApplicantsPage({ selectedProduct, applications, onBack, on
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-[#2d3e2d]">{app.userName}</h3>
                         <LevelBadge level={app.userLevel || 1} size="sm" />
+                        {app.hasPriority && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#fff4e0] border border-[#f5a145]/30 rounded-full text-xs text-[#f5a145] font-medium">
+                            ⭐ 우선
+                          </span>
+                        )}
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm text-[#6b8e6f]">
