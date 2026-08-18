@@ -133,7 +133,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-[15px] hover:bg-[#e89535] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-base hover:bg-[#e89535] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading && (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -152,7 +152,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
           <button
             type="button"
             onClick={onSwitchToSignup}
-            className="w-full h-[52px] border border-gray-200 text-gray-700 rounded-xl font-semibold text-[15px] hover:bg-gray-50 active:scale-[0.98] transition-all"
+            className="w-full h-[52px] border border-gray-200 text-gray-700 rounded-xl font-semibold text-base hover:bg-gray-50 active:scale-[0.98] transition-all"
           >
             회원가입
           </button>

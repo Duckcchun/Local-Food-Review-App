@@ -28,7 +28,7 @@ export function SortFilter({ selectedSort, onSelectSort }: SortFilterProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 text-[13px] text-gray-500 hover:text-gray-700 transition-colors"
+        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
       >
         <span>{currentSort.name}</span>
         <ChevronDown size={14} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
@@ -45,7 +45,7 @@ export function SortFilter({ selectedSort, onSelectSort }: SortFilterProps) {
                 className={`w-full flex items-center gap-2 px-3.5 py-2.5 text-left transition-colors ${isSelected ? "bg-gray-50" : "hover:bg-gray-50"}`}
               >
                 <span className="text-sm">{option.icon}</span>
-                <span className={`flex-1 text-[13px] ${isSelected ? "font-semibold text-gray-900" : "text-gray-600"}`}>{option.name}</span>
+                <span className={`flex-1 text-sm ${isSelected ? "font-semibold text-gray-900" : "text-gray-600"}`}>{option.name}</span>
                 {isSelected && <Check size={14} className="text-emerald-600 shrink-0" />}
               </button>
             );

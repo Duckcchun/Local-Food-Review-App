@@ -56,13 +56,13 @@ export function ProductDetailPage({
 
       {/* Main Info */}
       <div className="px-5 pt-5 pb-4">
-        <span className="inline-block text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded mb-2">
+        <span className="inline-block text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded mb-2">
           {getCategoryName(product.category)}
         </span>
-        <h1 className="text-[22px] font-bold text-gray-900 leading-tight mb-1">{product.name}</h1>
+        <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">{product.name}</h1>
         <p className="text-sm text-gray-500 mb-3">{product.seller}</p>
         <p className="text-sm text-gray-700 leading-relaxed mb-4">{product.description}</p>
-        <div className="flex items-center gap-4 text-[13px] text-gray-400">
+        <div className="flex items-center gap-4 text-sm text-gray-400">
           <span className="flex items-center gap-1"><MapPin size={14} />{product.location} · {product.distance}</span>
           <button onClick={onToggleLike} className="flex items-center gap-1 hover:text-rose-500 transition-colors">
             <ThumbsUp size={14} fill={isLiked ? "currentColor" : "none"} className={isLiked ? "text-rose-500" : ""} />
@@ -76,7 +76,7 @@ export function ProductDetailPage({
 
       {/* Application Info */}
       <div className="px-5 py-5">
-        <h3 className="text-[15px] font-bold text-gray-900 mb-4">모집 정보</h3>
+        <h3 className="text-base font-bold text-gray-900 mb-4">모집 정보</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 text-sm text-gray-600">
@@ -106,12 +106,12 @@ export function ProductDetailPage({
 
       {/* Review Mission */}
       <div className="px-5 py-5">
-        <h3 className="text-[15px] font-bold text-gray-900 mb-3">리뷰 미션</h3>
+        <h3 className="text-base font-bold text-gray-900 mb-3">리뷰 미션</h3>
         <div className="space-y-2.5">
           {["제품을 체험하고 솔직한 리뷰를 작성해 주세요", "장점, 단점, 개선점을 구체적으로 평가해 주세요", "사진 2장 이상과 함께 작성하면 추가 포인트!"].map((item, i) => (
             <div key={i} className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-              <span className="text-[13px] text-gray-600 leading-relaxed">{item}</span>
+              <span className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+              <span className="text-sm text-gray-600 leading-relaxed">{item}</span>
             </div>
           ))}
         </div>
@@ -121,25 +121,25 @@ export function ProductDetailPage({
 
       {/* Reviews */}
       <div className="px-5 py-5">
-        <h3 className="text-[15px] font-bold text-gray-900 mb-4">리뷰 <span className="text-emerald-600">{productReviews.length}</span></h3>
+        <h3 className="text-base font-bold text-gray-900 mb-4">리뷰 <span className="text-emerald-600">{productReviews.length}</span></h3>
         {productReviews.length === 0 ? (
           <div className="py-8 text-center">
-            <p className="text-[13px] text-gray-400">아직 작성된 리뷰가 없습니다</p>
+            <p className="text-sm text-gray-400">아직 작성된 리뷰가 없습니다</p>
           </div>
         ) : (
           <div className="space-y-4">
             {productReviews.slice(0, 5).map((review) => (
               <div key={review.id} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                 <div className="flex items-center gap-2.5 mb-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[12px] font-bold text-gray-500">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">
                     {review.userName ? review.userName[0] : 'U'}
                   </div>
                   <div>
-                    <span className="text-[13px] font-medium text-gray-800">{review.userName || '익명'}</span>
-                    <span className="text-[11px] text-gray-400 ml-2">{new Date(review.createdAt).toLocaleDateString('ko-KR')}</span>
+                    <span className="text-sm font-medium text-gray-800">{review.userName || '익명'}</span>
+                    <span className="text-xs text-gray-400 ml-2">{new Date(review.createdAt).toLocaleDateString('ko-KR')}</span>
                   </div>
                 </div>
-                <div className="space-y-1.5 text-[13px] leading-relaxed">
+                <div className="space-y-1.5 text-sm leading-relaxed">
                   {review.pros && <p className="text-gray-700"><span className="text-emerald-600 font-medium">장점</span> {review.pros}</p>}
                   {review.cons && <p className="text-gray-700"><span className="text-orange-500 font-medium">단점</span> {review.cons}</p>}
                   {review.improvements && <p className="text-gray-700"><span className="text-blue-500 font-medium">개선</span> {review.improvements}</p>}
@@ -162,16 +162,16 @@ export function ProductDetailPage({
         <div className="max-w-md mx-auto px-5 py-3">
           {hasApplied ? (
             canCancel ? (
-              <button onClick={onCancel} className="w-full h-[52px] bg-gray-100 text-gray-700 rounded-xl font-semibold text-[15px] hover:bg-gray-200 active:scale-[0.98] transition-all">
+              <button onClick={onCancel} className="w-full h-[52px] bg-gray-100 text-gray-700 rounded-xl font-semibold text-base hover:bg-gray-200 active:scale-[0.98] transition-all">
                 신청 취소하기
               </button>
             ) : (
-              <button disabled className="w-full h-[52px] bg-gray-100 text-gray-400 rounded-xl font-semibold text-[15px] cursor-not-allowed">
+              <button disabled className="w-full h-[52px] bg-gray-100 text-gray-400 rounded-xl font-semibold text-base cursor-not-allowed">
                 ✓ 신청 완료
               </button>
             )
           ) : (
-            <button onClick={onApply} className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-[15px] hover:bg-[#e89535] active:scale-[0.98] transition-all">
+            <button onClick={onApply} className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-base hover:bg-[#e89535] active:scale-[0.98] transition-all">
               체험단 신청하기
             </button>
           )}

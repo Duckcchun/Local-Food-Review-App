@@ -4,10 +4,16 @@
 
 /* ─── Base Layer ─── */
 @layer base {
+  html {
+    font-size: 16px;
+  }
+
   body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: 'kern' 1;
+    color: #2d3e2d;
   }
 
   /* Focus visible ring for keyboard navigation */

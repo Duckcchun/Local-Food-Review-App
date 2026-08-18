@@ -41,17 +41,17 @@ export const ProductCard = memo(function ProductCard({ product, onClick, isFavor
         {/* Badges */}
         <div className="absolute top-3 left-3 flex items-center gap-1.5">
           {product.badge && (
-            <span className="bg-black/70 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-md">
+            <span className="bg-black/70 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-md">
               {product.badge}
             </span>
           )}
           {isUrgent && (
-            <span className="bg-red-500/90 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-md flex items-center gap-1">
+            <span className="bg-red-500/90 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-md flex items-center gap-1">
               <Clock size={11} />D-{daysUntilDeadline}
             </span>
           )}
           {isAlmostFull && !isUrgent && (
-            <span className="bg-orange-500/90 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-md">
+            <span className="bg-orange-500/90 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-md">
               🔥 {Math.round(fillingRate)}%
             </span>
           )}
@@ -71,11 +71,11 @@ export const ProductCard = memo(function ProductCard({ product, onClick, isFavor
       {/* Content */}
       <div className="px-4 py-3.5">
         <div className="mb-2">
-          <h3 className="text-[15px] font-bold text-gray-900 leading-tight mb-0.5 line-clamp-1">{product.name}</h3>
-          <p className="text-[13px] text-gray-500">{product.seller}</p>
+          <h3 className="text-base font-bold text-gray-900 leading-tight mb-0.5 line-clamp-1">{product.name}</h3>
+          <p className="text-sm text-gray-500">{product.seller}</p>
         </div>
 
-        <p className="text-[13px] text-gray-600 leading-relaxed line-clamp-1 mb-3">{product.description}</p>
+        <p className="text-sm text-gray-600 leading-relaxed line-clamp-1 mb-3">{product.description}</p>
 
         {/* Progress */}
         <div className="mb-3">
@@ -89,11 +89,11 @@ export const ProductCard = memo(function ProductCard({ product, onClick, isFavor
 
         {/* Meta */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 text-[12px] text-gray-400">
+          <div className="flex items-center gap-3 text-xs text-gray-400">
             <span className="flex items-center gap-1"><MapPin size={13} />{product.distance}</span>
             <span className="flex items-center gap-1"><Users size={13} />{product.currentApplicants}/{product.requiredReviewers}</span>
           </div>
-          <div className="flex items-center gap-2 text-[12px]">
+          <div className="flex items-center gap-2 text-xs">
             <span className="text-gray-400">리뷰 {product.reviewCount}</span>
             <span className="text-rose-400">♥ {product.likeCount}</span>
           </div>

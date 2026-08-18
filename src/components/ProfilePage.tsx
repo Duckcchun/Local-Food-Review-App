@@ -413,19 +413,6 @@ export function ProfilePage({
           </button>
         </div>
 
-        {/* Benefits Section */}
-  <div className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-6 mb-6 text-white">
-          <div className="flex items-start gap-4 mb-4">
-            <div className="bg-white/20 rounded-full p-3">
-              <Download size={24} />
-            </div>
-            <div className="flex-1">
-              <h4 className="mb-2">포인트 사용하기</h4>
-              <p className="text-sm opacity-90">적립한 포인트로 할인 받으세요</p>
-            </div>
-          </div>
-        </div>
-
         {/* Excellence Recommendation */}
         <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0]">
           <div className="flex items-start gap-4">

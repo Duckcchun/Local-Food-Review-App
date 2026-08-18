@@ -89,7 +89,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
           {/* 로그인 (주 버튼) */}
           <button
             onClick={onSwitchToLogin}
-            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-[15px] hover:bg-[#e89535] active:scale-[0.98] transition-all mb-3"
+            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-base hover:bg-[#e89535] active:scale-[0.98] transition-all mb-3"
           >
             로그인
           </button>
@@ -128,7 +128,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
           <button onClick={() => setUserType(null)} className="text-gray-800 active:opacity-50">
             <ArrowLeft size={22} />
           </button>
-          <h4 className="text-[15px] font-semibold text-gray-900">
+          <h4 className="text-base font-semibold text-gray-900">
             {userType === "reviewer" ? "체험단 회원가입" : "사업자 회원가입"}
           </h4>
           <div className="w-6" />
@@ -166,7 +166,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
           )}
 
           {/* Terms */}
-          <p className="text-[11px] text-gray-400 text-center pt-2">
+          <p className="text-xs text-gray-400 text-center pt-2">
             가입 시 이용약관 및 개인정보 처리방침에 동의합니다.
           </p>
         </form>
@@ -178,7 +178,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-[15px] hover:bg-[#e89535] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full h-[52px] bg-[#f5a145] text-white rounded-xl font-semibold text-base hover:bg-[#e89535] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
             {isLoading ? "회원가입 중..." : "회원가입 완료"}
