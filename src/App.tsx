@@ -1097,7 +1097,7 @@ export default function App() {
             transition={pageTransition}
           >
             <ProductDetailPage
-              product={selectedProduct}
+              product={allProducts.find(p => p.id === selectedProduct?.id) || selectedProduct}
               onBack={handleBack}
               onApply={handleApply}
               isFavorite={favorites.includes(selectedProduct.id)}
