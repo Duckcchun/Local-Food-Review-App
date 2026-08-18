@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UserInfo } from '../App';
+import type { UserInfo } from '../types';
 import { projectId } from '../utils/supabase/info';
 
 interface AuthState {
