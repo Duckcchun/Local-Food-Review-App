@@ -4,6 +4,7 @@ import { ArrowLeft, Upload, X, ThumbsUp, ThumbsDown, Lightbulb } from "lucide-re
 import { toast } from "sonner";
 import type { Product } from "../data/mockData";
 import type { Review } from "../types";
+import { ImageUploader } from "./common/ImageUploader";
 
 type ImageWithFallbackProps = ImgHTMLAttributes<HTMLImageElement> & {
   src?: string | undefined;
@@ -46,27 +47,8 @@ export function ReviewWritePage({ product, onBack, userName = "회원", onSubmit
   const [suggestions, setSuggestions] = useState("");
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
-  const handleImageUpload = () => {
-    // Mock image upload - in real app, would handle file upload
-    const mockImages = [
-      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400",
-      "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400",
-      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
-    ];
-    
-    if (uploadedImages.length >= 5) {
-      toast.error("최대 5장까지 업로드 가능합니다");
-      return;
-    }
-
-    const randomImage = mockImages[Math.floor(Math.random() * mockImages.length)];
-    setUploadedImages(prev => [...prev, randomImage]);
-    toast.success("이미지가 추가되었습니다");
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
-    toast.success("이미지가 삭제되었습니다");
+  const handleImagesChange = (urls: string[]) => {
+    setUploadedImages(urls);
   };
 
   const handleSubmitReview = () => {
@@ -141,37 +123,12 @@ export function ReviewWritePage({ product, onBack, userName = "회원", onSubmit
             음식 사진 업로드
           </h4>
 
-          {uploadedImages.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {uploadedImages.map((image, index) => (
-                <div key={index} className="relative aspect-square">
-                  <ImageWithFallback
-                    src={image}
-                    alt={`Uploaded ${index + 1}`}
-                    className="w-full h-full object-cover rounded-[1rem]"
-                  />
-                  <button
-                    onClick={() => handleRemoveImage(index)}
-                    className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-lg hover:bg-[#f5f0dc]"
-                  >
-                    <X size={16} className="text-[#2d3e2d]" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <button
-            onClick={handleImageUpload}
-            disabled={uploadedImages.length >= 5}
-            className={`w-full py-3 rounded-[1rem] border-2 border-dashed transition-colors ${
-              uploadedImages.length >= 5
-                ? "border-[#9ca89d] text-[#9ca89d] cursor-not-allowed"
-                : "border-[#d4c5a0] text-[#6b8e6f] hover:border-[#f5a145] hover:bg-[#f5f0dc]"
-            }`}
-          >
-            {uploadedImages.length >= 5 ? "최대 5장까지 업로드 가능" : `사진 추가 (${uploadedImages.length}/5)`}
-          </button>
+          <ImageUploader
+            maxImages={5}
+            onImagesChange={handleImagesChange}
+            userId={userName}
+            offlineMode={true}
+          />
         </div>
 
         {/* Pros */}

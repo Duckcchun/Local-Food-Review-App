@@ -9,8 +9,13 @@ import { sortProducts } from "../utils/sortUtils";
 import type { SortOption } from "../utils/sortUtils";
 import { mockProducts } from "../data/mockData";
 import type { Product } from "../data/mockData";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { calculateDistance, formatDistance, getCurrentLocation } from "../utils/locationUtils";
+import { usePullToRefresh } from "../hooks/usePullToRefresh";
+import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import { PullToRefreshIndicator } from "./common/PullToRefreshIndicator";
+import { InfiniteScrollSentinel } from "./common/InfiniteScrollSentinel";
+import { CardSkeleton } from "./common/PageSkeleton";
 
 interface HomePageProps {
   onProductClick: (product: Product) => void;
@@ -20,15 +25,30 @@ interface HomePageProps {
   products?: Product[];
   onNotificationsClick?: () => void;
   unreadNotifications?: number;
+  onRefresh?: () => Promise<void>;
 }
 
-export function HomePage({ onProductClick, userName = "회원", favorites, onToggleFavorite, products = mockProducts, onNotificationsClick, unreadNotifications = 0 }: HomePageProps) {
+export function HomePage({ onProductClick, userName = "회원", favorites, onToggleFavorite, products = mockProducts, onNotificationsClick, unreadNotifications = 0, onRefresh }: HomePageProps) {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [distanceFilter, setDistanceFilter] = useState<number | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOption, setSortOption] = useState<SortOption>("distance");
+
+  // Pull-to-refresh
+  const handleRefresh = useCallback(async () => {
+    if (onRefresh) {
+      await onRefresh();
+    } else {
+      // Default: simulate refresh delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }, [onRefresh]);
+
+  const { isRefreshing, pullDistance, pullProgress, containerProps } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  });
 
   useEffect(() => {
     loadUserLocation();
@@ -97,6 +117,12 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
   // Apply sorting
   const sortedProducts = sortProducts(filteredProducts, sortOption);
 
+  // Infinite scroll
+  const { visibleItems, hasMore, isLoadingMore, sentinelRef, totalItems, loadedItems } = useInfiniteScroll({
+    items: sortedProducts,
+    pageSize: 6,
+  });
+
   // Check if any filters are active
   const hasActiveFilters = searchQuery.trim() || selectedCategory !== "all" || distanceFilter !== null;
 
@@ -108,7 +134,14 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
   };
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
+    <div className="min-h-screen bg-[#fffef5] pb-24 relative" {...containerProps}>
+      {/* Pull-to-Refresh Indicator */}
+      <PullToRefreshIndicator 
+        pullProgress={pullProgress} 
+        isRefreshing={isRefreshing} 
+        pullDistance={pullDistance} 
+      />
+
       {/* Hero Section */}
   <div className="bg-linear-to-b from-[#f5f0dc] to-[#fffef5] px-6 pt-8 pb-12">
         <div className="max-w-md mx-auto">
@@ -297,7 +330,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
           </div>
         ) : (
           <div className="space-y-6">
-            {sortedProducts.map((product, index) => (
+            {visibleItems.map((product, index) => (
               <div key={product.id} className="stagger-item">
                 <ProductCard
                   product={product}
@@ -307,6 +340,23 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
                 />
               </div>
             ))}
+
+            {/* Loading skeleton for next page */}
+            {isLoadingMore && (
+              <div className="space-y-6">
+                <CardSkeleton />
+                <CardSkeleton />
+              </div>
+            )}
+
+            {/* Infinite scroll sentinel */}
+            <InfiniteScrollSentinel
+              ref={sentinelRef}
+              isLoading={isLoadingMore}
+              hasMore={hasMore}
+              loadedCount={loadedItems}
+              totalCount={totalItems}
+            />
           </div>
         )}
       </div>

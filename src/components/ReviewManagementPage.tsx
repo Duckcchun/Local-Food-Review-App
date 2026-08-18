@@ -26,6 +26,7 @@ function ImageWithFallback({
   );
 }
 import type { Review } from "../types";
+import { NoReviewsIllustration } from "./common/EmptyStateIllustrations";
 
 interface ReviewManagementPageProps {
   reviews: Review[];
@@ -147,12 +148,18 @@ export function ReviewManagementPage({ reviews, onBack, onToggleVisibility, onRe
         {/* Reviews List */}
         <div className="space-y-4">
           {filteredReviews.length === 0 ? (
-            <div className="bg-white rounded-[1.5rem] p-12 text-center border-2 border-[#d4c5a0]">
-              <p className="text-[#9ca89d]">
+            <div className="bg-white rounded-[1.5rem] p-10 text-center border-2 border-[#d4c5a0]">
+              <NoReviewsIllustration className="mx-auto mb-5" />
+              <h3 className="text-base font-bold text-[#2d3e2d] mb-2">
                 {activeTab === "all" && "받은 리뷰가 없습니다"}
                 {activeTab === "published" && "공개된 리뷰가 없습니다"}
                 {activeTab === "hidden" && "비공개 처리한 리뷰가 없습니다"}
                 {activeTab === "reported" && "신고된 리뷰가 없습니다"}
+              </h3>
+              <p className="text-sm text-[#9ca89d]">
+                {activeTab === "all" 
+                  ? "체험단이 리뷰를 작성하면 여기에 표시됩니다" 
+                  : "해당하는 리뷰가 없습니다"}
               </p>
             </div>
           ) : (

@@ -1,6 +1,7 @@
 import { ArrowLeft, Heart } from "lucide-react";
 import { ProductCard } from "./ProductCard";
 import type { Product } from "../data/mockData";
+import { NoFavoritesIllustration } from "./common/EmptyStateIllustrations";
 
 interface MyFavoritesPageProps {
   onBack: () => void;
@@ -46,15 +47,15 @@ export function MyFavoritesPage({ onBack, favorites, onProductClick, onToggleFav
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">💛</div>
-            <h3 className="text-[#2d3e2d] mb-2">찜한 체험단이 없어요</h3>
-            <p className="text-sm text-[#9ca89d] mb-6">
-              마음에 드는 체험단을 찜해보세요
+          <div className="text-center py-12">
+            <NoFavoritesIllustration className="mx-auto mb-6" />
+            <h3 className="text-lg font-bold text-[#2d3e2d] mb-2">찜한 체험단이 없어요</h3>
+            <p className="text-sm text-[#9ca89d] mb-6 max-w-xs mx-auto">
+              하트를 눌러 마음에 드는 체험단을<br />찜 목록에 저장해보세요!
             </p>
             <button
               onClick={onBack}
-              className="bg-[#f5a145] text-white px-6 py-3 rounded-[1rem] hover:bg-[#e89535] transition-colors"
+              className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white px-6 py-3 rounded-[1.5rem] hover:opacity-90 transition-opacity shadow-md"
             >
               체험단 둘러보기
             </button>

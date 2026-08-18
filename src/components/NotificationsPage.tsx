@@ -1,6 +1,7 @@
 import { ChevronLeft, CheckCircle, XCircle, MessageSquare, Bell, Star } from "lucide-react";
 import { Logo } from "./Logo";
 import type { Notification } from "../types";
+import { NoNotificationsIllustration } from "./common/EmptyStateIllustrations";
 
 interface NotificationsPageProps {
   notifications: Notification[];
@@ -68,11 +69,11 @@ export function NotificationsPage({ notifications, onBack, onMarkAsRead }: Notif
         {/* Notifications List */}
         <div className="space-y-3">
           {notifications.length === 0 ? (
-            <div className="bg-white rounded-[1.5rem] p-12 text-center border-2 border-[#d4c5a0]">
-              <Bell size={48} className="mx-auto mb-4 text-[#d4c5a0]" />
-              <p className="text-[#9ca89d] mb-2">알림이 없습니다</p>
-              <p className="text-sm text-[#9ca89d]">
-                새로운 소식이 있으면 여기에 표시됩니다
+            <div className="bg-white rounded-[1.5rem] p-10 text-center border-2 border-[#d4c5a0]">
+              <NoNotificationsIllustration className="mx-auto mb-5" />
+              <h3 className="text-lg font-bold text-[#2d3e2d] mb-2">알림이 없습니다</h3>
+              <p className="text-sm text-[#9ca89d] max-w-xs mx-auto">
+                체험단 선정 결과나 새 리뷰 요청 등<br />중요한 소식이 여기에 표시됩니다
               </p>
             </div>
           ) : (

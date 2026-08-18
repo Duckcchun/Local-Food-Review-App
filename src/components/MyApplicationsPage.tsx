@@ -2,6 +2,7 @@ import { ArrowLeft, Clock, CheckCircle, XCircle } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 // import { ImageWithFallback } from "../figma/ImageWithFallback";
 import type { Application } from "../types";
+import { NoApplicationsIllustration } from "./common/EmptyStateIllustrations";
 
 interface MyApplicationsPageProps {
   onBack: () => void;
@@ -193,15 +194,15 @@ export function MyApplicationsPage({ onBack, applications, onProductClick }: MyA
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-[#2d3e2d] mb-2">신청한 체험단이 없어요</h3>
-            <p className="text-sm text-[#9ca89d] mb-6">
-              원하는 체험단에 신청해보세요
+          <div className="text-center py-12">
+            <NoApplicationsIllustration className="mx-auto mb-6" />
+            <h3 className="text-lg font-bold text-[#2d3e2d] mb-2">신청한 체험단이 없어요</h3>
+            <p className="text-sm text-[#9ca89d] mb-6 max-w-xs mx-auto">
+              우리 동네의 다양한 맛집 체험단에 신청하고<br />특별한 경험을 시작해보세요!
             </p>
             <button
               onClick={onBack}
-              className="bg-[#f5a145] text-white px-6 py-3 rounded-[1rem] hover:bg-[#e89535] transition-colors"
+              className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] text-white px-6 py-3 rounded-[1.5rem] hover:opacity-90 transition-opacity shadow-md"
             >
               체험단 둘러보기
             </button>

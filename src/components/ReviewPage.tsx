@@ -2,6 +2,7 @@ import { FileText, ChevronRight } from "lucide-react";
 import type { Application, Review } from "../types";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Logo } from "./Logo";
+import { NoReviewsIllustration } from "./common/EmptyStateIllustrations";
 
 interface ReviewPageProps {
   applications: Application[];
@@ -119,13 +120,14 @@ export function ReviewPage({ applications, completedReviews, onSelectProduct, us
 
         {/* Empty State */}
         {needsReview.length === 0 && completedReviews.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">
-              <FileText size={64} className="text-[#d4c5a0] mx-auto" />
-            </div>
-            <h3 className="text-[#2d3e2d] mb-2">작성할 리뷰가 없어요</h3>
-            <p className="text-sm text-[#9ca89d] mb-6">
-              체험단에 신청하고 제품을 체험해보세요!
+          <div className="text-center py-12">
+            <NoReviewsIllustration className="mx-auto mb-6" />
+            <h3 className="text-lg font-bold text-[#2d3e2d] mb-2">작성할 리뷰가 없어요</h3>
+            <p className="text-sm text-[#9ca89d] mb-2 max-w-xs mx-auto">
+              체험단에 선정된 후 제품을 체험하면<br />리뷰를 작성할 수 있어요
+            </p>
+            <p className="text-xs text-[#d4c5a0]">
+              홈에서 체험단을 신청해보세요! 🍽️
             </p>
           </div>
         )}

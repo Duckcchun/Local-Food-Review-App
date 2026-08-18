@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { UserInfo } from "../types";
 import { publicAnonKey } from "../utils/supabase/info";
 import { requestJson } from "../utils/request";
+import { signupSchema, validateForm, getFieldError } from "../utils/validation";
 
 interface SignupPageProps {
   onBack: () => void;
@@ -17,6 +18,7 @@ type UserType = "reviewer" | "business" | null;
 export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: SignupPageProps) {
   const [userType, setUserType] = useState<UserType>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string> | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,16 +32,29 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.password || !formData.phone) {
-      toast.error("필수 정보를 모두 입력해주세요");
+
+    // Validate with Zod
+    const result = validateForm(signupSchema, {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      password: formData.password,
+      confirmPassword: formData.passwordConfirm,
+      userType: userType || undefined,
+      businessName: formData.businessName || undefined,
+      businessNumber: formData.businessNumber || undefined,
+      businessAddress: formData.businessAddress || undefined,
+    });
+
+    if (!result.success) {
+      setFieldErrors(result.errors);
+      // Show first error as toast
+      const firstError = Object.values(result.errors)[0];
+      if (firstError) toast.error(firstError);
       return;
     }
-    
-    if (formData.password !== formData.passwordConfirm) {
-      toast.error("비밀번호가 일치하지 않습니다");
-      return;
-    }
+
+    setFieldErrors(null);
 
     if (userType === "business" && (!formData.businessName || !formData.businessNumber)) {
       toast.error("사업자 정보를 모두 입력해주세요");
@@ -134,6 +149,10 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear field error on change
+    if (fieldErrors?.[field]) {
+      setFieldErrors(prev => prev ? { ...prev, [field]: '' } : null);
+    }
   };
 
   if (userType === null) {
@@ -260,7 +279,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
-          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
+          <div className={`bg-white rounded-[1.5rem] p-6 border-2 ${fieldErrors?.name ? 'border-red-300' : 'border-[#d4c5a0]'}`}>
             <label className="text-sm text-[#6b8e6f] mb-2 block">이름 *</label>
             <div className="flex items-center gap-3">
               <User size={20} className="text-[#9ca89d]" />
@@ -272,10 +291,11 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
                 className="flex-1 bg-transparent outline-none text-[#2d3e2d] placeholder:text-[#9ca89d]"
               />
             </div>
+            {fieldErrors?.name && <p className="text-xs text-red-500 mt-2">{fieldErrors.name}</p>}
           </div>
 
           {/* Email */}
-          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
+          <div className={`bg-white rounded-[1.5rem] p-6 border-2 ${fieldErrors?.email ? 'border-red-300' : 'border-[#d4c5a0]'}`}>
             <label className="text-sm text-[#6b8e6f] mb-2 block">이메일 *</label>
             <div className="flex items-center gap-3">
               <Mail size={20} className="text-[#9ca89d]" />
@@ -287,10 +307,11 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
                 className="flex-1 bg-transparent outline-none text-[#2d3e2d] placeholder:text-[#9ca89d]"
               />
             </div>
+            {fieldErrors?.email && <p className="text-xs text-red-500 mt-2">{fieldErrors.email}</p>}
           </div>
 
           {/* Phone */}
-          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
+          <div className={`bg-white rounded-[1.5rem] p-6 border-2 ${fieldErrors?.phone ? 'border-red-300' : 'border-[#d4c5a0]'}`}>
             <label className="text-sm text-[#6b8e6f] mb-2 block">전화번호 *</label>
             <div className="flex items-center gap-3">
               <Phone size={20} className="text-[#9ca89d]" />
@@ -302,10 +323,11 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
                 className="flex-1 bg-transparent outline-none text-[#2d3e2d] placeholder:text-[#9ca89d]"
               />
             </div>
+            {fieldErrors?.phone && <p className="text-xs text-red-500 mt-2">{fieldErrors.phone}</p>}
           </div>
 
           {/* Password */}
-          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
+          <div className={`bg-white rounded-[1.5rem] p-6 border-2 ${fieldErrors?.password ? 'border-red-300' : 'border-[#d4c5a0]'}`}>
             <label className="text-sm text-[#6b8e6f] mb-2 block">비밀번호 *</label>
             <div className="flex items-center gap-3">
               <Lock size={20} className="text-[#9ca89d]" />
@@ -313,14 +335,15 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
                 type="password"
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="비밀번호를 입력하세요"
+                placeholder="6자 이상 입력하세요"
                 className="flex-1 bg-transparent outline-none text-[#2d3e2d] placeholder:text-[#9ca89d]"
               />
             </div>
+            {fieldErrors?.password && <p className="text-xs text-red-500 mt-2">{fieldErrors.password}</p>}
           </div>
 
           {/* Password Confirm */}
-          <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0]">
+          <div className={`bg-white rounded-[1.5rem] p-6 border-2 ${fieldErrors?.confirmPassword ? 'border-red-300' : 'border-[#d4c5a0]'}`}>
             <label className="text-sm text-[#6b8e6f] mb-2 block">비밀번호 확인 *</label>
             <div className="flex items-center gap-3">
               <Lock size={20} className="text-[#9ca89d]" />
@@ -332,6 +355,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
                 className="flex-1 bg-transparent outline-none text-[#2d3e2d] placeholder:text-[#9ca89d]"
               />
             </div>
+            {fieldErrors?.confirmPassword && <p className="text-xs text-red-500 mt-2">{fieldErrors.confirmPassword}</p>}
           </div>
 
           {/* Business Fields */}

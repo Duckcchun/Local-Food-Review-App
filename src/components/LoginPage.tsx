@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { UserInfo } from "../types";
 import { publicAnonKey } from "../utils/supabase/info";
 import { requestJson } from "../utils/request";
+import { loginSchema, validateForm } from "../utils/validation";
 
 interface LoginPageProps {
   onBack: () => void;
@@ -18,14 +19,29 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
     password: ""
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string> | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear field error on change
+    if (fieldErrors?.[name]) {
+      setFieldErrors(prev => prev ? { ...prev, [name]: '' } : null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate with Zod
+    const result = validateForm(loginSchema, formData);
+    if (!result.success) {
+      setFieldErrors(result.errors);
+      const firstError = Object.values(result.errors)[0];
+      if (firstError) toast.error(firstError);
+      return;
+    }
+    setFieldErrors(null);
     
     if (!formData.email || !formData.password) {
       toast.error("이메일과 비밀번호를 입력해주세요");
@@ -132,10 +148,11 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="example@email.com"
-                  className="w-full pl-12 pr-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
+                  className={`w-full pl-12 pr-4 py-3 rounded-[1rem] border-2 bg-white focus:outline-none ${fieldErrors?.email ? 'border-red-300 focus:border-red-400' : 'border-[#d4c5a0] focus:border-[#f5a145]'}`}
                   disabled={isLoading}
                 />
               </div>
+              {fieldErrors?.email && <p className="text-xs text-red-500 mt-1.5 pl-1">{fieldErrors.email}</p>}
             </div>
 
             {/* Password */}
@@ -151,10 +168,11 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup }: LoginPa
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="비밀번호를 입력하세요"
-                  className="w-full pl-12 pr-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
+                  className={`w-full pl-12 pr-4 py-3 rounded-[1rem] border-2 bg-white focus:outline-none ${fieldErrors?.password ? 'border-red-300 focus:border-red-400' : 'border-[#d4c5a0] focus:border-[#f5a145]'}`}
                   disabled={isLoading}
                 />
               </div>
+              {fieldErrors?.password && <p className="text-xs text-red-500 mt-1.5 pl-1">{fieldErrors.password}</p>}
             </div>
 
             {/* Submit Button */}
