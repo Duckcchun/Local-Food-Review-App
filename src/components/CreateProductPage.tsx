@@ -126,23 +126,23 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
   };
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-20">
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b-2 border-[#d4c5a0] z-10">
-        <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
-          <button onClick={onBack} className="text-[#2d3e2d] hover:text-[#6b8e6f] transition-colors">
-            <ArrowLeft size={24} />
+      <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
+          <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+            <ArrowLeft size={20} className="text-gray-800" />
           </button>
-          <h4 className="text-[#2d3e2d]">체험단 모집하기</h4>
-          <div className="w-6"></div>
+          <h4 className="text-[15px] font-semibold text-gray-900">체험단 모집하기</h4>
+          <div className="w-9"></div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 py-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="max-w-md mx-auto px-5 py-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Image Upload */}
           <div>
-            <label className="block text-[#2d3e2d] mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               상품 이미지 <span className="text-[#f5a145]">*</span>
             </label>
             {imagePreview ? (
@@ -150,31 +150,31 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
                 <img 
                   src={imagePreview} 
                   alt="Preview" 
-                  className="w-full h-48 object-cover rounded-[1.5rem] border-2 border-[#d4c5a0]"
+                  className="w-full h-48 object-cover rounded-2xl border border-gray-100 shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setImagePreview("")}
-                  className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg hover:bg-[#f5f0dc]"
+                  className="absolute top-3 right-3 bg-white rounded-full p-1.5 shadow-md hover:bg-gray-50"
                 >
-                  <X size={20} className="text-[#2d3e2d]" />
+                  <X size={16} className="text-gray-600" />
                 </button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={handleImageUpload}
-                className="w-full h-48 border-2 border-dashed border-[#d4c5a0] rounded-[1.5rem] flex flex-col items-center justify-center gap-3 hover:border-[#f5a145] hover:bg-[#f5f0dc] transition-colors"
+                className="w-full h-48 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-[#6b8e6f] hover:bg-[#6b8e6f]/5 transition-colors"
               >
-                <Upload size={32} className="text-[#9ca89d]" />
-                <span className="text-[#9ca89d]">이미지 업로드</span>
+                <Upload size={28} className="text-gray-400" />
+                <span className="text-sm text-gray-400">이미지 업로드</span>
               </button>
             )}
           </div>
 
           {/* Product Name */}
           <div>
-            <label className="block text-[#2d3e2d] mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               메뉴 이름 <span className="text-[#f5a145]">*</span>
             </label>
             <input
@@ -183,18 +183,18 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
               value={formData.name}
               onChange={handleInputChange}
               placeholder="예: 수제 돈까스 세트"
-              className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 focus:outline-none transition-all"
             />
           </div>
 
           {/* Category */}
           <div>
-            <label className="block text-[#2d3e2d] mb-2">카테고리</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">카테고리</label>
             <select
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 focus:outline-none transition-all"
             >
               <option value="korean">한식</option>
               <option value="chinese">중식</option>
@@ -208,7 +208,7 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
 
           {/* Description */}
           <div>
-            <label className="block text-[#2d3e2d] mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               한 줄 소개 <span className="text-[#f5a145]">*</span>
             </label>
             <input
@@ -217,27 +217,27 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
               value={formData.description}
               onChange={handleInputChange}
               placeholder="예: 바삭한 수제 돈까스와 특제 소스"
-              className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 focus:outline-none transition-all"
             />
           </div>
 
           {/* Detail Description */}
           <div>
-            <label className="block text-[#2d3e2d] mb-2">상세 설명</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">상세 설명</label>
             <textarea
               name="detailDescription"
               value={formData.detailDescription}
               onChange={handleInputChange}
               placeholder="메뉴에 대한 자세한 설명을 작성해주세요"
               rows={4}
-              className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 focus:outline-none transition-all resize-none"
             />
           </div>
 
           {/* Price */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[#2d3e2d] mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 체험 가격 <span className="text-[#f5a145]">*</span>
               </label>
               <div className="relative">
@@ -247,13 +247,13 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
                   value={formData.price}
                   onChange={handleInputChange}
                   placeholder="5000"
-                  className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 focus:outline-none transition-all"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ca89d]">원</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">원</span>
               </div>
             </div>
             <div>
-              <label className="block text-[#2d3e2d] mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 모집 인원 <span className="text-[#f5a145]">*</span>
               </label>
               <div className="relative">
@@ -263,16 +263,16 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
                   value={formData.requiredReviewers}
                   onChange={handleInputChange}
                   placeholder="10"
-                  className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 focus:outline-none transition-all"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ca89d]">명</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">명</span>
               </div>
             </div>
           </div>
 
           {/* Deadline Range Picker (react-datepicker) */}
           <div>
-            <label className="block text-[#2d3e2d] mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               모집 기간 <span className="text-[#f5a145]">*</span>
             </label>
             <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
@@ -281,10 +281,10 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
                   type="button"
                   className="w-full flex items-center justify-between px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white text-left hover:border-[#f5a145] focus:outline-none"
                 >
-                  <span className={formData.deadline ? "text-[#2d3e2d]" : "text-[#9ca89d]"}>
+                  <span className={formData.deadline ? "text-[#2d3e2d]" : "text-gray-400"}>
                     {formData.deadline || "기간 선택 (시작일-종료일)"}
                   </span>
-                  <CalendarIcon size={20} className="text-[#9ca89d]" />
+                  <CalendarIcon size={20} className="text-gray-400" />
                 </button>
               </DialogTrigger>
               <DialogContent className="max-w-md w-full bg-white rounded-[1.5rem] border-2 border-[#d4c5a0] p-6">
@@ -344,7 +344,7 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
                       </DialogClose>
                     </div>
                   </div>
-                  <p className="text-[11px] text-[#9ca89d]">* 최대 3개월 이내 기간만 선택 가능합니다</p>
+                  <p className="text-[11px] text-gray-400">* 최대 3개월 이내 기간만 선택 가능합니다</p>
                 </div>
               </DialogContent>
             </Dialog>
@@ -352,16 +352,16 @@ export function CreateProductPage({ onBack, onCreateProduct, userInfo }: CreateP
 
           {/* Benefits */}
           <div>
-            <label className="block text-[#2d3e2d] mb-2">체험단 혜택</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">체험단 혜택</label>
             <textarea
               name="benefits"
               value={formData.benefits}
               onChange={handleInputChange}
               placeholder="혜택을 한 줄씩 입력해주세요&#10;예:&#10;정상가 대비 70% 할인&#10;무료 배달&#10;리뷰 작성 시 포인트 적립"
               rows={5}
-              className="w-full px-4 py-3 rounded-[1rem] border-2 border-[#d4c5a0] bg-white focus:border-[#f5a145] focus:outline-none resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 focus:outline-none transition-all resize-none"
             />
-            <p className="text-xs text-[#9ca89d] mt-2">* 한 줄에 하나씩 입력해주세요</p>
+            <p className="text-xs text-gray-400 mt-2">* 한 줄에 하나씩 입력해주세요</p>
           </div>
 
           {/* Info Box */}

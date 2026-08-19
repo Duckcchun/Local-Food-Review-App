@@ -6,19 +6,19 @@ interface TermsPageProps {
 
 export function TermsPage({ onBack }: TermsPageProps) {
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-20">
-      <div className="sticky top-0 bg-white border-b-2 border-[#d4c5a0] z-10">
-        <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
-          <button onClick={onBack} className="text-[#2d3e2d] hover:text-[#6b8e6f] transition-colors">
-            <ArrowLeft size={24} />
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
+      <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
+          <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+            <ArrowLeft size={20} className="text-gray-800" />
           </button>
-          <h4 className="text-[#2d3e2d]">이용약관</h4>
-          <div className="w-6" />
+          <h4 className="text-[15px] font-semibold text-gray-900">이용약관</h4>
+          <div className="w-9" />
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 py-6">
-        <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0] space-y-4 text-sm text-[#2d3e2d]">
+      <div className="max-w-md mx-auto px-5 py-5">
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4 text-sm text-gray-700">
           <p>본 약관은 밥터뷰 서비스(이하 "서비스")의 이용과 관련하여, 회사와 이용자 간의 권리, 의무 및 책임 사항을 규정합니다.</p>
           <h3 className="text-base font-semibold">1. 목적</h3>
           <p>서비스의 제공 및 이용 조건을 정함을 목적으로 합니다.</p>

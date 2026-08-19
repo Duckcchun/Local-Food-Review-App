@@ -63,22 +63,22 @@ export function NoticePage({ onBack }: NoticePageProps) {
   if (selectedNotice) {
     const style = categoryStyle[selectedNotice.category];
     return (
-      <div className="min-h-screen bg-[#fffef5]">
-        <div className="sticky top-0 bg-[#fffef5] border-b border-gray-100 z-10">
+      <div className="min-h-screen bg-[#fafaf7]">
+        <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
           <div className="max-w-md mx-auto px-5 h-14 flex items-center gap-3">
-            <button onClick={() => setSelectedNotice(null)} className="text-gray-800 active:opacity-50">
-              <ArrowLeft size={22} />
+            <button onClick={() => setSelectedNotice(null)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+              <ArrowLeft size={20} className="text-gray-800" />
             </button>
-            <h4 className="text-base font-semibold text-gray-900">공지사항</h4>
+            <h4 className="text-[15px] font-semibold text-gray-900">공지사항</h4>
           </div>
         </div>
 
         <div className="max-w-md mx-auto px-5 py-6">
-          <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full mb-3 ${style.color}`}>
+          <span className={`inline-block text-[11px] font-medium px-2.5 py-1 rounded-full mb-3 ${style.color}`}>
             {style.label}
           </span>
           <h2 className="text-lg font-bold text-gray-900 mb-2">{selectedNotice.title}</h2>
-          <p className="text-sm text-gray-400 mb-6">{selectedNotice.date}</p>
+          <p className="text-xs text-gray-400 mb-6">{selectedNotice.date}</p>
           <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
             {selectedNotice.content}
           </div>
@@ -89,30 +89,34 @@ export function NoticePage({ onBack }: NoticePageProps) {
 
   // 목록
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-20">
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
-        <div className="max-w-md mx-auto px-6">
-          <button onClick={onBack} className="text-white mb-6 hover:opacity-80">
-            <ArrowLeft size={22} />
-          </button>
-          <h1 className="text-white text-xl font-bold mb-1 flex items-center gap-2">
-            <Megaphone size={22} /> 공지사항
-          </h1>
-          <p className="text-white/80 text-sm">밥터뷰의 새 소식을 확인하세요</p>
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
+      <div className="sticky top-0 z-30 bg-[#6b8e6f]">
+        <div className="max-w-md mx-auto px-5 pt-4 pb-3">
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-colors">
+              <ArrowLeft size={18} className="text-white" />
+            </button>
+            <div>
+              <h1 className="text-white text-lg font-bold flex items-center gap-2">
+                <Megaphone size={18} /> 공지사항
+              </h1>
+              <p className="text-white/70 text-xs">밥터뷰의 새 소식을 확인하세요</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 -mt-6 space-y-2">
+      <div className="max-w-md mx-auto px-5 pt-4 space-y-2">
         {NOTICES.map(notice => {
           const style = categoryStyle[notice.category];
           return (
             <button
               key={notice.id}
               onClick={() => setSelectedNotice(notice)}
-              className="w-full bg-white rounded-2xl p-4 border-2 border-[#d4c5a0] text-left hover:border-[#6b8e6f] transition-colors"
+              className="w-full bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-left hover:shadow-md hover:border-gray-200 transition-all"
             >
               <div className="flex items-start gap-3">
-                {notice.pinned && <Pin size={14} className="text-[#f5a145] shrink-0 mt-1" />}
+                {notice.pinned && <Pin size={13} className="text-[#f5a145] shrink-0 mt-0.5" />}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${style.color}`}>

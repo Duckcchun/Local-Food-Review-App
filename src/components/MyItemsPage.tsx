@@ -76,47 +76,51 @@ export function MyItemsPage({ onBack, userEmail }: MyItemsPageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-20">
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
-        <div className="max-w-md mx-auto px-6">
-          <button onClick={onBack} className="text-white mb-6 hover:opacity-80">
-            <ArrowLeft size={22} />
-          </button>
-          <h1 className="text-white text-xl font-bold mb-1">내 아이템함</h1>
-          <p className="text-white/80 text-sm">구매한 아이템을 확인하고 사용하세요</p>
+      <div className="sticky top-0 z-30 bg-[#6b8e6f]">
+        <div className="max-w-md mx-auto px-5 pt-4 pb-3">
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-colors">
+              <ArrowLeft size={18} className="text-white" />
+            </button>
+            <div>
+              <h1 className="text-white text-lg font-bold">내 아이템함</h1>
+              <p className="text-white/70 text-xs">구매한 아이템을 확인하고 사용하세요</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 -mt-6">
+      <div className="max-w-md mx-auto px-5 pt-4">
         {/* Summary Card */}
-        <div className="bg-white rounded-2xl p-5 mb-5 border-2 border-[#d4c5a0] shadow-lg">
+        <div className="bg-white rounded-2xl p-5 mb-4 border border-gray-100 shadow-sm">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-xl font-bold text-[#6b8e6f]">{activeItems.length}</div>
-              <div className="text-xs text-gray-500">사용 가능</div>
+              <div className="text-lg font-bold text-[#6b8e6f]">{activeItems.length}</div>
+              <div className="text-[11px] text-gray-400">사용 가능</div>
             </div>
             <div>
-              <div className="text-xl font-bold text-gray-400">{usedItems.length}</div>
-              <div className="text-xs text-gray-500">사용 완료</div>
+              <div className="text-lg font-bold text-gray-400">{usedItems.length}</div>
+              <div className="text-[11px] text-gray-400">사용 완료</div>
             </div>
             <div>
-              <div className="text-xl font-bold text-red-400">{expiredItems.length}</div>
-              <div className="text-xs text-gray-500">만료</div>
+              <div className="text-lg font-bold text-red-400">{expiredItems.length}</div>
+              <div className="text-[11px] text-gray-400">만료</div>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-5">
+        <div className="flex gap-2 mb-4">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`flex-1 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                 activeTab === tab.id
-                  ? "bg-[#6b8e6f] text-white"
-                  : "bg-white text-gray-500 border border-[#d4c5a0]"
+                  ? "bg-[#6b8e6f] text-white shadow-sm shadow-[#6b8e6f]/20"
+                  : "bg-white text-gray-500 border border-gray-100"
               }`}
             >
               {tab.label} ({tab.count})

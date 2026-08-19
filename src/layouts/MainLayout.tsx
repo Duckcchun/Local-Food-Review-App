@@ -31,8 +31,10 @@ export function MainLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Outlet />
+    <div className="min-h-screen bg-[#fafaf7]">
+      <div key={location.pathname} className="page-fade">
+        <Outlet />
+      </div>
       {showBottomNav && userInfo && (
         <BottomNav
           activeTab={getActiveTab()}

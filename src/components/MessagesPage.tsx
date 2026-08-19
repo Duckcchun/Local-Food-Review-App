@@ -117,15 +117,15 @@ export function MessagesPage({ onBack, userEmail, userName }: MessagesPageProps)
     const partnerName = conversations.find(c => c.partnerId === selectedPartner)?.partnerName || selectedPartner.split('@')[0];
 
     return (
-      <div className="min-h-screen bg-[#fffef5] flex flex-col">
+      <div className="min-h-screen bg-[#fafaf7] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 z-10">
+        <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
           <div className="max-w-md mx-auto px-5 h-14 flex items-center gap-3">
-            <button onClick={() => setSelectedPartner(null)} className="text-gray-800 active:opacity-50">
-              <ArrowLeft size={22} />
+            <button onClick={() => setSelectedPartner(null)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+              <ArrowLeft size={20} className="text-gray-800" />
             </button>
             <div className="flex-1">
-              <h4 className="text-base font-semibold text-gray-900">{partnerName}</h4>
+              <h4 className="text-[15px] font-semibold text-gray-900">{partnerName}</h4>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export function MessagesPage({ onBack, userEmail, userName }: MessagesPageProps)
               <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
                 msg.from === userEmail
                   ? 'bg-[#6b8e6f] text-white rounded-br-md'
-                  : 'bg-white border border-gray-200 text-gray-800 rounded-bl-md'
+                  : 'bg-white border border-gray-100 text-gray-800 rounded-bl-md shadow-sm'
               }`}>
                 <p>{msg.text}</p>
                 <p className={`text-[10px] mt-1 ${msg.from === userEmail ? 'text-white/60' : 'text-gray-400'}`}>
@@ -155,7 +155,7 @@ export function MessagesPage({ onBack, userEmail, userName }: MessagesPageProps)
         </div>
 
         {/* Input */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-100 px-4 py-3 pb-[env(safe-area-inset-bottom)]">
+        <div className="sticky bottom-0 bg-white/90 backdrop-blur-md border-t border-gray-100 px-4 py-3 pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
           <div className="max-w-md mx-auto flex items-center gap-2">
             <input
               type="text"
@@ -163,12 +163,12 @@ export function MessagesPage({ onBack, userEmail, userName }: MessagesPageProps)
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="메시지를 입력하세요"
-              className="flex-1 px-4 py-2.5 rounded-full border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:border-[#6b8e6f] focus:ring-1 focus:ring-[#6b8e6f]"
+              className="flex-1 px-4 py-2.5 rounded-full border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 transition-all"
             />
             <button
               onClick={handleSend}
               disabled={!newMessage.trim()}
-              className="w-10 h-10 bg-[#6b8e6f] text-white rounded-full flex items-center justify-center shrink-0 disabled:opacity-40 active:scale-90 transition-transform"
+              className="w-10 h-10 bg-[#6b8e6f] text-white rounded-full flex items-center justify-center shrink-0 disabled:opacity-40 active:scale-90 transition-all shadow-sm"
             >
               <Send size={18} />
             </button>
@@ -180,24 +180,28 @@ export function MessagesPage({ onBack, userEmail, userName }: MessagesPageProps)
 
   // ─── 대화 목록 ───
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-20">
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
-        <div className="max-w-md mx-auto px-6">
-          <button onClick={onBack} className="text-white mb-6 hover:opacity-80">
-            <ArrowLeft size={22} />
-          </button>
-          <h1 className="text-white text-xl font-bold mb-1">쪽지함</h1>
-          <p className="text-white/80 text-sm">사업자와 리뷰어 간 1:1 소통</p>
+      <div className="sticky top-0 z-30 bg-[#6b8e6f]">
+        <div className="max-w-md mx-auto px-5 pt-4 pb-3">
+          <div className="flex items-center gap-3 mb-2">
+            <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-colors">
+              <ArrowLeft size={18} className="text-white" />
+            </button>
+            <h1 className="text-white text-lg font-bold">쪽지함</h1>
+          </div>
+          <p className="text-white/70 text-xs ml-12">사업자와 리뷰어 간 1:1 소통</p>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 -mt-6">
+      <div className="max-w-md mx-auto px-5 pt-4">
         {conversations.length === 0 ? (
-          <div className="bg-white rounded-2xl p-10 text-center border-2 border-[#d4c5a0] shadow-lg">
-            <MessageCircle size={40} className="mx-auto mb-3 text-[#d4c5a0]" />
+          <div className="bg-white rounded-2xl p-10 text-center border border-gray-100 shadow-sm">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-2xl flex items-center justify-center">
+              <MessageCircle size={28} className="text-gray-300" />
+            </div>
             <h3 className="text-base font-semibold text-gray-700 mb-1">쪽지가 없어요</h3>
-            <p className="text-sm text-gray-400">체험단 활동 중 소통이 필요하면 여기서 메시지를 주고받을 수 있어요</p>
+            <p className="text-sm text-gray-400">체험단 활동 중 소통이 필요하면<br/>여기서 메시지를 주고받을 수 있어요</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -205,10 +209,10 @@ export function MessagesPage({ onBack, userEmail, userName }: MessagesPageProps)
               <button
                 key={conv.partnerId}
                 onClick={() => setSelectedPartner(conv.partnerId)}
-                className="w-full bg-white rounded-2xl p-4 border-2 border-[#d4c5a0] text-left hover:border-[#6b8e6f] transition-colors"
+                className="w-full bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-left hover:shadow-md hover:border-gray-200 transition-all"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
                     {conv.partnerName[0]?.toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -219,7 +223,7 @@ export function MessagesPage({ onBack, userEmail, userName }: MessagesPageProps)
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-500 truncate pr-2">{conv.lastMessage}</p>
+                      <p className="text-xs text-gray-500 truncate pr-2">{conv.lastMessage}</p>
                       {conv.unreadCount > 0 && (
                         <span className="shrink-0 w-5 h-5 bg-[#f5a145] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                           {conv.unreadCount}
