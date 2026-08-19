@@ -9,13 +9,22 @@ export function ProductDetailRoute() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { userInfo, accessToken } = useAuthStore();
-  const { allProducts, favorites, productLikes, toggleFavorite, toggleProductLike, selectedProduct, setSelectedProduct, incrementApplicants } = useProductStore();
+
+  // 단일 store 호출 - allProducts에서 최신 데이터 참조
+  const allProducts = useProductStore(state => state.allProducts);
+  const favorites = useProductStore(state => state.favorites);
+  const productLikes = useProductStore(state => state.productLikes);
+  const toggleFavorite = useProductStore(state => state.toggleFavorite);
+  const toggleProductLike = useProductStore(state => state.toggleProductLike);
+  const setSelectedProduct = useProductStore(state => state.setSelectedProduct);
+  const incrementApplicants = useProductStore(state => state.incrementApplicants);
+  const decrementApplicants = useProductStore(state => state.decrementApplicants);
+
   const { applications, apply, cancelApplication } = useApplicationStore();
   const { completedReviews } = useReviewStore();
-  const { decrementApplicants } = useProductStore();
 
-  // 항상 최신 allProducts에서 가져옴 (좋아요 등 실시간 반영)
-  const product = useProductStore(state => state.allProducts.find(p => p.id === id)) || selectedProduct;
+  // 항상 allProducts에서 최신 product를 가져옴
+  const product = allProducts.find(p => p.id === id);
 
   if (!product) {
     navigate('/');
