@@ -1,7 +1,8 @@
 import { Logo } from "./Logo";
-import { ChevronRight, Download, TrendingUp, Award, Store, BarChart3, Settings, LogOut, Star, Info, ShoppingBag, History } from "lucide-react";
+import { ChevronRight, Download, TrendingUp, Award, Store, BarChart3, Settings, LogOut, Star, Info, ShoppingBag, History, Moon, Sun } from "lucide-react";
 import { DeleteAccountModal } from "./DeleteAccountModal";
 import { getOwnedBadges, getActiveItems } from "../utils/inventory";
+import { useDarkMode } from "../hooks/useDarkMode";
 
 /**
  * Lightweight ImageWithFallback component to avoid dependency on ../figma/ImageWithFallback.
@@ -37,10 +38,12 @@ interface ProfilePageProps {
   onNavigateToPointShop?: () => void;
   onNavigateToPointHistory?: () => void;
   onNavigateToMyItems?: () => void;
+  onNavigateToMessages?: () => void;
   onEditReview?: (product: Product) => void;
   onNavigateToDashboard?: () => void;
   onNavigateToTerms?: () => void;
   onNavigateToPrivacy?: () => void;
+  onNavigateToNotice?: () => void;
   onEditProfile?: () => void;
   onDeleteAccount?: () => void;
   accessToken?: string;
@@ -57,10 +60,12 @@ export function ProfilePage({
   onNavigateToPointShop, 
   onNavigateToPointHistory,
   onNavigateToMyItems, 
+  onNavigateToMessages,
   onEditReview, 
   onNavigateToDashboard,
   onNavigateToTerms,
   onNavigateToPrivacy,
+  onNavigateToNotice,
   onEditProfile,
   onDeleteAccount,
   accessToken,
@@ -243,6 +248,7 @@ export function ProfilePage({
   const nextLevel = LEVELS[currentLevel.level];
   const [showLevelModal, setShowLevelModal] = useState(false);
   const ownedBadges = getOwnedBadges(userInfo.email);
+  const darkMode = useDarkMode();
 
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
@@ -432,6 +438,13 @@ export function ProfilePage({
             </button>
           )}
 
+          {onNavigateToMessages && (
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToMessages}>
+              <span className="text-[#2d3e2d]">쪽지함</span>
+              <ChevronRight size={20} className="text-[#6b8e6f]" />
+            </button>
+          )}
+
           <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToApplications}>
             <span className="text-[#2d3e2d]">신청한 체험단</span>
             <ChevronRight size={20} className="text-[#6b8e6f]" />
@@ -444,6 +457,13 @@ export function ProfilePage({
 
           <div className="border-t border-[#d4c5a0] my-3"></div>
 
+          {onNavigateToNotice && (
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToNotice}>
+              <span className="text-[#2d3e2d]">공지사항</span>
+              <ChevronRight size={20} className="text-[#6b8e6f]" />
+            </button>
+          )}
+
           <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToTerms}>
             <span className="text-[#2d3e2d]">이용약관</span>
             <ChevronRight size={20} className="text-[#6b8e6f]" />
@@ -452,6 +472,21 @@ export function ProfilePage({
             <span className="text-[#2d3e2d]">개인정보 처리방침</span>
             <ChevronRight size={20} className="text-[#6b8e6f]" />
           </button>
+
+          {/* 다크모드 토글 */}
+          <div className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3">
+            <div className="flex items-center gap-3">
+              {darkMode.isDark ? <Moon size={20} className="text-[#6b8e6f]" /> : <Sun size={20} className="text-[#6b8e6f]" />}
+              <span className="text-[#2d3e2d]">{darkMode.isDark ? '다크모드' : '라이트모드'}</span>
+            </div>
+            <button
+              onClick={darkMode.toggle}
+              className={`relative w-11 h-6 rounded-full transition-colors ${darkMode.isDark ? 'bg-[#6b8e6f]' : 'bg-gray-300'}`}
+            >
+              <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${darkMode.isDark ? 'translate-x-5.5 left-0.5' : 'left-0.5'}`} 
+                   style={{ transform: darkMode.isDark ? 'translateX(22px)' : 'translateX(0)' }} />
+            </button>
+          </div>
 
           <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] hover:bg-[#ebe5cc] transition-colors" onClick={onLogout}>
             <div className="flex items-center gap-3">

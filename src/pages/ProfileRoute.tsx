@@ -42,6 +42,8 @@ export function ProfileRoute() {
       onNavigateToPrivacy={() => navigate('/privacy')}
       onEditProfile={() => navigate('/edit-profile')}
       onNavigateToMyItems={() => navigate('/my-items')}
+      onNavigateToMessages={() => navigate('/messages')}
+      onNavigateToNotice={() => navigate('/notice')}
       accessToken={accessToken}
       onLogout={handleLogout}
     />

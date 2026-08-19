@@ -3,6 +3,7 @@ import { ArrowLeft, Heart, ThumbsUp, Share2, Calendar, Users, MapPin } from "luc
 import type { Product } from "../data/mockData";
 import type { Review } from "../App";
 import { getCategoryName } from "../data/categories";
+import { shareContent } from "../utils/share";
 
 interface ProductDetailPageProps {
   product: Product;
@@ -23,8 +24,20 @@ export function ProductDetailPage({
   isLiked = false, onToggleLike, reviews = [], hasApplied = false, canCancel = false,
 }: ProductDetailPageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [helpfulReviews, setHelpfulReviews] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('helpfulReviews') || '[]')); } catch { return new Set(); }
+  });
   const productReviews = reviews.filter(r => r.productId === product.id);
   const fillingRate = Math.round((product.currentApplicants / product.requiredReviewers) * 100);
+
+  const toggleHelpful = (reviewId: string) => {
+    setHelpfulReviews(prev => {
+      const next = new Set(prev);
+      if (next.has(reviewId)) { next.delete(reviewId); } else { next.add(reviewId); }
+      try { localStorage.setItem('helpfulReviews', JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-[#fffef5] pb-[88px]">
@@ -44,7 +57,10 @@ export function ProductDetailPage({
             <ArrowLeft size={20} className="text-gray-800" />
           </button>
           <div className="flex items-center gap-2">
-            <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm">
+            <button 
+              onClick={() => shareContent({ title: product.name, description: product.description, url: window.location.href })}
+              className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform"
+            >
               <Share2 size={18} className="text-gray-700" />
             </button>
             <button onClick={onToggleFavorite} className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
@@ -151,6 +167,18 @@ export function ProductDetailPage({
                     ))}
                   </div>
                 )}
+                {/* 도움이 돼요 버튼 */}
+                <button
+                  onClick={() => toggleHelpful(review.id)}
+                  className={`mt-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    helpfulReviews.has(review.id)
+                      ? 'bg-[#6b8e6f]/10 text-[#6b8e6f] border border-[#6b8e6f]/30'
+                      : 'bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100'
+                  }`}
+                >
+                  <ThumbsUp size={12} fill={helpfulReviews.has(review.id) ? "currentColor" : "none"} />
+                  도움이 돼요
+                </button>
               </div>
             ))}
           </div>

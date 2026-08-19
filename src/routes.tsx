@@ -28,6 +28,8 @@ import { TermsRoute } from './pages/TermsRoute';
 import { PrivacyRoute } from './pages/PrivacyRoute';
 import { MyItemsRoute } from './pages/MyItemsRoute';
 import { AuthCallbackRoute } from './pages/AuthCallbackRoute';
+import { MessagesRoute } from './pages/MessagesRoute';
+import { NoticeRoute } from './pages/NoticeRoute';
 
 /**
  * Auth guard component: redirects unauthenticated users to signup.
@@ -111,6 +113,8 @@ export const router = createBrowserRouter([
       { path: 'terms', element: <TermsRoute /> },
       { path: 'privacy', element: <PrivacyRoute /> },
       { path: 'my-items', element: <MyItemsRoute /> },
+      { path: 'messages', element: <MessagesRoute /> },
+      { path: 'notice', element: <NoticeRoute /> },
     ],
   },
 
