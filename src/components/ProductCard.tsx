@@ -70,18 +70,18 @@ export const ProductCard = memo(function ProductCard({ product, onClick, isFavor
 
       {/* Content */}
       <div className="px-4 py-3.5">
-        <div className="mb-2">
-          <h3 className="text-base font-bold text-gray-900 leading-tight mb-0.5 line-clamp-1">{product.name}</h3>
-          <p className="text-sm text-gray-500">{product.seller}</p>
+        <div className="mb-2.5">
+          <h3 className="text-[15px] font-bold text-gray-900 leading-tight mb-1 line-clamp-1">{product.name}</h3>
+          <p className="text-[13px] text-gray-500 font-medium">{product.seller}</p>
         </div>
 
-        <p className="text-sm text-gray-600 leading-relaxed line-clamp-1 mb-3">{product.description}</p>
+        <p className="text-[13px] text-gray-500 leading-relaxed line-clamp-1 mb-3">{product.description}</p>
 
         {/* Progress */}
         <div className="mb-3">
-          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-[5px] bg-gray-100 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${fillingRate >= 80 ? 'bg-orange-400' : fillingRate >= 50 ? 'bg-emerald-400' : 'bg-emerald-300'}`}
+              className={`h-full rounded-full transition-all duration-500 ${fillingRate >= 80 ? 'bg-gradient-to-r from-orange-400 to-orange-500' : fillingRate >= 50 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-emerald-300 to-emerald-400'}`}
               style={{ width: `${Math.min(fillingRate, 100)}%` }}
             />
           </div>
@@ -90,12 +90,12 @@ export const ProductCard = memo(function ProductCard({ product, onClick, isFavor
         {/* Meta */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 text-xs text-gray-400">
-            <span className="flex items-center gap-1"><MapPin size={13} />{product.distance}</span>
-            <span className="flex items-center gap-1"><Users size={13} />{product.currentApplicants}/{product.requiredReviewers}</span>
+            <span className="flex items-center gap-1"><MapPin size={12} />{product.distance}</span>
+            <span className="flex items-center gap-1"><Users size={12} />{product.currentApplicants}/{product.requiredReviewers}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2.5 text-xs">
             <span className="text-gray-400">리뷰 {product.reviewCount}</span>
-            <span className="text-rose-400">♥ {product.likeCount}</span>
+            <span className="text-rose-400 font-medium">♥ {product.likeCount}</span>
           </div>
         </div>
       </div>

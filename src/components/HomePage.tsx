@@ -70,14 +70,14 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
   return (
     <div className="min-h-screen bg-[#fffef5] pb-24">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-30 bg-[#fffef5]">
+      <div className="sticky top-0 z-30 bg-[#fffef5]/95 backdrop-blur-md">
         <div className="max-w-md mx-auto px-5 pt-4 pb-2 flex items-center justify-between">
           <Logo />
           {onNotificationsClick && (
-            <button onClick={onNotificationsClick} className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors">
+            <button onClick={onNotificationsClick} className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100/80 transition-colors">
               <Bell size={22} className="text-gray-700" />
               {unreadNotifications > 0 && (
-                <span className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-[#fffef5]">
                   {unreadNotifications > 9 ? '9+' : unreadNotifications}
                 </span>
               )}
@@ -90,7 +90,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
         <div className="max-w-md mx-auto px-5 pb-3">
           <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
         </div>
-        <div className="h-px bg-gray-100" />
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
       </div>
 
       {/* Filter & Sort */}
@@ -136,15 +136,15 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
       <div className="max-w-md mx-auto px-5">
         {sortedProducts.length === 0 ? (
           <div className="py-20 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <Search size={28} className="text-gray-300" />
+            <div className="w-20 h-20 mx-auto mb-5 bg-gray-50 rounded-2xl flex items-center justify-center">
+              <Search size={32} className="text-gray-300" />
             </div>
-            <h3 className="text-base font-semibold text-gray-700 mb-1">
+            <h3 className="text-base font-semibold text-gray-700 mb-2">
               {searchQuery ? "검색 결과가 없어요" : selectedCategory !== "all" ? "해당 카테고리에 체험단이 없어요" : "근처에 체험단이 없어요"}
             </h3>
-            <p className="text-sm text-gray-400 mb-5">{hasActiveFilters ? "다른 조건으로 검색해보세요" : "곧 새로운 체험단이 등록됩니다"}</p>
+            <p className="text-sm text-gray-400 mb-6">{hasActiveFilters ? "다른 조건으로 검색해보세요" : "곧 새로운 체험단이 등록됩니다"}</p>
             {hasActiveFilters && (
-              <button onClick={resetFilters} className="inline-flex items-center gap-1.5 bg-[#6b8e6f] text-white text-sm font-medium px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors">
+              <button onClick={resetFilters} className="inline-flex items-center gap-1.5 bg-[#6b8e6f] text-white text-sm font-medium px-6 py-2.5 rounded-xl hover:bg-[#5a7a5e] transition-colors shadow-sm">
                 <FilterX size={14} />필터 초기화
               </button>
             )}

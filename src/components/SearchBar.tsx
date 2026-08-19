@@ -83,8 +83,8 @@ export function SearchBar({ value, onChange, placeholder = "맛집, 체험단 �
   return (
     <div ref={containerRef} className="relative">
       {/* 입력 필드 */}
-      <div className={`flex items-center gap-2.5 bg-gray-100 rounded-xl px-3.5 py-2.5 transition-all ${isFocused ? "bg-white ring-1 ring-[#6b8e6f]" : ""}`}>
-        <Search size={18} className="text-gray-400 shrink-0" />
+      <div className={`flex items-center gap-2.5 bg-gray-100/80 rounded-2xl px-4 py-3 transition-all duration-200 ${isFocused ? "bg-white ring-2 ring-[#6b8e6f]/30 shadow-sm" : "hover:bg-gray-100"}`}>
+        <Search size={18} className={`shrink-0 transition-colors duration-200 ${isFocused ? "text-[#6b8e6f]" : "text-gray-400"}`} />
         <input
           type="text"
           value={value}
@@ -96,7 +96,7 @@ export function SearchBar({ value, onChange, placeholder = "맛집, 체험단 �
           className="flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 outline-none"
         />
         {value && (
-          <button onClick={() => onChange("")} className="shrink-0 w-5 h-5 flex items-center justify-center bg-gray-300 rounded-full">
+          <button onClick={() => onChange("")} className="shrink-0 w-5 h-5 flex items-center justify-center bg-gray-300 rounded-full hover:bg-gray-400 transition-colors">
             <X size={12} className="text-white" />
           </button>
         )}

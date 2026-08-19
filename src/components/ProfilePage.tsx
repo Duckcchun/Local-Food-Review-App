@@ -1,5 +1,5 @@
 import { Logo } from "./Logo";
-import { ChevronRight, Download, TrendingUp, Award, Store, BarChart3, Settings, LogOut, Star, Info, ShoppingBag, History, Moon, Sun } from "lucide-react";
+import { ChevronRight, Download, TrendingUp, Award, Store, BarChart3, Settings, LogOut, Star, Info, ShoppingBag, History, Moon, Sun, Edit3, Package, Mail, ClipboardList, Heart, Megaphone, FileText, Shield } from "lucide-react";
 import { DeleteAccountModal } from "./DeleteAccountModal";
 import { getOwnedBadges, getActiveItems } from "../utils/inventory";
 import { useDarkMode } from "../hooks/useDarkMode";
@@ -251,61 +251,61 @@ export function ProfilePage({
   const darkMode = useDarkMode();
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
+    <div className="min-h-screen bg-[#fafaf7] pb-24">
       {/* Header */}
-  <div className="bg-[#6b8e6f] bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
+  <div className="bg-gradient-to-br from-[#6b8e6f] via-[#7a9a7e] to-[#8fa893] pt-8 pb-14">
         <div className="max-w-md mx-auto px-6">
           <Logo className="mb-6" variant="white" />
           <h1 className="text-white mb-2">
             마이페이지
           </h1>
-          <p className="text-white opacity-90">
+          <p className="text-white/80 text-sm">
             내 활동과 포인트를 확인하세요
           </p>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 -mt-6">
+      <div className="max-w-md mx-auto px-6 -mt-8">
         {/* User Profile Card */}
-        <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0] shadow-lg">
+        <div className="bg-white rounded-[1.5rem] p-6 mb-5 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#f5a145] to-[#e89535] flex items-center justify-center shadow-lg shadow-[#f5a145]/20">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                 <circle cx="16" cy="12" r="6" fill="white" />
                 <path d="M8 26c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="white" />
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="text-[#2d3e2d] mb-1">{userInfo.name}</h3>
+              <h3 className="text-[#2d3e2d] text-lg font-bold mb-1">{userInfo.name}</h3>
               <LevelBadge level={userLevel} showName={true} />
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#d4c5a0]">
+          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
             <div className="text-center">
-              <div className="text-[#2d3e2d] mb-1">{completedReviews.length}</div>
-              <div className="text-sm text-[#9ca89d]">리뷰</div>
+              <div className="text-[#2d3e2d] text-lg font-bold mb-0.5">{completedReviews.length}</div>
+              <div className="text-xs text-[#9ca89d]">리뷰</div>
             </div>
             <div className="text-center">
-              <div className="text-[#2d3e2d] mb-1">0</div>
-              <div className="text-sm text-[#9ca89d]">받은 좋아요</div>
+              <div className="text-[#2d3e2d] text-lg font-bold mb-0.5">0</div>
+              <div className="text-xs text-[#9ca89d]">받은 좋아요</div>
             </div>
             <div className="text-center">
-              <div className="text-[#f5a145] mb-1">{userPoints.toLocaleString()}P</div>
-              <div className="text-sm text-[#9ca89d]">포인트</div>
+              <div className="text-[#f5a145] text-lg font-bold mb-0.5">{userPoints.toLocaleString()}P</div>
+              <div className="text-xs text-[#9ca89d]">포인트</div>
             </div>
           </div>
         </div>
 
         {/* Owned Badges */}
         {ownedBadges.length > 0 && (
-          <div className="bg-white rounded-[1.5rem] p-5 mb-6 border-2 border-[#d4c5a0]">
+          <div className="bg-white rounded-[1.5rem] p-5 mb-5 border border-gray-100 shadow-sm">
             <h4 className="text-[#2d3e2d] text-sm font-semibold mb-3">🏅 내 배지</h4>
             <div className="flex flex-wrap gap-2">
               {ownedBadges.map((badge) => (
                 <span
                   key={badge.id}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fffbf0] border border-[#f5a145]/30 rounded-full text-sm"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#fffbf0] border border-[#f5a145]/20 rounded-full text-sm"
                 >
                   <span>{badge.icon}</span>
                   <span className="text-[#2d3e2d] font-medium">{badge.name}</span>
@@ -387,97 +387,107 @@ export function ProfilePage({
         </div>
 
         {/* Point Actions */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-5">
           <button 
             onClick={onNavigateToPointShop}
-            className="bg-gradient-to-r from-[#f5a145] to-[#e89535] rounded-[1.5rem] p-5 text-white hover:opacity-90 transition-opacity"
+            className="bg-gradient-to-br from-[#f5a145] to-[#e89535] rounded-2xl p-5 text-white hover:opacity-90 transition-opacity shadow-md shadow-[#f5a145]/20"
           >
             <div className="flex flex-col items-center text-center">
-              <div className="bg-white/20 rounded-full p-3 mb-3">
-                <ShoppingBag size={24} />
+              <div className="bg-white/20 rounded-xl p-3 mb-3">
+                <ShoppingBag size={22} />
               </div>
-              <h4 className="mb-1">포인트 샵</h4>
-              <p className="text-sm opacity-90">혜택 구매하기</p>
+              <h4 className="text-sm font-bold mb-0.5">포인트 샵</h4>
+              <p className="text-[11px] opacity-80">혜택 구매하기</p>
             </div>
           </button>
 
           <button 
             onClick={onNavigateToPointHistory}
-            className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] rounded-[1.5rem] p-5 text-white hover:opacity-90 transition-opacity"
+            className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] rounded-2xl p-5 text-white hover:opacity-90 transition-opacity shadow-md shadow-[#6b8e6f]/20"
           >
             <div className="flex flex-col items-center text-center">
-              <div className="bg-white/20 rounded-full p-3 mb-3">
-                <History size={24} />
+              <div className="bg-white/20 rounded-xl p-3 mb-3">
+                <History size={22} />
               </div>
-              <h4 className="mb-1">포인트 내역</h4>
-              <p className="text-sm opacity-90">적립/사용 내역</p>
+              <h4 className="text-sm font-bold mb-0.5">포인트 내역</h4>
+              <p className="text-[11px] opacity-80">적립/사용 내역</p>
             </div>
           </button>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0]">
-          <h3 className="text-[#2d3e2d] mb-4">내 활동</h3>
+        {/* ── 내 활동 그룹 ── */}
+        <div className="bg-white rounded-[1.5rem] p-6 mb-4 border-2 border-[#d4c5a0]">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-full bg-[#6b8e6f]/10 flex items-center justify-center">
+              <ClipboardList size={15} className="text-[#6b8e6f]" />
+            </div>
+            <h3 className="text-[#2d3e2d] text-[15px] font-semibold">내 활동</h3>
+          </div>
           
           {onEditProfile && (
-            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onEditProfile}>
-              <span className="text-[#2d3e2d]">프로필 수정</span>
-              <ChevronRight size={20} className="text-[#6b8e6f]" />
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5 hover:bg-[#ebe5cc] transition-colors" onClick={onEditProfile}>
+              <div className="flex items-center gap-3">
+                <Edit3 size={18} className="text-[#6b8e6f]" />
+                <span className="text-[#2d3e2d] text-sm">프로필 수정</span>
+              </div>
+              <ChevronRight size={18} className="text-[#9ca89d]" />
             </button>
           )}
 
           {onNavigateToMyItems && (
-            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToMyItems}>
-              <div className="flex items-center gap-2">
-                <span className="text-[#2d3e2d]">내 아이템함</span>
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToMyItems}>
+              <div className="flex items-center gap-3">
+                <Package size={18} className="text-[#6b8e6f]" />
+                <span className="text-[#2d3e2d] text-sm">내 아이템함</span>
                 {ownedBadges.length > 0 && (
-                  <span className="text-xs bg-[#f5a145] text-white px-1.5 py-0.5 rounded-full">{getActiveItems(userInfo.email).length}</span>
+                  <span className="text-[10px] bg-[#f5a145] text-white px-1.5 py-0.5 rounded-full font-medium">{getActiveItems(userInfo.email).length}</span>
                 )}
               </div>
-              <ChevronRight size={20} className="text-[#6b8e6f]" />
+              <ChevronRight size={18} className="text-[#9ca89d]" />
             </button>
           )}
 
           {onNavigateToMessages && (
-            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToMessages}>
-              <span className="text-[#2d3e2d]">쪽지함</span>
-              <ChevronRight size={20} className="text-[#6b8e6f]" />
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToMessages}>
+              <div className="flex items-center gap-3">
+                <Mail size={18} className="text-[#6b8e6f]" />
+                <span className="text-[#2d3e2d] text-sm">쪽지함</span>
+              </div>
+              <ChevronRight size={18} className="text-[#9ca89d]" />
             </button>
           )}
 
-          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToApplications}>
-            <span className="text-[#2d3e2d]">신청한 체험단</span>
-            <ChevronRight size={20} className="text-[#6b8e6f]" />
+          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToApplications}>
+            <div className="flex items-center gap-3">
+              <ClipboardList size={18} className="text-[#6b8e6f]" />
+              <span className="text-[#2d3e2d] text-sm">신청한 체험단</span>
+            </div>
+            <ChevronRight size={18} className="text-[#9ca89d]" />
           </button>
 
-          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToFavorites}>
-            <span className="text-[#2d3e2d]">찜한 체험단</span>
-            <ChevronRight size={20} className="text-[#6b8e6f]" />
+          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToFavorites}>
+            <div className="flex items-center gap-3">
+              <Heart size={18} className="text-[#6b8e6f]" />
+              <span className="text-[#2d3e2d] text-sm">찜한 체험단</span>
+            </div>
+            <ChevronRight size={18} className="text-[#9ca89d]" />
           </button>
+        </div>
 
-          <div className="border-t border-[#d4c5a0] my-3"></div>
-
-          {onNavigateToNotice && (
-            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToNotice}>
-              <span className="text-[#2d3e2d]">공지사항</span>
-              <ChevronRight size={20} className="text-[#6b8e6f]" />
-            </button>
-          )}
-
-          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToTerms}>
-            <span className="text-[#2d3e2d]">이용약관</span>
-            <ChevronRight size={20} className="text-[#6b8e6f]" />
-          </button>
-          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToPrivacy}>
-            <span className="text-[#2d3e2d]">개인정보 처리방침</span>
-            <ChevronRight size={20} className="text-[#6b8e6f]" />
-          </button>
+        {/* ── 설정 그룹 ── */}
+        <div className="bg-white rounded-[1.5rem] p-6 mb-4 border-2 border-[#d4c5a0]">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-full bg-[#6b8e6f]/10 flex items-center justify-center">
+              <Settings size={15} className="text-[#6b8e6f]" />
+            </div>
+            <h3 className="text-[#2d3e2d] text-[15px] font-semibold">설정</h3>
+          </div>
 
           {/* 다크모드 토글 */}
-          <div className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-3">
+          <div className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5">
             <div className="flex items-center gap-3">
-              {darkMode.isDark ? <Moon size={20} className="text-[#6b8e6f]" /> : <Sun size={20} className="text-[#6b8e6f]" />}
-              <span className="text-[#2d3e2d]">{darkMode.isDark ? '다크모드' : '라이트모드'}</span>
+              {darkMode.isDark ? <Moon size={18} className="text-[#6b8e6f]" /> : <Sun size={18} className="text-[#6b8e6f]" />}
+              <span className="text-[#2d3e2d] text-sm">{darkMode.isDark ? '다크모드' : '라이트모드'}</span>
             </div>
             <button
               onClick={darkMode.toggle}
@@ -488,51 +498,95 @@ export function ProfilePage({
             </button>
           </div>
 
-          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] hover:bg-[#ebe5cc] transition-colors" onClick={onLogout}>
+          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5 hover:bg-[#ebe5cc] transition-colors" onClick={onLogout}>
             <div className="flex items-center gap-3">
-              <LogOut size={20} className="text-[#6b8e6f]" />
-              <span className="text-[#2d3e2d]">로그아웃</span>
+              <LogOut size={18} className="text-[#6b8e6f]" />
+              <span className="text-[#2d3e2d] text-sm">로그아웃</span>
             </div>
-            <ChevronRight size={20} className="text-[#6b8e6f]" />
+            <ChevronRight size={18} className="text-[#9ca89d]" />
           </button>
 
-          <button className="w-full flex items-center justify-between p-4 mt-2 rounded-[1rem] hover:bg-red-50 transition-colors" onClick={() => setShowDeleteModal(true)}>
-            <span className="text-sm text-red-500">회원 탈퇴</span>
-            <ChevronRight size={18} className="text-red-300" />
+          <button className="w-full flex items-center justify-between p-4 rounded-[1rem] hover:bg-red-50/60 transition-colors" onClick={() => setShowDeleteModal(true)}>
+            <div className="flex items-center gap-3">
+              <span className="w-[18px] h-[18px] flex items-center justify-center text-red-400 text-sm">⚠</span>
+              <span className="text-sm text-red-500">회원 탈퇴</span>
+            </div>
+            <ChevronRight size={16} className="text-red-300" />
           </button>
         </div>
 
-        {/* Excellence Recommendation */}
+        {/* ── 정보 그룹 ── */}
         <div className="bg-white rounded-[1.5rem] p-6 mb-6 border-2 border-[#d4c5a0]">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-full bg-[#6b8e6f]/10 flex items-center justify-center">
+              <Info size={15} className="text-[#6b8e6f]" />
+            </div>
+            <h3 className="text-[#2d3e2d] text-[15px] font-semibold">정보</h3>
+          </div>
+
+          {onNavigateToNotice && (
+            <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToNotice}>
+              <div className="flex items-center gap-3">
+                <Megaphone size={18} className="text-[#6b8e6f]" />
+                <span className="text-[#2d3e2d] text-sm">공지사항</span>
+              </div>
+              <ChevronRight size={18} className="text-[#9ca89d]" />
+            </button>
+          )}
+
+          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] mb-2.5 hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToTerms}>
+            <div className="flex items-center gap-3">
+              <FileText size={18} className="text-[#6b8e6f]" />
+              <span className="text-[#2d3e2d] text-sm">이용약관</span>
+            </div>
+            <ChevronRight size={18} className="text-[#9ca89d]" />
+          </button>
+
+          <button className="w-full flex items-center justify-between p-4 bg-[#f5f0dc] rounded-[1rem] hover:bg-[#ebe5cc] transition-colors" onClick={onNavigateToPrivacy}>
+            <div className="flex items-center gap-3">
+              <Shield size={18} className="text-[#6b8e6f]" />
+              <span className="text-[#2d3e2d] text-sm">개인정보 처리방침</span>
+            </div>
+            <ChevronRight size={18} className="text-[#9ca89d]" />
+          </button>
+
+          <div className="mt-4 pt-3 border-t border-[#d4c5a0]/50 text-center">
+            <span className="text-xs text-[#9ca89d]">앱 버전 1.2.0</span>
+          </div>
+        </div>
+
+        {/* Excellence Recommendation */}
+        <div className="bg-white rounded-[1.5rem] p-6 mb-5 border border-gray-100 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="bg-[#6b8e6f] rounded-full p-3">
-              <TrendingUp size={24} className="text-white" />
+            <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] rounded-xl p-3 shadow-sm">
+              <TrendingUp size={22} className="text-white" />
             </div>
             <div className="flex-1">
-              <h4 className="text-[#2d3e2d] mb-2">우수 평가단 등급</h4>
-              <p className="text-sm text-[#6b8e6f] mb-4">
+              <h4 className="text-[#2d3e2d] text-[15px] font-semibold mb-1">우수 평가단 등급</h4>
+              <p className="text-sm text-[#6b8e6f]">
                 솔직한 리뷰로 더 많은 체험 기회를 받아보세요
               </p>
             </div>
           </div>
           
-          <div className="bg-[#f5f0dc] rounded-[1rem] p-4">
+          <div className="bg-[#f5f0dc]/60 rounded-xl p-4 mt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-[#6b8e6f]">신뢰도 점수</span>
-              <span className="text-[#2d3e2d]">92/100</span>
+              <span className="text-xs font-medium text-[#6b8e6f]">신뢰도 점수</span>
+              <span className="text-sm font-bold text-[#2d3e2d]">92/100</span>
             </div>
             <div className="w-full bg-white rounded-full h-2 overflow-hidden">
-              <div className="bg-[#6b8e6f] h-full rounded-full" style={{ width: '92%' }}></div>
+              <div className="bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] h-full rounded-full" style={{ width: '92%' }}></div>
             </div>
           </div>
         </div>
 
         {/* My Reviews */}
         <div className="mb-6">
-          <h3 className="text-[#2d3e2d] mb-4">내가 작성한 리뷰</h3>
-          <div className="space-y-4">
+          <h3 className="text-[#2d3e2d] text-[15px] font-semibold mb-4">내가 작성한 리뷰</h3>
+          <div className="space-y-3">
             {completedReviews.length === 0 ? (
-              <div className="text-center py-8 bg-white rounded-[1.5rem] border-2 border-[#d4c5a0]">
+              <div className="text-center py-10 bg-white rounded-[1.5rem] border border-gray-100">
+                <div className="text-3xl mb-2">📝</div>
                 <p className="text-sm text-[#9ca89d]">작성한 리뷰가 없습니다</p>
               </div>
             ) : (
@@ -560,9 +614,9 @@ export function ProfilePage({
                 };
                 
                 return (
-                  <div key={review.id} className="bg-white rounded-[1.5rem] p-4 border-2 border-[#d4c5a0]">
-                    <div className="flex gap-4">
-                      <div className="w-20 h-20 rounded-[1rem] overflow-hidden bg-[#f5f0dc] shrink-0">
+                  <div key={review.id} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                    <div className="flex gap-3.5">
+                      <div className="w-[72px] h-[72px] rounded-xl overflow-hidden bg-gray-100 shrink-0">
                         <ImageWithFallback
                           src={review.productImage}
                           alt={review.productName}
@@ -570,20 +624,20 @@ export function ProfilePage({
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-[#2d3e2d] mb-2 truncate">{review.productName}</h4>
-                        <p className="text-sm text-[#6b8e6f] line-clamp-2">
+                        <h4 className="text-[#2d3e2d] text-sm font-semibold mb-1.5 truncate">{review.productName}</h4>
+                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
                           {review.pros && `장점: ${review.pros}`}
                           {review.cons && ` / 단점: ${review.cons}`}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#d4c5a0]">
-                      <span className="text-xs text-[#9ca89d]">{formattedDate}</span>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+                      <span className="text-[11px] text-[#9ca89d]">{formattedDate}</span>
                       <button 
-                        className="text-sm text-[#6b8e6f] hover:text-[#5a7a5e]" 
+                        className="text-xs font-medium text-[#6b8e6f] hover:text-[#5a7a5e] px-2.5 py-1 rounded-lg hover:bg-[#6b8e6f]/5 transition-colors" 
                         onClick={() => onEditReview && onEditReview(reviewProduct)}
                       >
-                        수정
+                        수정하기
                       </button>
                     </div>
                   </div>
