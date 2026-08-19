@@ -26,7 +26,20 @@ export default function App() {
   return (
     <>
       <RouterProvider router={router} />
-      <Toaster position="top-center" />
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            background: '#1f2937',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '12px',
+            fontSize: '14px',
+            padding: '12px 16px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          },
+        }}
+      />
     </>
   );
 }

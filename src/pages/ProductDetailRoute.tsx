@@ -14,7 +14,8 @@ export function ProductDetailRoute() {
   const { completedReviews } = useReviewStore();
   const { decrementApplicants } = useProductStore();
 
-  const product = allProducts.find(p => p.id === id) || selectedProduct;
+  // 항상 최신 allProducts에서 가져옴 (좋아요 등 실시간 반영)
+  const product = useProductStore(state => state.allProducts.find(p => p.id === id)) || selectedProduct;
 
   if (!product) {
     navigate('/');
