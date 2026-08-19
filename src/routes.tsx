@@ -27,6 +27,7 @@ import { StoreRegistrationRoute } from './pages/StoreRegistrationRoute';
 import { TermsRoute } from './pages/TermsRoute';
 import { PrivacyRoute } from './pages/PrivacyRoute';
 import { MyItemsRoute } from './pages/MyItemsRoute';
+import { AuthCallbackRoute } from './pages/AuthCallbackRoute';
 
 /**
  * Auth guard component: redirects unauthenticated users to signup.
@@ -79,6 +80,10 @@ export const router = createBrowserRouter([
   {
     path: '/forgot-password',
     element: <GuestOnly><ForgotPasswordRoute /></GuestOnly>,
+  },
+  {
+    path: '/auth/callback',
+    element: <AuthCallbackRoute />,
   },
 
   // Authenticated routes with MainLayout
