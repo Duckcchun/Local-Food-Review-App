@@ -126,11 +126,22 @@ export const useProductStore = create<ProductState>((set, get) => ({
     const newFavorites = isCurrentlyFavorite
       ? favorites.filter(id => id !== productId)
       : [...favorites, productId];
+    const delta = isCurrentlyFavorite ? -1 : 1;
 
-    set({ favorites: newFavorites });
+    set(state => ({
+      favorites: newFavorites,
+      allProducts: state.allProducts.map(p =>
+        p.id === productId
+          ? { ...p, likeCount: Math.max(0, (p.likeCount || 0) + delta) }
+          : p
+      ),
+      businessProducts: state.businessProducts.map(p =>
+        p.id === productId
+          ? { ...p, likeCount: Math.max(0, (p.likeCount || 0) + delta) }
+          : p
+      ),
+    }));
 
-    // Save to localStorage (we need userEmail from auth store - caller passes via accessToken context)
-    // This will be saved by the component that calls it
     if (isCurrentlyFavorite) {
       toast.success("찜 목록에서 제거되었습니다");
     } else {
