@@ -40,7 +40,7 @@ export function ProductDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-[88px]">
+    <div className="min-h-screen bg-[#fafaf7] pb-[88px]">
       {/* Hero Image */}
       <div className="relative aspect-[4/3] bg-gray-100">
         {!imageLoaded && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
@@ -88,7 +88,7 @@ export function ProductDetailPage({
       </div>
 
       {/* Divider */}
-      <div className="h-2 bg-gray-50" />
+      <div className="h-px mx-5 bg-gradient-to-r from-transparent via-gray-200 to-transparent my-1" />
 
       {/* Application Info */}
       <div className="px-5 py-5">
@@ -118,7 +118,7 @@ export function ProductDetailPage({
         </div>
       </div>
 
-      <div className="h-2 bg-gray-50" />
+      <div className="h-px mx-5 bg-gradient-to-r from-transparent via-gray-200 to-transparent my-1" />
 
       {/* Review Mission */}
       <div className="px-5 py-5">
@@ -133,7 +133,7 @@ export function ProductDetailPage({
         </div>
       </div>
 
-      <div className="h-2 bg-gray-50" />
+      <div className="h-px mx-5 bg-gradient-to-r from-transparent via-gray-200 to-transparent my-1" />
 
       {/* Reviews */}
       <div className="px-5 py-5">
@@ -186,7 +186,7 @@ export function ProductDetailPage({
       </div>
 
       {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#fffef5] border-t border-[#d4c5a0] z-20 pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-100 z-20 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
         <div className="max-w-md mx-auto px-5 py-3">
           {hasApplied ? (
             canCancel ? (

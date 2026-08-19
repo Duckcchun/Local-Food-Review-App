@@ -71,52 +71,52 @@ export function MyApplicationsPage({ onBack, applications, onProductClick }: MyA
   };
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
+    <div className="min-h-screen bg-[#fafaf7] pb-24">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b-2 border-[#d4c5a0] z-10">
-        <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
-          <button onClick={onBack} className="text-[#2d3e2d] hover:text-[#6b8e6f] transition-colors">
-            <ArrowLeft size={24} />
+      <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
+          <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+            <ArrowLeft size={20} className="text-gray-800" />
           </button>
-          <h4 className="text-[#2d3e2d]">신청한 체험단</h4>
-          <div className="w-6"></div>
+          <h4 className="text-[15px] font-semibold text-gray-900">신청한 체험단</h4>
+          <div className="w-9"></div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 py-6">
+      <div className="max-w-md mx-auto px-5 py-5">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-white rounded-[1.5rem] p-4 border-2 border-[#d4c5a0] text-center">
-            <div className="text-[#6b8e6f] mb-1">
+        <div className="grid grid-cols-3 gap-2.5 mb-5">
+          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+            <div className="text-lg font-bold text-[#6b8e6f] mb-0.5">
               {applications.filter(a => a.status === "accepted").length}
             </div>
-            <div className="text-xs text-[#9ca89d]">승인</div>
+            <div className="text-[11px] text-gray-400">승인</div>
           </div>
-          <div className="bg-white rounded-[1.5rem] p-4 border-2 border-[#d4c5a0] text-center">
-            <div className="text-[#f5a145] mb-1">
+          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+            <div className="text-lg font-bold text-[#f5a145] mb-0.5">
               {applications.filter(a => a.status === "pending").length}
             </div>
-            <div className="text-xs text-[#9ca89d]">대기중</div>
+            <div className="text-[11px] text-gray-400">대기중</div>
           </div>
-          <div className="bg-white rounded-[1.5rem] p-4 border-2 border-[#d4c5a0] text-center">
-            <div className="text-[#2d3e2d] mb-1">
+          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
+            <div className="text-lg font-bold text-[#2d3e2d] mb-0.5">
               {applications.length}
             </div>
-            <div className="text-xs text-[#9ca89d]">전체</div>
+            <div className="text-[11px] text-gray-400">전체</div>
           </div>
         </div>
 
         {/* Applications List */}
         {applications.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {applications.map((application) => (
               <div
                 key={application.id}
-                className="bg-white rounded-[1.5rem] p-5 border-2 border-[#d4c5a0] cursor-pointer hover:border-[#f5a145] transition-colors"
+                className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md hover:border-gray-200 transition-all"
                 onClick={() => onProductClick(application)}
               >
-                <div className="flex gap-4 mb-4">
-                  <div className="w-24 h-24 rounded-[1rem] overflow-hidden bg-[#f5f0dc] shrink-0">
+                <div className="flex gap-3.5 mb-4">
+                  <div className="w-[72px] h-[72px] rounded-xl overflow-hidden bg-gray-100 shrink-0">
                     <ImageWithFallback
                       src={application.productImage}
                       alt={application.productName}
@@ -124,66 +124,64 @@ export function MyApplicationsPage({ onBack, applications, onProductClick }: MyA
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-[#2d3e2d] flex-1">{application.productName}</h3>
+                    <div className="flex items-start justify-between mb-1.5">
+                      <h3 className="text-[#2d3e2d] text-sm font-semibold flex-1 truncate">{application.productName}</h3>
                       {(() => {
                         const statusInfo = getStatusInfo(application.status);
                         const StatusIcon = statusInfo.icon;
                         return (
-                          <span className={`text-xs px-3 py-1 rounded-full flex items-center gap-1 ${statusInfo.color}`}>
-                            <StatusIcon size={16} />
+                          <span className={`text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 font-medium ${statusInfo.color}`}>
+                            <StatusIcon size={12} />
                             {statusInfo.label}
                           </span>
                         );
                       })()}
                     </div>
-                    <p className="text-sm text-[#6b8e6f] mb-2">{application.userName}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#9ca89d]">신청일: {formatDate(application.appliedAt)}</span>
-                    </div>
+                    <p className="text-xs text-gray-400 mb-1.5">{application.userName}</p>
+                    <span className="text-[11px] text-gray-400">신청일: {formatDate(application.appliedAt)}</span>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#d4c5a0]">
+                <div className="pt-3.5 border-t border-gray-50">
                   {application.status === "accepted" ? (
-                    <div className="bg-[#e8f4e9] rounded-[1rem] p-3">
-                      <p className="text-sm text-[#6b8e6f] mb-2">
+                    <div className="bg-[#6b8e6f]/5 rounded-xl p-3">
+                      <p className="text-xs font-medium text-[#6b8e6f] mb-0.5">
                         🎉 체험단으로 선정되었습니다!
                       </p>
-                      <p className="text-xs text-[#9ca89d]">
+                      <p className="text-[11px] text-gray-400">
                         음식을 수령한 후 리뷰를 작성해주세요
                       </p>
                     </div>
                   ) : application.status === "pending" ? (
-                    <div className="bg-[#fff8ed] rounded-[1rem] p-3">
-                      <p className="text-sm text-[#f5a145]">
+                    <div className="bg-[#f5a145]/5 rounded-xl p-3">
+                      <p className="text-xs font-medium text-[#f5a145] mb-0.5">
                         ⏳ 심사 대기중입니다
                       </p>
-                      <p className="text-xs text-[#9ca89d] mt-1">
+                      <p className="text-[11px] text-gray-400">
                         결과는 마감일 이후에 확인하실 수 있습니다
                       </p>
                     </div>
                   ) : application.status === "rejected" ? (
-                    <div className="bg-[#f5f5f5] rounded-[1rem] p-3">
-                      <p className="text-sm text-[#9ca89d]">
+                    <div className="bg-gray-50 rounded-xl p-3">
+                      <p className="text-xs font-medium text-gray-500 mb-0.5">
                         아쉽게도 선정되지 못했습니다
                       </p>
-                      <p className="text-xs text-[#9ca89d] mt-1">
+                      <p className="text-[11px] text-gray-400">
                         다음 기회에 다시 도전해주세요!
                       </p>
                     </div>
                   ) : application.status === "review-completed" ? (
-                    <div className="bg-blue-50 rounded-[1rem] p-3">
-                      <p className="text-sm text-blue-600 mb-2">
+                    <div className="bg-blue-50/60 rounded-xl p-3">
+                      <p className="text-xs font-medium text-blue-600 mb-0.5">
                         ✅ 리뷰 작성이 완료되었습니다
                       </p>
-                      <p className="text-xs text-blue-600">
+                      <p className="text-[11px] text-gray-400">
                         소중한 의견 감사합니다!
                       </p>
                     </div>
                   ) : (
-                    <div className="bg-[#f5f5f5] rounded-[1rem] p-3">
-                      <p className="text-sm text-[#9ca89d]">
+                    <div className="bg-gray-50 rounded-xl p-3">
+                      <p className="text-xs font-medium text-gray-500">
                         아쉽게도 선정되지 못했습니다
                       </p>
                     </div>
@@ -194,14 +192,16 @@ export function MyApplicationsPage({ onBack, applications, onProductClick }: MyA
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-[#2d3e2d] mb-2">신청한 체험단이 없어요</h3>
-            <p className="text-sm text-[#9ca89d] mb-6">
+            <div className="w-20 h-20 mx-auto mb-5 bg-gray-50 rounded-2xl flex items-center justify-center">
+              <span className="text-3xl">📝</span>
+            </div>
+            <h3 className="text-[#2d3e2d] text-base font-semibold mb-2">신청한 체험단이 없어요</h3>
+            <p className="text-sm text-gray-400 mb-6">
               원하는 체험단에 신청해보세요
             </p>
             <button
               onClick={onBack}
-              className="bg-[#f5a145] text-white px-6 py-3 rounded-[1rem] hover:bg-[#e89535] transition-colors"
+              className="bg-[#f5a145] text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-[#e89535] active:scale-[0.98] transition-all shadow-sm"
             >
               체험단 둘러보기
             </button>

@@ -11,30 +11,30 @@ interface MyFavoritesPageProps {
 
 export function MyFavoritesPage({ onBack, favorites, onProductClick, onToggleFavorite }: MyFavoritesPageProps) {
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
+    <div className="min-h-screen bg-[#fafaf7] pb-24">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b-2 border-[#d4c5a0] z-10">
-        <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
-          <button onClick={onBack} className="text-[#2d3e2d] hover:text-[#6b8e6f] transition-colors">
-            <ArrowLeft size={24} />
+      <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
+          <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+            <ArrowLeft size={20} className="text-gray-800" />
           </button>
-          <h4 className="text-[#2d3e2d]">찜한 체험단</h4>
-          <div className="w-6"></div>
+          <h4 className="text-[15px] font-semibold text-gray-900">찜한 체험단</h4>
+          <div className="w-9"></div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 py-6">
+      <div className="max-w-md mx-auto px-5 py-5">
         {/* Count */}
-        <div className="flex items-center gap-2 mb-6">
-          <Heart size={20} className="text-[#f5a145]" fill="#f5a145" />
-          <span className="text-[#2d3e2d]">
-            찜한 체험단 <span className="text-[#f5a145]">{favorites.length}</span>개
+        <div className="flex items-center gap-2 mb-5">
+          <Heart size={18} className="text-[#f5a145]" fill="#f5a145" />
+          <span className="text-sm text-gray-700">
+            찜한 체험단 <span className="font-bold text-[#f5a145]">{favorites.length}</span>개
           </span>
         </div>
 
         {/* Favorites List */}
         {favorites.length > 0 ? (
-          <div className="grid gap-4">
+          <div className="grid gap-3.5">
             {favorites.map((product) => (
               <ProductCard
                 key={product.id}
@@ -47,14 +47,16 @@ export function MyFavoritesPage({ onBack, favorites, onProductClick, onToggleFav
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">💛</div>
-            <h3 className="text-[#2d3e2d] mb-2">찜한 체험단이 없어요</h3>
-            <p className="text-sm text-[#9ca89d] mb-6">
+            <div className="w-20 h-20 mx-auto mb-5 bg-gray-50 rounded-2xl flex items-center justify-center">
+              <span className="text-3xl">💛</span>
+            </div>
+            <h3 className="text-gray-800 text-base font-semibold mb-2">찜한 체험단이 없어요</h3>
+            <p className="text-sm text-gray-400 mb-6">
               마음에 드는 체험단을 찜해보세요
             </p>
             <button
               onClick={onBack}
-              className="bg-[#f5a145] text-white px-6 py-3 rounded-[1rem] hover:bg-[#e89535] transition-colors"
+              className="bg-[#f5a145] text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-[#e89535] active:scale-[0.98] transition-all shadow-sm"
             >
               체험단 둘러보기
             </button>
