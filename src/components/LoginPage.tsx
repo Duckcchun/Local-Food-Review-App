@@ -81,21 +81,21 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup, onForgotP
   };
 
   return (
-    <div className="min-h-screen bg-[#fffef5] flex flex-col">
+    <div className="min-h-screen bg-[#fafaf7] flex flex-col">
       {/* Header */}
-      <div className="px-5 pt-14 pb-8">
+      <div className="px-5 pt-12 pb-6">
         <div className="max-w-md mx-auto">
-          <button onClick={onBack} className="text-gray-800 mb-8 -ml-1 active:opacity-50">
-            <ArrowLeft size={22} />
+          <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors -ml-1 mb-6">
+            <ArrowLeft size={20} className="text-gray-800" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1.5">로그인</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">로그인</h1>
           <p className="text-sm text-gray-500">밥터뷰에 오신 것을 환영합니다</p>
         </div>
       </div>
 
       {/* Form */}
       <div className="flex-1 max-w-md mx-auto w-full px-5">
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1.5">이메일</label>
@@ -107,7 +107,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup, onForgotP
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="example@email.com"
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#6b8e6f] focus:ring-1 focus:ring-[#6b8e6f] transition-all"
+                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 transition-all"
                 disabled={isLoading}
               />
             </div>
@@ -124,7 +124,7 @@ export function LoginPage({ onBack, onLoginComplete, onSwitchToSignup, onForgotP
                 value={formData.password}
                 onChange={handleInputChange}
                 placeholder="비밀번호를 입력하세요"
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#6b8e6f] focus:ring-1 focus:ring-[#6b8e6f] transition-all"
+                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 transition-all"
                 disabled={isLoading}
               />
             </div>

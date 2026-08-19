@@ -114,7 +114,7 @@ export function ReviewWritePage({ product, onBack, userName = "회원", onSubmit
   };
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
+    <div className="min-h-screen bg-[#fffef5] pb-20">
       {/* Header */}
       <div className="sticky top-0 bg-white border-b-2 border-[#d4c5a0] z-10">
         <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">

@@ -1,7 +1,7 @@
 import { FileText, ChevronRight } from "lucide-react";
 import type { Application, Review } from "../App";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
-import { Logo } from "./Logo";
+import { EmptyState } from "./common/EmptyState";
 
 interface ReviewPageProps {
   applications: Application[];
@@ -17,34 +17,28 @@ export function ReviewPage({ applications, completedReviews, onSelectProduct, us
   const needsReview = acceptedApplications.filter(app => !reviewedProductIds.has(app.productId));
 
   return (
-    <div className="min-h-screen bg-[#fafaf7] pb-24">
-      {/* Header */}
-  <div className="bg-gradient-to-br from-[#6b8e6f] via-[#7a9a7e] to-[#8fa893] pt-8 pb-14">
-        <div className="max-w-md mx-auto px-6">
-          <Logo className="mb-6" variant="white" />
-          <h1 className="text-white mb-2">
-            리뷰 작성
-          </h1>
-          <p className="text-white/80 text-sm">
-            체험한 제품의 솔직한 리뷰를 남겨주세요
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-md mx-auto px-6 -mt-8">
-        {/* Stats Card */}
-        <div className="bg-white rounded-2xl p-6 mb-5 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#f5a145] mb-0.5">{needsReview.length}</div>
-              <div className="text-xs text-gray-400">작성 대기</div>
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
+      {/* Compact Sticky Header */}
+      <div className="sticky top-0 z-30 bg-[#6b8e6f]">
+        <div className="max-w-md mx-auto px-5 pt-4 pb-3 flex items-center justify-between">
+          <div>
+            <h1 className="text-white text-lg font-bold">리뷰 작성</h1>
+            <p className="text-white/70 text-xs">체험한 제품의 솔직한 리뷰를 남겨주세요</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-center bg-white/15 rounded-xl px-3 py-1.5">
+              <div className="text-sm font-bold text-white">{needsReview.length}</div>
+              <div className="text-[10px] text-white/70">대기</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#6b8e6f] mb-0.5">{completedReviews.length}</div>
-              <div className="text-xs text-gray-400">작성 완료</div>
+            <div className="text-center bg-white/15 rounded-xl px-3 py-1.5">
+              <div className="text-sm font-bold text-white">{completedReviews.length}</div>
+              <div className="text-[10px] text-white/70">완료</div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-md mx-auto px-5 pt-5">
 
         {/* Needs Review Section */}
         {needsReview.length > 0 && (
@@ -119,15 +113,11 @@ export function ReviewPage({ applications, completedReviews, onSelectProduct, us
 
         {/* Empty State */}
         {needsReview.length === 0 && completedReviews.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-5 bg-gray-50 rounded-2xl flex items-center justify-center">
-              <FileText size={36} className="text-gray-300" />
-            </div>
-            <h3 className="text-[#2d3e2d] text-base font-semibold mb-2">작성할 리뷰가 없어요</h3>
-            <p className="text-sm text-gray-400">
-              체험단에 신청하고 제품을 체험해보세요!
-            </p>
-          </div>
+          <EmptyState
+            icon={FileText}
+            title="작성할 리뷰가 없어요"
+            description="체험단에 신청하고 제품을 체험해보세요!"
+          />
         )}
 
         {/* Info Box */}

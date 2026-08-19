@@ -79,7 +79,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
   // ─── 첫 화면: 웰컴 페이지 ───
   if (userType === null) {
     return (
-      <div className="min-h-screen bg-[#fffef5] flex flex-col">
+      <div className="min-h-screen bg-[#fafaf7] flex flex-col">
         {/* Hero */}
         <div className="flex-1 flex flex-col items-center justify-center px-8 pt-20 pb-10">
           <Logo className="mb-8 scale-125" />
@@ -128,17 +128,17 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
 
   // ─── 회원가입 폼 ───
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-28">
+    <div className="min-h-screen bg-[#fafaf7] pb-28">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-gray-100 z-10">
+      <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
         <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
-          <button onClick={() => setUserType(null)} className="text-gray-800 active:opacity-50">
-            <ArrowLeft size={22} />
+          <button onClick={() => setUserType(null)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+            <ArrowLeft size={20} className="text-gray-800" />
           </button>
-          <h4 className="text-base font-semibold text-gray-900">
+          <h4 className="text-[15px] font-semibold text-gray-900">
             {userType === "reviewer" ? "체험단 회원가입" : "사업자 회원가입"}
           </h4>
-          <div className="w-6" />
+          <div className="w-9" />
         </div>
       </div>
 
@@ -219,7 +219,7 @@ export function SignupPage({ onBack, onSignupComplete, onSwitchToLogin }: Signup
       </div>
 
       {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-20 pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-100 z-20 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
         <div className="max-w-md mx-auto px-5 py-3">
           <button
             onClick={handleSubmit}
@@ -251,7 +251,7 @@ function FormInput({ icon: Icon, label, type = "text", value, onChange, placehol
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#6b8e6f] focus:ring-1 focus:ring-[#6b8e6f] transition-all"
+          className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#6b8e6f] focus:ring-2 focus:ring-[#6b8e6f]/20 transition-all"
         />
       </div>
     </div>

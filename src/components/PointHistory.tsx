@@ -30,7 +30,7 @@ export function PointHistory({ onBack, transactions, currentPoints }: PointHisto
     .reduce((sum, t) => sum + t.amount, 0);
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
+    <div className="min-h-screen bg-[#fffef5] pb-20">
       {/* Header */}
   <div className="bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
         <div className="max-w-md mx-auto px-6">

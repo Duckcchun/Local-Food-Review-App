@@ -5,6 +5,26 @@ import type { Review } from "../App";
 import { getCategoryName } from "../data/categories";
 import { shareContent } from "../utils/share";
 
+// Generate a consistent gradient color pair from a username string
+const AVATAR_GRADIENTS = [
+  ["#f97316", "#fb923c"], // orange
+  ["#8b5cf6", "#a78bfa"], // purple
+  ["#06b6d4", "#22d3ee"], // cyan
+  ["#ec4899", "#f472b6"], // pink
+  ["#10b981", "#34d399"], // emerald
+  ["#f59e0b", "#fbbf24"], // amber
+  ["#6366f1", "#818cf8"], // indigo
+  ["#14b8a6", "#2dd4bf"], // teal
+];
+
+function getAvatarGradient(name: string): [string, string] {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_GRADIENTS[Math.abs(hash) % AVATAR_GRADIENTS.length];
+}
+
 interface ProductDetailPageProps {
   product: Product;
   onBack: () => void;
@@ -147,9 +167,18 @@ export function ProductDetailPage({
             {productReviews.slice(0, 5).map((review) => (
               <div key={review.id} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                 <div className="flex items-center gap-2.5 mb-2.5">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">
-                    {review.userName ? review.userName[0] : 'U'}
-                  </div>
+                  {(() => {
+                    const name = review.userName || '익명';
+                    const [from, to] = getAvatarGradient(name);
+                    return (
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm"
+                        style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
+                      >
+                        {name[0]}
+                      </div>
+                    );
+                  })()}
                   <div>
                     <span className="text-sm font-medium text-gray-800">{review.userName || '익명'}</span>
                     <span className="text-xs text-gray-400 ml-2">{new Date(review.createdAt).toLocaleDateString('ko-KR')}</span>

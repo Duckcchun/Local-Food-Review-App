@@ -77,7 +77,7 @@ export function ProfilePage({
 
   if (isBusinessUser) {
     return (
-      <div className="min-h-screen bg-[#fffef5] pb-24">
+      <div className="min-h-screen bg-[#fffef5] pb-20">
         {/* Header */}
   <div className="bg-[#6b8e6f] bg-gradient-to-br from-[#6b8e6f] to-[#8fa893] pt-8 pb-12">
           <div className="max-w-md mx-auto px-6">
@@ -251,7 +251,7 @@ export function ProfilePage({
   const darkMode = useDarkMode();
 
   return (
-    <div className="min-h-screen bg-[#fafaf7] pb-24">
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
       {/* Header */}
   <div className="bg-gradient-to-br from-[#6b8e6f] via-[#7a9a7e] to-[#8fa893] pt-8 pb-14">
         <div className="max-w-md mx-auto px-6">

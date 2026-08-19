@@ -68,7 +68,7 @@ export function HomePage({ onProductClick, userName = "회원", favorites, onTog
   ];
 
   return (
-    <div className="min-h-screen bg-[#fffef5] pb-24">
+    <div className="min-h-screen bg-[#fffef5] pb-20">
       {/* Sticky Header */}
       <div className="sticky top-0 z-30 bg-[#fffef5]/95 backdrop-blur-md">
         <div className="max-w-md mx-auto px-5 pt-4 pb-2 flex items-center justify-between">

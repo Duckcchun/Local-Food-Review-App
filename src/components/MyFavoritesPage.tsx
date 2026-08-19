@@ -1,5 +1,6 @@
 import { ArrowLeft, Heart } from "lucide-react";
 import { ProductCard } from "./ProductCard";
+import { EmptyState } from "./common/EmptyState";
 import type { Product } from "../data/mockData";
 
 interface MyFavoritesPageProps {
@@ -11,7 +12,7 @@ interface MyFavoritesPageProps {
 
 export function MyFavoritesPage({ onBack, favorites, onProductClick, onToggleFavorite }: MyFavoritesPageProps) {
   return (
-    <div className="min-h-screen bg-[#fafaf7] pb-24">
+    <div className="min-h-screen bg-[#fafaf7] pb-20">
       {/* Header */}
       <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-10 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
         <div className="max-w-md mx-auto px-5 h-14 flex items-center justify-between">
@@ -46,21 +47,13 @@ export function MyFavoritesPage({ onBack, favorites, onProductClick, onToggleFav
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 mx-auto mb-5 bg-gray-50 rounded-2xl flex items-center justify-center">
-              <span className="text-3xl">💛</span>
-            </div>
-            <h3 className="text-gray-800 text-base font-semibold mb-2">찜한 체험단이 없어요</h3>
-            <p className="text-sm text-gray-400 mb-6">
-              마음에 드는 체험단을 찜해보세요
-            </p>
-            <button
-              onClick={onBack}
-              className="bg-[#f5a145] text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-[#e89535] active:scale-[0.98] transition-all shadow-sm"
-            >
-              체험단 둘러보기
-            </button>
-          </div>
+          <EmptyState
+            icon="💛"
+            title="찜한 체험단이 없어요"
+            description="마음에 드는 체험단을 찜해보세요"
+            actionLabel="체험단 둘러보기"
+            onAction={onBack}
+          />
         )}
       </div>
     </div>

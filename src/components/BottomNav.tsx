@@ -14,6 +14,9 @@ export function BottomNav({ activeTab, onTabChange, userType }: BottomNavProps) 
     return (
       <button
         onClick={() => onTabChange(tab)}
+        aria-label={label}
+        aria-current={isActive ? "page" : undefined}
+        role="tab"
         className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5 relative active:scale-95 transition-all duration-150"
       >
         {isActive && (
@@ -25,6 +28,7 @@ export function BottomNav({ activeTab, onTabChange, userType }: BottomNavProps) 
             fill={isActive ? "#6b8e6f" : "none"}
             stroke={isActive ? "#6b8e6f" : "#9ca3af"}
             strokeWidth={isActive ? 2.2 : 1.8}
+            aria-hidden="true"
           />
         </div>
         <span className={`text-[10px] leading-tight transition-colors duration-200 ${isActive ? "font-bold text-[#6b8e6f]" : "font-medium text-gray-400"}`}>
@@ -35,8 +39,8 @@ export function BottomNav({ activeTab, onTabChange, userType }: BottomNavProps) 
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 z-50 pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
-      <div className="max-w-md mx-auto h-16 flex items-stretch">
+    <nav aria-label="주요 탐색" className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 z-50 pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
+      <div className="max-w-md mx-auto h-16 flex items-stretch" role="tablist">
         <NavButton tab="home" icon={Home} label="홈" />
         {!isBusiness && <NavButton tab="review" icon={FileText} label="리뷰" />}
         <NavButton tab="profile" icon={User} label="MY" />
