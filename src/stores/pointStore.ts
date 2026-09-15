@@ -16,10 +16,14 @@ interface PointState {
 
   // Business logic
   earnPoints: (amount: number, description: string, category?: string) => void;
+  spendPoints: (amount: number, description: string, category?: string) => void;
   purchaseProduct: (product: PointProduct, userEmail: string) => void;
   checkLevelUp: () => void;
   initFromLocalStorage: (userEmail?: string) => void;
   persistToLocalStorage: (userEmail?: string) => void;
+  // Aliases (storage) — 테스트/외부 호출 호환용
+  saveToStorage: (userEmail?: string) => void;
+  loadFromStorage: (userEmail?: string) => void;
   reset: () => void;
 }
 
@@ -56,6 +60,28 @@ export const usePointStore = create<PointState>((set, get) => ({
     });
 
     // Check level up
+    get().checkLevelUp();
+  },
+
+  spendPoints: (amount, description, category) => {
+    const { userPoints, pointTransactions } = get();
+    const newPoints = Math.max(0, userPoints - amount);
+
+    const transaction: PointTransaction = {
+      id: `trans-${Date.now()}`,
+      type: "spend",
+      amount,
+      description,
+      date: new Date().toLocaleString('ko-KR'),
+      category,
+    };
+
+    set({
+      userPoints: newPoints,
+      pointTransactions: [transaction, ...pointTransactions],
+    });
+
+    // 포인트 소모로 레벨이 내려갈 수 있으므로 재계산
     get().checkLevelUp();
   },
 
@@ -117,6 +143,10 @@ export const usePointStore = create<PointState>((set, get) => ({
       localStorage.setItem(localKey('pointTransactions', userEmail), JSON.stringify(pointTransactions));
     } catch { /* ignore */ }
   },
+
+  // persistToLocalStorage / initFromLocalStorage 의 별칭 (외부 호출 호환용)
+  saveToStorage: (userEmail) => get().persistToLocalStorage(userEmail),
+  loadFromStorage: (userEmail) => get().initFromLocalStorage(userEmail),
 
   reset: () => {
     set({ userPoints: 0, userLevel: 1, pointTransactions: [] });
