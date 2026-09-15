@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, TrendingUp, Users, FileText, Heart, BarChart3, Calendar, AlertCircle } from "lucide-react";
+import { ChevronLeft, TrendingUp, Users, FileText, Heart, BarChart3, Calendar, AlertCircle, ThumbsUp, ThumbsDown, Lightbulb, Sparkles } from "lucide-react";
 import { Logo } from "./Logo";
 import { StatCard } from "./StatCard";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -7,6 +7,7 @@ import type { Product } from "../data/mockData";
 import type { Application, Review } from "../App";
 import { calculateBusinessStats, getProductPerformances, getChartData, getPeriodLabel } from "../utils/statsUtils";
 import type { PeriodFilter, ProductPerformance } from "../utils/statsUtils";
+import { extractKeywords, calculateSentiment } from "../utils/reviewAnalytics";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 
 interface BusinessDashboardProps {
@@ -33,6 +34,10 @@ export function BusinessDashboard({
   const stats = calculateBusinessStats(products || [], applications || [], businessReviews || [], period);
   const performances = getProductPerformances(products || [], applications || [], businessReviews || []);
   const chartData = getChartData(applications || [], businessReviews || [], period);
+
+  // 리뷰 텍스트 분석 (장점/단점 키워드 + 긍정·부정 비중)
+  const { prosKeywords, consKeywords } = extractKeywords(businessReviews, 5);
+  const sentiment = calculateSentiment(businessReviews);
 
   const periods: Array<{ id: PeriodFilter; label: string }> = [
     { id: "week", label: "이번 주" },
@@ -244,6 +249,103 @@ export function BusinessDashboard({
               />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+
+        {/* 리뷰 분석 리포트 */}
+        <div className="bg-white rounded-[1.5rem] p-6 border-2 border-[#d4c5a0] mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles size={20} className="text-[#9d4edd]" />
+            <h3 className="text-[#2d3e2d]">리뷰 분석 리포트</h3>
+          </div>
+          <p className="text-sm text-[#9ca89d] mb-6">
+            {businessReviews.length}개 리뷰의 장점·단점을 분석했어요
+          </p>
+
+          {businessReviews.length === 0 ? (
+            <div className="text-center py-10">
+              <Sparkles size={40} className="mx-auto mb-3 text-[#d4c5a0]" />
+              <p className="text-[#9ca89d] text-sm">리뷰가 쌓이면 분석 리포트가 생성됩니다</p>
+            </div>
+          ) : (
+            <>
+              {/* 긍정 / 부정 비중 */}
+              <div className="mb-6">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-[#6b8e6f] font-medium">😊 긍정 {sentiment.positive}%</span>
+                  <span className="text-[#f5a145] font-medium">부정 {sentiment.negative}% 😐</span>
+                </div>
+                <div className="w-full h-3 rounded-full overflow-hidden flex bg-[#f5f0dc]">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#6b8e6f] to-[#8fa893] transition-all"
+                    style={{ width: `${sentiment.positive}%` }}
+                  />
+                  <div
+                    className="h-full bg-gradient-to-r from-[#f5a145] to-[#e89535] transition-all"
+                    style={{ width: `${sentiment.negative}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* 키워드 TOP */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 자주 언급된 장점 */}
+                <div className="bg-[#e8f5e9] rounded-[1rem] p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ThumbsUp size={16} className="text-[#4a7c59]" />
+                    <h4 className="text-sm font-medium text-[#155724]">고객이 좋아한 점 TOP 5</h4>
+                  </div>
+                  {prosKeywords.length === 0 ? (
+                    <p className="text-xs text-[#9ca89d]">아직 데이터가 부족해요</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {prosKeywords.map((k) => (
+                        <span
+                          key={k.keyword}
+                          className="text-xs px-3 py-1.5 rounded-full bg-white text-[#155724] border border-[#a8d5ba]"
+                        >
+                          {k.keyword} <span className="text-[#6b8e6f]">×{k.count}</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 자주 언급된 단점 */}
+                <div className="bg-[#fff4e0] rounded-[1rem] p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ThumbsDown size={16} className="text-[#e89535]" />
+                    <h4 className="text-sm font-medium text-[#856404]">보완이 필요한 점 TOP 5</h4>
+                  </div>
+                  {consKeywords.length === 0 ? (
+                    <p className="text-xs text-[#9ca89d]">아직 데이터가 부족해요</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {consKeywords.map((k) => (
+                        <span
+                          key={k.keyword}
+                          className="text-xs px-3 py-1.5 rounded-full bg-white text-[#856404] border border-[#f5c877]"
+                        >
+                          {k.keyword} <span className="text-[#f5a145]">×{k.count}</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 요약 코멘트 */}
+              <div className="mt-4 flex items-start gap-2 bg-[#f3e8ff] rounded-[1rem] p-4">
+                <Lightbulb size={18} className="text-[#9d4edd] shrink-0 mt-0.5" />
+                <p className="text-sm text-[#6b4899]">
+                  {sentiment.positive >= 60
+                    ? "전반적으로 긍정적인 평가예요. 자주 언급된 장점을 마케팅 포인트로 활용해보세요."
+                    : sentiment.negative >= 60
+                    ? "보완이 필요한 점이 자주 언급되고 있어요. 위 키워드를 우선 개선해보세요."
+                    : "장단점이 고르게 나뉘어요. 단점 키워드를 개선하면 만족도를 높일 수 있어요."}
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Product Performances */}
